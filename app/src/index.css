@@ -1,0 +1,147 @@
+@import 'tailwindcss';
+
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('./assets/space-grotesk.woff2') format('woff2');
+  font-weight: 300 700;
+  font-display: swap;
+}
+
+/*
+ * Monochrome design system (requirements §6.5):
+ * near-black ground, 4-step gray ramp, hairline borders, one accent used
+ * exactly once (the Charlatan reveal at the verdict).
+ */
+@theme {
+  --color-paper: #0a0a0a;
+  --color-ink: #fafafa;
+  --color-g1: #1c1c1c;
+  --color-g2: #262626;
+  --color-g3: #3d3d3d;
+  --color-g4: #737373;
+  --color-g5: #a3a3a3;
+  --color-accent: #ff3d8a;
+  --font-sans: 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  overscroll-behavior: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Utility voice: tiny uppercase labels with wide tracking. */
+.eb {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-g4);
+}
+.eb2 {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-g5);
+}
+
+.hairline {
+  border-top: 1px solid var(--color-g2);
+}
+
+/* Primary action: loud bordered button, >=56px target. */
+.cta {
+  display: block;
+  width: 100%;
+  min-height: 56px;
+  border: 1px solid var(--color-ink);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--color-ink);
+  text-align: center;
+  padding: 16px 12px;
+  font-family: inherit;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  font-size: 14px;
+  text-transform: uppercase;
+}
+.cta:disabled {
+  border-color: var(--color-g3);
+  color: var(--color-g3);
+}
+.cta-quiet {
+  border-color: var(--color-g3);
+  color: var(--color-g5);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+}
+
+/* Inverted block: the loudest thing monochrome can say (2nd-tie warning). */
+.invert {
+  background: var(--color-ink);
+  color: var(--color-paper);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: 1px solid var(--color-g2);
+  border-radius: 10px;
+  padding: 12px 14px;
+  min-height: 56px;
+  font-size: 15px;
+}
+
+input.field {
+  width: 100%;
+  min-height: 56px;
+  border: 1px solid var(--color-ink);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--color-ink);
+  padding: 14px;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 700;
+  outline: none;
+}
+input.field::placeholder {
+  color: var(--color-g3);
+  font-weight: 400;
+}
+input.quietfield {
+  border-color: var(--color-g3);
+}
+
+.striped-cover {
+  background: repeating-linear-gradient(-45deg, #0a0a0a 0 8px, #111111 8px 10px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
