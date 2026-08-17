@@ -151,10 +151,10 @@ flowchart TD
 | Component | Notes |
 |---|---|
 | Cover panel (resting state) | Full-bleed; swipe up **and hold** to expose, snaps shut on release; Motion-driven physics |
-| Secret word | Massive heavy type; identical layout for civilian & Charlatan; visible only while cover held |
+| Secret word | Massive heavy type; identical layout for civilian & Charlatan; visible only while cover held; positioned in the lower half of the screen, directly above the role button (the holding thumb's home zone) |
 | Whisper banner (conditional) | "psst, the word is X" alongside the word when a Whisper targets this player |
 | "Hold to check your role" button | On the covered state, identical for every player; long-press with ~800 ms visible fill (an affordance, not a timer) |
-| Role card | Visible only while held, snaps away on release; identical geometry & dwell for both roles |
+| Role card | Visible only while held, snaps away on release; grows upward from the held role button so targets sit directly above the thumb; identical geometry & dwell for both roles |
 | Release targets on role card | Charlatan: "burn a Whisper" target (only while eligible **and** the round's single Whisper is unburned — its absence is an accepted, deliberate tell) — commit by releasing on it; Civilian: same-position targets that simply close the card |
 | Slide-to-pass control | Exits to next handoff / clue phase |
 

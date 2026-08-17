@@ -95,12 +95,14 @@
   .cover .big { font-size: 14px; font-weight: 800; letter-spacing: .06em; }
   .cover .sub { font-size: 11px; color: #737373; max-width: 22ch; line-height: 1.5; }
   .cover.folded { flex: 0 0 54px; justify-content: flex-start; padding: 8px; }
-  .wordstage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; }
+  .wordstage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 14px; gap: 10px; text-align: center; }
   .theword { font-size: 54px; font-weight: 900; letter-spacing: -.02em; }
   .holdnote { font-size: 10px; color: #737373; letter-spacing: .08em; text-transform: uppercase; }
   .rolebtn { border: 1px solid #3D3D3D; border-radius: 10px; padding: 14px 12px; text-align: center; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: #A3A3A3; position: relative; overflow: hidden; }
   .rolebtn .fill { position: absolute; inset: 0 auto 0 0; width: 0; background: #1C1C1C; }
   .rolebtn span { position: relative; }
+  .rolebtn.held { border-color: #FAFAFA; color: #FAFAFA; }
+  .rolebtn.held .fill { width: 100%; }
   .slide { border: 1px solid #262626; border-radius: 999px; padding: 12px; display: flex; align-items: center; gap: 10px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #A3A3A3; }
   .slide .knob { width: 26px; height: 26px; border-radius: 999px; background: #FAFAFA; color: #0A0A0A; display: flex; align-items: center; justify-content: center; font-weight: 900; }
   .whisper { border: 1px solid #3D3D3D; border-radius: 10px; padding: 10px 12px; font-size: 12px; text-align: left; display: flex; gap: 8px; align-items: baseline; }
@@ -250,7 +252,9 @@
         <div class="cap">
           <h4>2 · Word — held open</h4>
           <p>The cover folds to a strip; the word lands at maximum size and weight — the app's
-          typographic hero. Everything else recedes while holding. Release: instant snap shut.</p>
+          typographic hero — <em>low on the screen, right above the role button</em>, inside the
+          holding thumb's home zone. Everything else recedes while holding. Release: instant snap
+          shut.</p>
         </div>
       </div>
 
@@ -284,23 +288,25 @@
           <div style="font-size:20px;font-weight:900;margin-top:2px" class="dim">TOM</div>
           <div style="height:12px"></div>
           <div class="cover dim" style="flex:0 0 90px"><div class="grab"></div></div>
-          <div class="grow" style="display:flex;flex-direction:column;justify-content:center">
-            <div class="card">
+          <div class="grow" style="display:flex;flex-direction:column;justify-content:flex-end;gap:8px">
+            <div class="card" style="gap:8px">
               <div class="eb2">Jouw rol</div>
               <div class="role">CHARLATAN</div>
-              <div style="font-size:11px;color:#737373;line-height:1.5">je blind-bonus vervalt — kijken kost de verdubbelaar</div>
-              <div class="zone">Sleep hierheen &amp; laat los<br><b style="letter-spacing:.02em">FLUISTER</b> · 1 kaart over</div>
-              <div class="zone" style="border-style:solid;border-color:#262626">laat elders los om te sluiten</div>
+              <div style="font-size:11px;color:#737373;line-height:1.5">je blind-bonus vervalt — kijken kost de verdubbelaar · laat elders los om te sluiten</div>
+              <div class="zone">Sleep &amp; laat hier los<br><b style="letter-spacing:.02em">FLUISTER</b> · 1 kaart over</div>
             </div>
+            <div class="rolebtn held"><div class="fill"></div><span>Rol zichtbaar — hou vast</span></div>
           </div>
+          <div style="height:10px"></div>
           <div class="slide dim"><span class="knob">→</span> Schuif door</div>
         </div>
         <div class="cap">
           <h4>4 · Role card — held, Charlatan</h4>
-          <p>Open only while the long-press is held. The Whisper commits by sliding the touching thumb
-          onto the dashed target and releasing there — release anywhere else closes the card (§3.3).
-          The civilian card shows the same two targets; both just close. The target is absent once the
-          round's Whisper is burned — the accepted tell (§3.6).</p>
+          <p>The card grows upward from the held role button, so the dashed Whisper target sits
+          <em>directly above the thumb</em>: hold → one thumb-width slide up → release-to-commit
+          (§3.3). Releasing anywhere else closes the card. The civilian card shows a same-position
+          target that just closes; the target is absent once the round's Whisper is burned — the
+          accepted tell (§3.6).</p>
         </div>
       </div>
     </div>

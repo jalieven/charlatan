@@ -163,6 +163,11 @@ secret is only-visible-while-touching, and every commitment is a release-on-targ
   **slides the already-touching thumb onto the "burn a Whisper" target and releases there**
   to arm it — one continuous hold → drag → release-to-commit. Releasing anywhere else just
   closes the card; nothing happens. No second hand, ever.
+- **Thumb economics:** all secret UI lives in the holding thumb's home zone at the bottom of
+  the screen. The revealed word renders **in the lower half of the screen, directly above the
+  role button**; the role card grows upward from that same button, with the **Whisper release
+  target directly above the thumb** — so hold, drag, and release-to-commit is one minimal,
+  one-handed movement.
 - **Choreography parity:** the civilian role card shows release targets of identical size
   and position (all of which simply close the card), so an onlooker reading thumb movement
   and dwell time cannot distinguish the two roles.
