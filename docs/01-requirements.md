@@ -1,11 +1,10 @@
 # Charlatan — Full Requirements
 
-> Derived from the original product notes and three completed rounds of product-owner decisions
-> (OQ-1 … OQ-21, OQ-22 … OQ-32, and OQ-27 / OQ-33 … OQ-39; all folded into this document and
-> the register files removed). The role formerly called *Imposter* is named **Charlatan**
-> everywhere. Statements marked `⚠️ OQ-n` (n ≥ 40) are interpretations or proposals awaiting
-> validation; each links to the fourth-pass register in
-> [06-open-questions.md](./06-open-questions.md).
+> Derived from the original product notes and **four completed rounds of product-owner
+> decisions** (OQ-1 … OQ-41; all folded into this document, all register files removed). The
+> de-ambiguation process is closed: this specification is **implementation-ready**. The role
+> formerly called *Imposter* is named **Charlatan** everywhere. Remaining soft spots are
+> playtest questions, not spec questions — see Appendix C.
 
 ---
 
@@ -214,9 +213,9 @@ joiners receive it on joining, and a same-name rejoiner gets their remaining car
   later player to target).
 - **At most one Whisper fires per round**, first-come, first-served in reveal order: once any
   Charlatan burns a card, the Whisper target no longer appears on later role cards that
-  round. `⚠️ OQ-41` (a later-revealing, peeked Charlatan who holds an unspent card, is not
-  last, and still sees no Whisper target can deduce their unknown partner already whispered —
-  an accepted micro-leak, see the register)
+  round. (Accepted micro-leak: a later-revealing, peeked Charlatan who holds an unspent card,
+  is not last, and still sees no Whisper target can deduce their unknown partner already
+  whispered. Deliberately kept — it is part of what makes the Whisper strong.)
 - **Effect:** a **uniformly random player among those who reveal after the Charlatan** gets
   an extra fake message on their reveal screen — *"psst, the word is X"* — where X is a wrong
   word drawn from the word pair's curated distractor list (Appendix A). That player now
@@ -322,17 +321,25 @@ The app is **one phase state machine**; the full phase set is:
    either Charlatans win or one clue cycle + revote.
 7. **Guess flow.** The caught Charlatan types one guess at the real word; the app resolves
    steal (round ends) or no steal (continue or civilian win per §3.7).
-8. **Result flow.** The payoff, staged as **five acts of progressive disclosure** — each
-   advanced by a tap, so the phone-holder narrates it to the table like a game-show host
-   instead of everyone squinting at a wall of data: `⚠️ OQ-40`
+8. **Result flow.** The payoff, staged as **three acts of progressive disclosure** — one act
+   on screen at a time, advanced by tap, so the phone-holder narrates it to the table like a
+   game-show host instead of everyone squinting at a wall of data:
    - **Act 1 — The verdict:** who won, huge type, and the Charlatan identities — the app's
-     single accent-color moment.
-   - **Act 2 — The words:** real word vs decoy word, side by side.
-   - **Act 3 — The secrets:** the steal guess (judge the near-miss), who peeked, blind
-     doubles earned, and the Whisper — who burned it, on whom, and the fake word.
-   - **Act 4 — The replay:** every clue in order with vote outcomes — the shareable,
-     screenshot-friendly moment; scrolls internally.
-   - **Act 5 — The damage:** per-player point deltas → Continue to scoreboard.
+     single accent-color moment. The loudest beat first; everything after is explanation.
+     Two drill-ins sit **behind buttons on this page**: **The words** (real vs decoy, side by
+     side — the "OHHH *that's* why you said 'beans'" beat) and **The replay** (every clue in
+     order, grouped by cycle, annotated with vote outcomes — the shareable,
+     screenshot-friendly moment; scrolls internally; closing returns to the verdict).
+   - **Act 2 — The secrets:** the steal guess (judge the near-miss), who peeked, blind
+     doubles earned, and the Whisper — who burned it, on whom, and the fake word. The "you
+     did THAT on no information?!" beats.
+   - **Act 3 — The damage:** per-player point deltas → Continue to scoreboard.
+
+   Mechanics: tap anywhere (or a ≥56 px Continue) advances; a **three-dot progress strip**
+   shows position; back-swiping to a previous act is allowed — everything on S8 is public,
+   so no privacy machinery is needed; each act fits one screen without scrolling (the replay
+   drill-in scrolls internally); one motion accent per act, per the "let one thing move"
+   design rule.
 9. **Scoreboard flow.** Cumulative session scores; **Next round** (back to Assign);
    **Edit players** — add or remove players between rounds (re-validate 4–12, re-derive
    Charlatan scaling per §2.1; new players join the scoreboard at 0; leavers' rows gray out
@@ -359,7 +366,7 @@ accepted, deliberate trade-off — it matches the app's trust model.
 | S5 | Vote ballot | vote | Private single-choice ballot |
 | S6 | Verdict | verdict | Tie counter & warning, or ejection + open role announcement |
 | S7 | Charlatan's guess | guess | The steal attempt |
-| S8 | Round result & replay | result | Five-act progressive reveal + replay |
+| S8 | Round result & replay | result | Three-act progressive reveal; words & replay behind buttons on the verdict |
 | S9 | Scoreboard | scoreboard | Cumulative scores between rounds; roster editing |
 
 Component-level detail for every screen is in [02-flows.md §5](./02-flows.md).
@@ -517,9 +524,28 @@ first clue reliably outs the Charlatan or where the Charlatan can never be caugh
 
 ---
 
-## Appendix B — Assumption register
+## Appendix B — Decision history
 
-Three decision passes are complete: OQ-1 … OQ-21, OQ-22 … OQ-32, and OQ-27 / OQ-33 … OQ-39
-were decided by the product owner and folded into this document; all three register files
-were removed. Every `⚠️ OQ-n` marker above (n ≥ 40) corresponds to an entry in the fourth-pass
-register, [06-open-questions.md](./06-open-questions.md).
+Four decision passes are complete and closed: OQ-1 … OQ-21 (first pass), OQ-22 … OQ-32
+(second pass), OQ-27 / OQ-33 … OQ-39 (third pass), and OQ-40 … OQ-41 (fourth pass). Every
+item was decided by the product owner and folded into this document; all register files were
+removed and the de-ambiguation process is finished. No `⚠️ OQ-n` markers remain — this
+specification is the single source of truth.
+
+---
+
+## Appendix C — Playtest watch-list
+
+Not spec gaps — behaviors to observe once the game is in hands:
+
+- **Whisper cascade under parity:** a Whispered civilian who mistrusts their real word tends
+  to get ejected — with eliminations plus the parity threshold, one Whisper can cascade into
+  a Charlatan win. Deliberately strong (the micro-leak in §3.6 is likewise accepted as part
+  of the Whisper's strength); confirm it feels exciting rather than unfair.
+- **Charlatan count clamp vs scaling defaults:** the clamp (1…⌊players/3⌋) allows up to 4
+  Charlatans at 12 players while the auto default never exceeds 2; a 4-Charlatan round ends
+  at 4v4 parity. Legal but barely tested — consider labeling counts above the auto default
+  as "experimental" in the setup UI.
+- **Blind-double asymmetry on steals:** a blind hidden partner banks +8 off a teammate's +3
+  steal — the highest payout in the game for a player who did nothing knowingly. Explicitly
+  wanted; keep an eye on it when tuning point values.

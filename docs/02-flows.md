@@ -1,8 +1,8 @@
 # Charlatan — Flow Diagrams & Screen Components
 
 Diagrams are Mermaid and render directly on GitHub. Screen identifiers (S1–S9) match
-[01-requirements.md §5](./01-requirements.md#5-screens). `OQ-n` markers reference the
-fourth-pass register in [06-open-questions.md](./06-open-questions.md).
+[01-requirements.md §5](./01-requirements.md#5-screens). All four decision passes are folded
+in — this document carries no open questions.
 
 ---
 
@@ -64,11 +64,11 @@ flowchart TD
     Threshold -->|"yes — threshold reached"| ResultChar["S8 · Result<br/>CHARLATANS WIN"]
     Threshold -->|no| Eliminate2["Eliminated: no more clues/votes"] --> ExtraClue
 
-    ResultTies --> Replay["S8 · Replay<br/>roles, peeks, blind doubles, Whisper,<br/>every clue in order + vote history"]
-    ResultSteal --> Replay
-    ResultCiv --> Replay
-    ResultChar --> Replay
-    Replay --> Score["S9 · Scoreboard (see diagram 1)"]
+    ResultTies --> Acts["S8 · Three acts, advanced by tap:<br/>1 Verdict (words & replay behind buttons)<br/>2 Secrets · 3 Damage"]
+    ResultSteal --> Acts
+    ResultCiv --> Acts
+    ResultChar --> Acts
+    Acts --> Score["S9 · Scoreboard (see diagram 1)"]
 ```
 
 ---
@@ -87,7 +87,7 @@ flowchart TD
 
     Covered -->|"long-press 'check your role'<br/>(~800 ms visible fill — no accidental peeks)"| Card["ROLE CARD visible while held<br/>identical geometry for both roles"]
     Card -->|"release off-target —<br/>card snaps away, nothing happens"| Covered
-    Card -->|"Charlatan only, card unspent, not last to reveal,<br/>round's Whisper not yet burned (OQ-41):<br/>slide held thumb onto 'burn a Whisper'<br/>target and RELEASE THERE"| Armed["Whisper armed:<br/>uniform-random later revealer<br/>(max 1 Whisper per round,<br/>first-come in reveal order)"]
+    Card -->|"Charlatan only, card unspent, not last to reveal,<br/>round's Whisper not yet burned:<br/>slide held thumb onto 'burn a Whisper'<br/>target and RELEASE THERE"| Armed["Whisper armed:<br/>uniform-random later revealer<br/>(max 1 Whisper per round,<br/>first-come in reveal order)"]
     Card -->|"civilian card: same-position targets<br/>all simply close the card"| Covered
     Armed --> Covered
 
@@ -155,7 +155,7 @@ flowchart TD
 | Whisper banner (conditional) | "psst, the word is X" alongside the word when a Whisper targets this player |
 | "Hold to check your role" button | On the covered state, identical for every player; long-press with ~800 ms visible fill (an affordance, not a timer) |
 | Role card | Visible only while held, snaps away on release; identical geometry & dwell for both roles |
-| Release targets on role card | Charlatan: "burn a Whisper" target (only while eligible **and** the round's single Whisper is unburned, OQ-41) — commit by releasing on it; Civilian: same-position targets that simply close the card |
+| Release targets on role card | Charlatan: "burn a Whisper" target (only while eligible **and** the round's single Whisper is unburned — its absence is an accepted, deliberate tell) — commit by releasing on it; Civilian: same-position targets that simply close the card |
 | Slide-to-pass control | Exits to next handoff / clue phase |
 
 ### S4 · Clue entry + Ledger
@@ -193,20 +193,18 @@ flowchart TD
 | Guess input | Typed; case-insensitive, trimmed, singular/plural tolerance |
 | Submit button | One attempt only |
 
-### S8 · Round result + replay — five acts of progressive disclosure (OQ-40)
+### S8 · Round result + replay — three acts of progressive disclosure
 
-One act on screen at a time; a tap (or ≥56 px Continue) advances; a 5-dot progress strip
-shows position; back-swipe between acts is allowed (everything here is public). Each act fits
-one screen without scrolling — except the replay, which scrolls internally. One motion accent
-per act.
+One act on screen at a time; a tap (or ≥56 px Continue) advances; a **three-dot progress
+strip** shows position; back-swipe between acts is allowed (everything here is public). Each
+act fits one screen without scrolling — the replay drill-in scrolls internally. One motion
+accent per act. The phone-holder narrates like a game-show host, act by act.
 
 | Act | Content | Notes |
 |---|---|---|
-| 1 · The verdict | Winner banner + Charlatan identities | The **one accent-color moment** of the app; Charlatan names in the accent, huge type |
-| 2 · The words | Real word vs decoy word, side by side | Massive weight-contrast typography |
-| 3 · The secrets | Steal guess (judge near-misses), who peeked, blind doubles, Whisper: who → whom + fake word | The "you did THAT on no information?!" beats live here |
-| 4 · The replay | Every clue in order, grouped by cycle, with vote outcomes | The shareable, screenshot-friendly moment; internal scroll |
-| 5 · The damage | Per-player point deltas this round | Steal: +3, blind hidden partner +8; then Continue → scoreboard |
+| 1 · The verdict | Winner banner + Charlatan identities; **two drill-in buttons: "The words" and "The replay"** | The **one accent-color moment** of the app; Charlatan names in the accent, huge type. Words drill-in: real vs decoy side by side ("OHHH *that's* why you said 'beans'"). Replay drill-in: every clue in order, grouped by cycle, annotated with vote outcomes — the shareable, screenshot-friendly moment, internal scroll; closing returns to the verdict |
+| 2 · The secrets | Steal guess (judge near-misses), who peeked, blind doubles, Whisper: who → whom + fake word | The "you did THAT on no information?!" beats live here |
+| 3 · The damage | Per-player point deltas this round | Steal: +3, blind hidden partner +8; then Continue → scoreboard |
 
 ### S9 · Scoreboard
 | Component | Notes |
