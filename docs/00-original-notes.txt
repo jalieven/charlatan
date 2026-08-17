@@ -1,0 +1,68 @@
+Imposter app requirements:
+--------------------------
+
+# Features
+
+Pass-and-play (strongly recommended first)
+
+No backend, no accounts, no networking, no reconnection logic. The entire game is React state in a single component tree, deployed as a static site. You can have it working in a weekend.
+
+Flow: enter names → assign roles → hand the phone around, each player taps to reveal their word → discussion and clues input by all users → vote → reveal.
+
+The one part that needs real care is the reveal screen. Use hold-to-reveal (word shows only while a finger is down) rather than tap-to-toggle, and put a sliding "next" button between players so nobody picks up the phone with the last person's word still showing. This single detail is most of the difference between a version people keep playing and one they abandon.
+
+Rules decisions that matter more than the code
+
+Imposter word mode beats blank mode. If the imposter gets a related word rather than nothing, they may not know they're the imposter — which is far more interesting than a player who knows they're bluffing from turn one.
+
+Word pairs are the actual product. They need to be close enough to be confusable but far enough apart that clues diverge: coffee/tea, beach/desert, guitar/violin. Hand-curate a couple hundred; auto-generated lists produce pairs that are either identical or absurdly obvious. Budget real time here. So generate a perfect prompt to generate a 200 combinations.
+
+Randomize who speaks first each round — going first is a genuine disadvantage, and it shouldn't always fall on the same person.
+
+Give the caught imposter a guess. When voted out, they get one chance to name the real word and steal the win. It keeps them engaged and adds a good beat to the ending.
+
+Scale imposters with player count (1 for 4–7, 2 for 8+), and let the host override it.
+
+Extra features:
+- The score of all previous rounds is displayed between each round.
+- The imposter secretly picks a risk level before the round: with "hard mode" they get no related word at all, but if they survive, they earn double points. Self-selected difficulty with a visible-only-at-reveal wager creates great "you did THAT on no information?!" moments.
+- Post-round dossiers. The app tracks stats across sessions (stored locally): "Sarah has survived 8 of 9 imposter rounds," "Tom has voted wrong 6 times in a row." Persistent reputations turn a one-off party game into a running group narrative — and reputations become in-game information ("it's ALWAYS Sarah").
+- Clue ledger. Players type their one-word clue into the phone before saying it aloud. Now the app has data: at the reveal, it can replay the round — "here's every clue in order, here's where the room's suspicion turned." That post-game replay screen is the shareable moment. All typed words of the players are always visible.
+- There shouldn't be a timer. When each player has said/typed 2 clues it is in general clear who the imposter might be. This 2 clues per user can be modified when starting the game.
+- Voting after 2 rounds should be individually (passing phone). After everybody has voted -> if tie: continue clues, if mayority voted one user: end screen is shown with result or if there are more imposters: back to clues flow.
+- The whisper. Once per game, the imposter can burn their one ability: the next player's reveal screen shows a fake message — "psst, the word is X" with a wrong word. That player now doesn't know if their original word or the whispered one is real. High-risk sabotage tool.
+
+# Implementation
+
+Vite + React + Tailwind. That's the whole stack, and it's genuinely the right answer here rather than a default.
+
+Skip Next.js. You have no server, no data fetching, no SEO surface, and no routes — the entire app is one phase state machine (setup → assign → reveal → discuss → vote → result). Next's whole value proposition is server rendering and routing, so you'd be paying its complexity tax for nothing. Vite gives you instant HMR and a static dist/ folder you can drop on Cloudflare Pages, Netlify, or Vercel for free.
+
+For the rest:
+
+Tailwind — for a monochrome design you're mostly composing spacing, borders, and type scale, which is exactly what utility classes are good at. A CSS-in-JS library buys you nothing.
+Motion (the library formerly branded Framer Motion) — worth the bundle. The hold-to-reveal interaction and phase transitions are the app's entire feel, and hand-rolling those in CSS gets miserable fast. AnimatePresence for phase swaps is the main thing you want.
+No router. useState for the phase. Adding React Router here means the back button can drop someone into a reveal screen mid-round.
+No component library. shadcn/ui is tempting, but you have maybe six screens and one dialog. Its defaults will also fight your aesthetic — you'd spend more time stripping its styling than writing your own buttons.
+Zustand only if prop drilling starts to hurt. For a single game object, useReducer is probably enough.
+
+Add vite-plugin-pwa near the end. Party games get played in basements and bars with bad signal, and "add to home screen, works offline" is a real quality-of-life win for ~10 lines of config.
+
+Making black-and-white actually look slick
+
+The trap is that monochrome with default styling just reads as unstyled. What carries it:
+
+Typography does all the work. Pick one distinctive face and lean on extreme weight contrast — the secret word at massive size in a heavy weight, labels tiny and uppercase with wide letter-spacing. Something geometric like Space Grotesk, or a tight grotesque like Inter Tight, will look intentional in a way system-ui won't.
+
+Use near-black, not #000. Around 
+#0A0A0A with text at 
+#FAFAFA reads as designed; pure black on pure white reads as a browser default. Then build a small gray ramp (say 4–5 steps) and stick to it religiously.
+
+Borders over shadows. Shadows need color to look good. Thin hairline borders and generous negative space give you the crisp editorial feel that monochrome does well.
+
+Let one thing move. Since you have no color to direct attention, motion becomes your emphasis tool — a subtle scale on the revealed word, a progress ring on the discussion timer.
+
+One accent color, used once. A single hot color reserved exclusively for the imposter reveal is more striking against pure monochrome than any full palette would be. Optional, but it makes the payoff moment land.
+
+Also: tap targets at 56px minimum and text large enough to read at arm's length. The phone is getting passed around a room, not held six inches from one face.
+
