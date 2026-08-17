@@ -5,14 +5,14 @@ players (the **Charlatans**) receive a different secret word than everyone else 
 in during clue-giving without knowing — at least at first — that they are the odd one out.
 
 This folder is the requirements package derived from the original product notes
-(`charlatan.txt`) plus two completed rounds of product-owner decisions. It is meant to be
+(`charlatan.txt`) plus three completed rounds of product-owner decisions. It is meant to be
 validated **before implementation starts**.
 
 | Document | Purpose |
 |---|---|
-| [01-requirements.md](./01-requirements.md) | Full lingual + technical description of the game, every flow, every screen, and the technology decisions. Includes all decisions from both passes. |
+| [01-requirements.md](./01-requirements.md) | Full lingual + technical description of the game, every flow, every screen, and the technology decisions. Includes all decisions from all passes. |
 | [02-flows.md](./02-flows.md) | Flow diagrams (session level, round level, reveal micro-flow, vote resolution) and the screen-by-screen component inventory. |
-| [05-open-questions.md](./05-open-questions.md) | The **third-pass** register: remaining and newly found ambiguities after incorporating both decision passes, each with a proposed resolution. |
+| [06-open-questions.md](./06-open-questions.md) | The **fourth-pass** register: what remains after three decision passes — two items plus a watch-list. |
 
 ## Document history
 
@@ -22,18 +22,22 @@ validated **before implementation starts**.
   All items were decided — including the one-thumb reveal grammar (OQ-22), the parity
   threshold change from the watch-list, and per-player Whisper cards — and folded in; the
   file was removed.
-- **Third pass:** the analysis was re-run again, producing
-  [05-open-questions.md](./05-open-questions.md) (OQ-33 … OQ-39, plus OQ-27 carried over with
-  the requested explanation). Numbering continues across passes so no reference is ever
-  ambiguous.
+- **Third pass:** the analysis was re-run again, producing `05-open-questions.md`
+  (OQ-33 … OQ-39, plus OQ-27 carried over with the requested explanation). All items were
+  decided — including peek disclosure, the final parity threshold, the one-Whisper-per-round
+  cap, and the blind double surviving a teammate's steal — and folded in; the file was
+  removed.
+- **Fourth pass:** the analysis was re-run once more, producing
+  [06-open-questions.md](./06-open-questions.md) (OQ-40 … OQ-41 plus a watch-list). The spec
+  is largely converged. Numbering continues across passes so no reference is ever ambiguous.
 
 ## How to read this package
 
 1. Read **01-requirements.md** top to bottom — anything marked `⚠️ OQ-n` is an interpretation
-   made while incorporating the decisions, cross-referenced to the third-pass register.
+   or proposal awaiting validation, cross-referenced to the fourth-pass register.
 2. Validate the game logic visually against the diagrams in **02-flows.md**.
-3. Go through **05-open-questions.md** and decide each item — start with OQ-27 (peek
-   disclosure, explained there) and OQ-33 (confirming the parity threshold).
+3. Go through **06-open-questions.md** — validate the five-act result screen (OQ-40) and the
+   accepted Whisper micro-leak (OQ-41), and skim the watch-list.
 
 ## Naming
 

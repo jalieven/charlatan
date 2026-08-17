@@ -1,11 +1,11 @@
 # Charlatan — Full Requirements
 
-> Derived from the original product notes and two completed rounds of product-owner decisions
-> (first pass OQ-1 … OQ-21, second pass OQ-22 … OQ-32; both registers are folded into this
-> document and their files removed). The role formerly called *Imposter* is named **Charlatan**
-> everywhere. Statements marked `⚠️ OQ-n` (n ≥ 33, plus the carried-over OQ-27) are
-> interpretations made while incorporating the decisions; each links to the third-pass register
-> in [05-open-questions.md](./05-open-questions.md).
+> Derived from the original product notes and three completed rounds of product-owner decisions
+> (OQ-1 … OQ-21, OQ-22 … OQ-32, and OQ-27 / OQ-33 … OQ-39; all folded into this document and
+> the register files removed). The role formerly called *Imposter* is named **Charlatan**
+> everywhere. Statements marked `⚠️ OQ-n` (n ≥ 40) are interpretations or proposals awaiting
+> validation; each links to the fourth-pass register in
+> [06-open-questions.md](./06-open-questions.md).
 
 ---
 
@@ -57,9 +57,9 @@ is client-side React state, deployed as a static site, installable as an offline
   player count is re-validated (4–12) and the Charlatan default is re-derived; a manual
   override is kept if still within 1 … ⌊players/3⌋, otherwise it resets to auto.
 - A leaver's score row **stays on the scoreboard, grayed out**, and is restored if they
-  rejoin by the same name. **Names cannot be renamed mid-session** — a rename is a leave plus
-  a join, since the name is the only identity. `⚠️ OQ-34` (whether personal Whisper cards are
-  also restored on rejoin)
+  rejoin by the same name — their **remaining Whisper cards are restored too** (never a fresh
+  allotment). **Names cannot be renamed mid-session** — a rename is a leave plus a join,
+  since the name is the only identity.
 
 ### 2.2 Setup options (Setup screen, §5 S1)
 
@@ -68,9 +68,9 @@ is client-side React state, deployed as a static site, installable as an offline
 | Player names | — | Ordered list, add/remove/reorder; order = seating & pass order. Unique, non-empty names. |
 | Charlatan count | Auto by player count | Host override allowed, clamped to 1 … ⌊players/3⌋. |
 | Clues per player before voting | **2** | Configurable at game start (range 1–4). Voting opens only after this many full clue cycles. |
-| Whisper cards **per player** | **1** | Personal, session-long allotment (§3.6). `⚠️ OQ-34` |
+| Whisper cards **per player** | **1** | Personal, session-long allotment (§3.6). Setup-only — the allotment cannot be changed between rounds; mid-session joiners receive it on joining. |
 | Accent color on/off | On | Single accent color used exclusively for the Charlatan reveal moment (§6.5). |
-| Language | **Dutch** | Dutch (default) or English UI (§6.4). Locale is fixed for the session. `⚠️ OQ-38` |
+| Language | **Dutch** | Dutch (default) or English UI (§6.4). Locale is fixed for the session. |
 
 There is deliberately **no timer of any kind, anywhere in the app**. The game gates on clue
 count and vote outcomes, never on time.
@@ -93,8 +93,11 @@ count and vote outcomes, never on time.
     ("you survived and you never even checked?!").
   - A **Charlatan who peeks** gains knowledge (they can hedge their clues and may use the
     Whisper) but forfeits the blind double.
-- Whether each player peeked is disclosed on the round result screen (required for score
-  transparency). `⚠️ OQ-27`
+- Whether each player peeked is **disclosed on the round result screen** — required for score
+  transparency, and the table meta it creates ("Jan *never* peeks") is a wanted feature. Live
+  observability of the peek gesture — the room seeing *that* someone peeked, never what they
+  saw — is likewise accepted as part of the social game: no mandatory dwell is added to mask
+  it, and peek-bluffing is fair play.
 - **Charlatans are never told who their partner is** — not even after peeking. This is
   intentional: partner anonymity is what makes Whisper friendly fire (§3.6) meaningful and
   keeps multi-Charlatan rounds honest.
@@ -113,8 +116,9 @@ here. The generation prompt is a deliverable of this document: see **Appendix A*
 
 The app ships **one curated list per locale** — Dutch and English. The Dutch list is a
 **separate curation effort, not a translation**: confusability differs per language
-(koffie/thee works; many English pairs won't). A session draws from the active locale's list.
-`⚠️ OQ-38`
+(koffie/thee works; many English pairs won't). A session draws from the active locale's list;
+each locale keeps its own no-repeat draw pool (playing Dutch tonight doesn't burn English
+pairs).
 
 Per round, the app draws one unused pair at random (no repeats within a session), randomly
 decides which of the two words is *real* vs *decoy*, and gives all Charlatans the same decoy
@@ -162,7 +166,7 @@ secret is only-visible-while-touching, and every commitment is a release-on-targ
   closes the card; nothing happens. No second hand, ever.
 - **Choreography parity:** the civilian role card shows release targets of identical size
   and position (all of which simply close the card), so an onlooker reading thumb movement
-  and dwell time cannot distinguish the two roles. `⚠️ OQ-27`
+  and dwell time cannot distinguish the two roles.
 - **Slide-to-pass:** between players there is a **sliding "next" interstitial** (a
   deliberate, non-accidental gesture) so nobody can pick up the phone with the previous
   player's word still showing.
@@ -198,21 +202,25 @@ the player list order from the round's random starting point, skipping eliminate
 
 The Whisper is a high-risk sabotage tool funded by **personal Whisper cards**: each player
 gets the configured allotment (default **1**) for the whole session, spendable only in rounds
-where they are a Charlatan. `⚠️ OQ-34`
+where they are a Charlatan. The allotment is fixed at setup and never changes mid-session;
+joiners receive it on joining, and a same-name rejoiner gets their remaining cards back
+(§2.1).
 
 - **Who:** any current-round Charlatan **who has peeked** (using the Whisper requires knowing
   your role — and peeking forfeits the blind double, which is the ability's price), while
   they still hold an unspent personal card.
 - **When & how:** from the Charlatan's own reveal screen, via the role card's
   release-on-target gesture (§3.3). **Unusable if the Charlatan reveals last** (there is no
-  later player to target). A Charlatan may burn **at most one card per round**.
+  later player to target).
+- **At most one Whisper fires per round**, first-come, first-served in reveal order: once any
+  Charlatan burns a card, the Whisper target no longer appears on later role cards that
+  round. `⚠️ OQ-41` (a later-revealing, peeked Charlatan who holds an unspent card, is not
+  last, and still sees no Whisper target can deduce their unknown partner already whispered —
+  an accepted micro-leak, see the register)
 - **Effect:** a **uniformly random player among those who reveal after the Charlatan** gets
   an extra fake message on their reveal screen — *"psst, the word is X"* — where X is a wrong
   word drawn from the word pair's curated distractor list (Appendix A). That player now
   cannot be sure whether their originally revealed word or the whispered word is real.
-- **At most one Whisper per target per round.** If both Charlatans whisper in the same round,
-  the second target is drawn from the remaining eligible players, and each Whisper uses a
-  **distinct distractor word**. `⚠️ OQ-35`
 - **Friendly fire is allowed:** if the random target is the other Charlatan, the Whisper is
   **not** wasted — Charlatans can sabotage each other (they don't know who their partner is).
 - **Disclosure:** who burned a Whisper, on whom, and the fake word are revealed on the round
@@ -234,8 +242,8 @@ where they are a Charlatan. `⚠️ OQ-34`
       survivors, then revote); if they were the last Charlatan, the civilians win.
     - **Ejected Civilian:** they are eliminated. If the **threshold** now holds — remaining
       civilians **equal** remaining Charlatans — the round ends and the **Charlatans win**.
-      Otherwise play continues: one clue cycle among survivors, then revote. `⚠️ OQ-33`
-      (The parity threshold deliberately gives minimum-size tables a mistake of slack: at 4
+      Otherwise play continues: one clue cycle among survivors, then revote.
+      (The parity threshold is final. It deliberately gives minimum-size tables a mistake of slack: at 4
       players — 3 civilians + 1 Charlatan — the first wrong ejection leaves 2 v 1 and play
       continues; only a second wrong ejection, reaching 1 v 1, ends the round.)
   - **Tie for most votes → no ejection.** One additional clue cycle is played, then the group
@@ -257,8 +265,9 @@ steal the win**. It keeps them engaged and adds a good beat to the ending.
   with trimming and basic singular/plural tolerance. The guess is shown on the result screen,
   so the group can house-rule an obvious near-miss.
 - A correct guess flips the round to a **Charlatan win for all Charlatans** and ends it, even
-  if other Charlatans were still hidden. Every Charlatan — guesser and hidden alike — scores
-  the same steal points (§3.9).
+  if other Charlatans were still hidden. The guesser and any *peeked* hidden Charlatan score
+  the steal points; a still-hidden Charlatan who **never peeked keeps their blind survival
+  double** — a teammate's steal never costs a blind partner their +8 (§3.9).
 - The result screen then reveals everything: roles, the word pair, who peeked, blind doubles
   earned, Whisper usage, followed by the clue-by-clue replay.
 
@@ -271,10 +280,10 @@ scoreboard. Scoring rules:
 |---|---|
 | Civilian team wins (all Charlatans ejected, no steal) | +2 per Civilian — **eliminated civilians score the same as survivors** (team win; being voted out is not punished twice) |
 | Civilian personally voted for a Charlatan on an ejecting vote | +1 bonus |
-| Civilian never peeked this round **and the civilian team wins** | +1 reward, on top of the team win (eliminated civilians included `⚠️ OQ-37`) — a non-peeking, sharp-voting civilian can reach +4 in one round |
+| Civilian never peeked this round **and the civilian team wins** | +1 reward, on top of the team win (eliminated civilians included) — a non-peeking, sharp-voting civilian can reach +4 in one round |
 | Charlatan survives the round (threshold or tie limit), having peeked | +4 |
 | Charlatan survives the round **blind** (never peeked — "hard mode") | +8 (double) |
-| Steal (ejected Charlatan guesses the real word) | **+3 to every Charlatan**, guesser and hidden alike; the blind double never applies to a steal-ended round `⚠️ OQ-36` |
+| Steal (ejected Charlatan guesses the real word) | +3 to the guesser and to any **peeked** hidden Charlatan; a still-hidden Charlatan who **never peeked** scores **+8** instead — the blind double survives a teammate's steal. The guesser never gets the double (they were caught). |
 
 "Survives" means the round ends by threshold or by the third consecutive tie with the
 Charlatan not ejected; steal-ended rounds are scored by the steal row instead. Point values
@@ -313,8 +322,17 @@ The app is **one phase state machine**; the full phase set is:
    either Charlatans win or one clue cycle + revote.
 7. **Guess flow.** The caught Charlatan types one guess at the real word; the app resolves
    steal (round ends) or no steal (continue or civilian win per §3.7).
-8. **Result flow.** Full reveal (accent color moment): roles, peek status, blind doubles,
-   Whisper usage, steal outcome, then the **replay**: clues in order with vote outcomes.
+8. **Result flow.** The payoff, staged as **five acts of progressive disclosure** — each
+   advanced by a tap, so the phone-holder narrates it to the table like a game-show host
+   instead of everyone squinting at a wall of data: `⚠️ OQ-40`
+   - **Act 1 — The verdict:** who won, huge type, and the Charlatan identities — the app's
+     single accent-color moment.
+   - **Act 2 — The words:** real word vs decoy word, side by side.
+   - **Act 3 — The secrets:** the steal guess (judge the near-miss), who peeked, blind
+     doubles earned, and the Whisper — who burned it, on whom, and the fake word.
+   - **Act 4 — The replay:** every clue in order with vote outcomes — the shareable,
+     screenshot-friendly moment; scrolls internally.
+   - **Act 5 — The damage:** per-player point deltas → Continue to scoreboard.
 9. **Scoreboard flow.** Cumulative session scores; **Next round** (back to Assign);
    **Edit players** — add or remove players between rounds (re-validate 4–12, re-derive
    Charlatan scaling per §2.1; new players join the scoreboard at 0; leavers' rows gray out
@@ -341,7 +359,7 @@ accepted, deliberate trade-off — it matches the app's trust model.
 | S5 | Vote ballot | vote | Private single-choice ballot |
 | S6 | Verdict | verdict | Tie counter & warning, or ejection + open role announcement |
 | S7 | Charlatan's guess | guess | The steal attempt |
-| S8 | Round result & replay | result | Full reveal + clue-by-clue replay |
+| S8 | Round result & replay | result | Five-act progressive reveal + replay |
 | S9 | Scoreboard | scoreboard | Cumulative scores between rounds; roster editing |
 
 Component-level detail for every screen is in [02-flows.md §5](./02-flows.md).
@@ -389,8 +407,9 @@ consecutive-tie counter, eliminations, peek flags, and per-player Whisper cards.
 3. Every transition between two players' private screens passes through a handoff
    interstitial requiring a deliberate slide gesture.
 4. The peek affordance and the role card are identical in layout, target geometry, and
-   plausible interaction length for both roles, so onlookers cannot read a role from screen
-   time or thumb movement (`⚠️ OQ-27`).
+   plausible interaction length for both roles, so onlookers cannot read a **role** from
+   screen time or thumb movement. (That someone peeked at all is deliberately observable —
+   accepted table theater, §2.3.)
 5. Ballot contents are never shown after confirmation; only aggregate results are revealed.
 6. Resume (§4) never lands on exposed private data: rehydration always re-enters via the
    handoff interstitial for the current cursor.
@@ -406,13 +425,16 @@ consecutive-tie counter, eliminations, peek flags, and per-player Whisper cards.
   so word order can differ per language.
 - **Translation files use the `.properties` format**, one file per locale, shipped as static
   assets. The implementation must include, from day one:
-  - `en-i18n.properties` — the source-of-truth English strings, **human-polished** (not
-    developer placeholder copy) `⚠️ OQ-39`; and
+  - `en-i18n.properties` — the source-of-truth English strings, **human-polished**: the
+    product owner reviews and signs off both `.properties` files before v1 ships (a string is
+    shippable when it matches the app's voice — short, dry, second-person — and fits its
+    layout slot at arm's-length type sizes); and
   - `dutch-i18n.properties` — a complete Dutch translation of **every** string key used in
     the frontend. A key present in English but missing in Dutch is a build error, not a
     silent English fallback.
 - **The default locale is Dutch**; English is selectable on the Setup screen. The locale is
-  fixed for the duration of a session and persisted locally. `⚠️ OQ-38`
+  fixed for the duration of a session and persisted locally; a resumed session keeps its
+  locale regardless of any later preference change.
 - **Scope boundary:** the word-pair lists (Appendix A) are game *content*, not UI chrome;
   they are not part of the `.properties` files. Both a Dutch and an English pair list ship in
   v1; the Dutch list is a **separate curation effort, not a translation** (§3.1).
@@ -497,8 +519,7 @@ first clue reliably outs the Charlatan or where the Charlatan can never be caugh
 
 ## Appendix B — Assumption register
 
-Two decision passes are complete: OQ-1 … OQ-21 (first register, removed) and OQ-22 … OQ-32
-(second register, removed) were decided by the product owner and folded into this document.
-Every `⚠️ OQ-n` marker above (n ≥ 33, plus the carried-over OQ-27) corresponds to an entry in
-the third-pass register, [05-open-questions.md](./05-open-questions.md), produced by re-running
-the ambiguity/contradiction analysis on this updated specification.
+Three decision passes are complete: OQ-1 … OQ-21, OQ-22 … OQ-32, and OQ-27 / OQ-33 … OQ-39
+were decided by the product owner and folded into this document; all three register files
+were removed. Every `⚠️ OQ-n` marker above (n ≥ 40) corresponds to an entry in the fourth-pass
+register, [06-open-questions.md](./06-open-questions.md).

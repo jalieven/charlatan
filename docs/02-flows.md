@@ -2,7 +2,7 @@
 
 Diagrams are Mermaid and render directly on GitHub. Screen identifiers (S1–S9) match
 [01-requirements.md §5](./01-requirements.md#5-screens). `OQ-n` markers reference the
-third-pass register in [05-open-questions.md](./05-open-questions.md).
+fourth-pass register in [06-open-questions.md](./06-open-questions.md).
 
 ---
 
@@ -19,7 +19,7 @@ flowchart TD
     Resume --> Round
     S1 -->|Start game| Round["ROUND<br/>(see diagram 2)"]
     Round --> S9["S9 · Scoreboard<br/>cumulative session scores"]
-    S9 -->|"Edit players — join/leave between rounds:<br/>re-validate 4–12, re-derive scaling,<br/>leavers grayed out, same-name rejoin restores (OQ-34)"| S9
+    S9 -->|"Edit players — join/leave between rounds:<br/>re-validate 4–12, re-derive scaling,<br/>leavers grayed out, same-name rejoin<br/>restores score + remaining Whisper cards"| S9
     S9 -->|Next round<br/>new word pair, new roles| Round
     S9 -->|End session| Launch
 ```
@@ -56,11 +56,11 @@ flowchart TD
     S6 -->|"plurality — ejected player's role<br/>openly announced"| Role{"Ejected role?"}
 
     Role -->|Charlatan| Guess["S7 · Charlatan's guess<br/>immediate, typed"]
-    Guess -->|guess correct| ResultSteal["S8 · Result<br/>STEAL — all Charlatans win,<br/>+3 each (OQ-36)"]
+    Guess -->|guess correct| ResultSteal["S8 · Result<br/>STEAL — all Charlatans win<br/>(+3 each; a blind hidden partner keeps +8)"]
     Guess -->|"guess wrong,<br/>hidden Charlatans remain"| Eliminate1["Eliminated: no more clues/votes"] --> ExtraClue
     Guess -->|"guess wrong,<br/>was the last Charlatan"| ResultCiv["S8 · Result<br/>CIVILIANS WIN"]
 
-    Role -->|Civilian| Threshold{"Remaining civilians =<br/>remaining Charlatans?<br/>(parity, OQ-33)"}
+    Role -->|Civilian| Threshold{"Remaining civilians =<br/>remaining Charlatans?<br/>(parity — final)"}
     Threshold -->|"yes — threshold reached"| ResultChar["S8 · Result<br/>CHARLATANS WIN"]
     Threshold -->|no| Eliminate2["Eliminated: no more clues/votes"] --> ExtraClue
 
@@ -82,22 +82,23 @@ commitment a release-on-target, no simultaneous gestures anywhere.
 flowchart TD
     H["S2 · Handoff: 'Pass the phone to NAME'"] -->|slide to continue| Covered["S3 · Covered (resting state)<br/>cover panel + 'hold to check your role' button"]
 
-    Covered -->|"swipe up + hold on cover"| Word["WORD visible while held<br/>(+ 'psst, the word is X' banner<br/>if Whispered, OQ-35)"]
+    Covered -->|"swipe up + hold on cover"| Word["WORD visible while held<br/>(+ 'psst, the word is X' banner<br/>if Whispered)"]
     Word -->|"release — cover snaps shut"| Covered
 
-    Covered -->|"long-press 'check your role'<br/>(~800 ms visible fill — no accidental peeks)"| Card["ROLE CARD visible while held<br/>identical geometry for both roles (OQ-27)"]
+    Covered -->|"long-press 'check your role'<br/>(~800 ms visible fill — no accidental peeks)"| Card["ROLE CARD visible while held<br/>identical geometry for both roles"]
     Card -->|"release off-target —<br/>card snaps away, nothing happens"| Covered
-    Card -->|"Charlatan only, card unspent, has peeked,<br/>not last to reveal: slide held thumb onto<br/>'burn a Whisper' target and RELEASE THERE"| Armed["Whisper armed:<br/>uniform-random later revealer,<br/>max 1 per target, 1 per Charlatan per round"]
+    Card -->|"Charlatan only, card unspent, not last to reveal,<br/>round's Whisper not yet burned (OQ-41):<br/>slide held thumb onto 'burn a Whisper'<br/>target and RELEASE THERE"| Armed["Whisper armed:<br/>uniform-random later revealer<br/>(max 1 Whisper per round,<br/>first-come in reveal order)"]
     Card -->|"civilian card: same-position targets<br/>all simply close the card"| Covered
     Armed --> Covered
 
     Covered -->|"slide 'next' (deliberate gesture —<br/>nobody inherits the last word)"| NextH["Next handoff or Clue phase"]
 ```
 
-Invariants: word **and** role card render only while actively held (OQ-22 resolved:
-snap-back everywhere); commitments only by release-on-target; leaving S3 always passes
-through the slide gesture; role-card geometry and plausible dwell identical for both roles
-(OQ-27); peeking is possible only on the player's own reveal turn.
+Invariants: word **and** role card render only while actively held (snap-back everywhere);
+commitments only by release-on-target; leaving S3 always passes through the slide gesture;
+role-card geometry and plausible dwell identical for both roles; peeking is possible only on
+the player's own reveal turn. Live observability of the peek act is accepted table theater —
+no mandatory dwell masks it.
 
 ---
 
@@ -111,11 +112,11 @@ flowchart TD
     T -->|"2nd"| C2["No ejection · +1 clue cycle · revote<br/>MANDATORY warning:<br/>'one more tie and the Charlatans win'"]
     T -->|"3rd"| C3["Round ends · Charlatans win<br/>(scored as survival)"]
     B -->|"Yes — tie counter resets,<br/>role openly announced"| D{"Ejected player's role?"}
-    D -->|Civilian| E{"Remaining civilians =<br/>remaining Charlatans? (OQ-33)"}
+    D -->|Civilian| E{"Remaining civilians =<br/>remaining Charlatans? (parity — final)"}
     E -->|Yes| F["Round ends · Charlatans win"]
     E -->|No| G["Eliminated · +1 clue cycle · revote"]
     D -->|Charlatan| I["Immediate steal guess"]
-    I -->|Correct| J["Round ends · all Charlatans win<br/>+3 each (OQ-36)"]
+    I -->|Correct| J["Round ends · all Charlatans win<br/>(+3 each; blind hidden partner keeps +8)"]
     I -->|"Wrong, hidden Charlatans remain"| K["Eliminated · +1 clue cycle · revote"]
     I -->|"Wrong, last Charlatan"| L["Round ends · Civilians win"]
 ```
@@ -133,8 +134,8 @@ flowchart TD
 | Name input + add button | 56 px targets |
 | Charlatan count stepper | Auto default (1 for 4–7, 2 for 8+), override clamped 1…⌊players/3⌋ |
 | Clues-per-player stepper | Default 2, range 1–4 |
-| Whisper cards per player stepper | Default 1; personal session-long allotment (OQ-34) |
-| Language selector | Dutch (default) / English; fixed for the session (OQ-38) |
+| Whisper cards per player stepper | Default 1; personal session-long allotment; setup-only, never changed mid-session |
+| Language selector | Dutch (default) / English; fixed for the session |
 | Accent color toggle | On by default |
 | Start button | Disabled until valid; primary action |
 
@@ -153,8 +154,8 @@ flowchart TD
 | Secret word | Massive heavy type; identical layout for civilian & Charlatan; visible only while cover held |
 | Whisper banner (conditional) | "psst, the word is X" alongside the word when a Whisper targets this player |
 | "Hold to check your role" button | On the covered state, identical for every player; long-press with ~800 ms visible fill (an affordance, not a timer) |
-| Role card | Visible only while held, snaps away on release; identical geometry & dwell for both roles (OQ-27) |
-| Release targets on role card | Charlatan: "burn a Whisper" target (when eligible) — commit by releasing on it; Civilian: same-position targets that simply close the card |
+| Role card | Visible only while held, snaps away on release; identical geometry & dwell for both roles |
+| Release targets on role card | Charlatan: "burn a Whisper" target (only while eligible **and** the round's single Whisper is unburned, OQ-41) — commit by releasing on it; Civilian: same-position targets that simply close the card |
 | Slide-to-pass control | Exits to next handoff / clue phase |
 
 ### S4 · Clue entry + Ledger
@@ -192,23 +193,26 @@ flowchart TD
 | Guess input | Typed; case-insensitive, trimmed, singular/plural tolerance |
 | Submit button | One attempt only |
 
-### S8 · Round result + replay
-| Component | Notes |
-|---|---|
-| Role reveal | The **one accent-color moment** of the app; Charlatan names in the accent |
-| Word pair reveal | Real word vs decoy word |
-| Peek & blind disclosure | Who peeked; blind doubles and civilian no-peek rewards earned (OQ-27) |
-| Whisper disclosure | Who burned a card, on whom, and the fake word |
-| Steal outcome | The typed guess, shown so the group can judge near-misses; +3 to every Charlatan (OQ-36) |
-| Replay timeline | Every clue in order + where suspicion turned; the shareable moment |
-| Points summary | Per-player deltas this round |
-| Continue button | To scoreboard |
+### S8 · Round result + replay — five acts of progressive disclosure (OQ-40)
+
+One act on screen at a time; a tap (or ≥56 px Continue) advances; a 5-dot progress strip
+shows position; back-swipe between acts is allowed (everything here is public). Each act fits
+one screen without scrolling — except the replay, which scrolls internally. One motion accent
+per act.
+
+| Act | Content | Notes |
+|---|---|---|
+| 1 · The verdict | Winner banner + Charlatan identities | The **one accent-color moment** of the app; Charlatan names in the accent, huge type |
+| 2 · The words | Real word vs decoy word, side by side | Massive weight-contrast typography |
+| 3 · The secrets | Steal guess (judge near-misses), who peeked, blind doubles, Whisper: who → whom + fake word | The "you did THAT on no information?!" beats live here |
+| 4 · The replay | Every clue in order, grouped by cycle, with vote outcomes | The shareable, screenshot-friendly moment; internal scroll |
+| 5 · The damage | Per-player point deltas this round | Steal: +3, blind hidden partner +8; then Continue → scoreboard |
 
 ### S9 · Scoreboard
 | Component | Notes |
 |---|---|
 | Cumulative score table | All rounds this session; shown between every round; leavers' rows grayed out, restored on same-name rejoin |
 | Round history strip | Compact per-round outcomes |
-| Edit-players control | Join/leave between rounds; re-validates 4–12, re-derives Charlatan scaling; joiners start at 0 (OQ-34) |
+| Edit-players control | Join/leave between rounds; re-validates 4–12, re-derives Charlatan scaling; joiners start at 0 with the configured Whisper allotment; same-name rejoin restores score + remaining cards |
 | Next-round button | New assignment with current roster |
 | End-session button | Back to launch/setup |
