@@ -163,7 +163,7 @@ flowchart TD
 | Turn banner | "NAME, your clue" — speaking order from random first speaker, re-randomized each round |
 | Speaking-order strip | All players; eliminated players struck through and skipped |
 | One-word clue input | Private non-blocking warnings: multi-word, equals own secret word, duplicates an earlier clue this round |
-| Ledger | Every clue this round, in order, always visible; grouped by cycle; **must scale gracefully to 5+ cycles** |
+| Ledger | Every clue this round, in order, always visible; grouped by cycle; **must scale gracefully to 5+ cycles**; a neutral record — suspicion markers (◆) exist only in the post-round replay, never live |
 | Cycle counter | "Clue round 1 of 2", growing with tie/ejection loops |
 | Tie-stakes banner (conditional) | Persists through the cycle after the 2nd consecutive tie: "one more tie and the Charlatans win" |
 | Go-to-vote button | Appears only when the required cycles are complete |
@@ -201,7 +201,7 @@ accent per act. The phone-holder narrates like a game-show host, act by act.
 
 | Act | Content | Notes |
 |---|---|---|
-| 1 · The verdict | Winner banner + Charlatan identities; **one drill-in button: "The words & the replay"** | The **one accent-color moment** of the app; Charlatan names in the accent, huge type. The drill-in is a single screen: back-to-verdict link pinned at the very top, the word pair (real vs decoy, side by side) fixed beneath it, the replay scrolling below (clues grouped by cycle, vote outcomes) — the shareable, screenshot-friendly moment. No progress dots on the drill-in; closing returns to the verdict |
+| 1 · The verdict | Winner banner + Charlatan identities; **one drill-in button: "The words & the replay"** | The **one accent-color moment** of the app; Charlatan names in the accent, huge type. The drill-in is a single screen: back-to-verdict link pinned at the very top, the word pair (real vs decoy, side by side) fixed beneath it, the replay scrolling below (clues grouped by cycle, vote outcomes, ◆ suspicion markers derived from vote tallies — replay-only, never in the live Ledger) — the shareable, screenshot-friendly moment. No progress dots on the drill-in; closing returns to the verdict |
 | 2 · The secrets | Steal guess (judge near-misses), who peeked, blind doubles, Whisper: who → whom + fake word | The "you did THAT on no information?!" beats live here |
 | 3 · The damage | Per-player point deltas this round | Steal: +3, blind hidden partner +8; then Continue → scoreboard |
 

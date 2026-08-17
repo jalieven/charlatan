@@ -190,7 +190,9 @@ the player list order from the round's random starting point, skipping eliminate
 - Every clue is typed before being spoken; typing is done openly (clues are public
   information anyway).
 - The Ledger shows **every typed clue of every player, in order, at all times** during the
-  discussion and voting phases of the round.
+  discussion and voting phases of the round. The live Ledger is a **neutral record**: words,
+  authors, and cycle grouping only — it never carries suspicion markers, highlights, or any
+  other app editorializing mid-round.
 - The app never blocks a clue, but it **warns** (non-blocking, visible only to the typer) on
   obvious fouls: more than one word, a clue identical to the player's own secret word, or a
   duplicate of any earlier clue this round. The group polices everything else by party
@@ -199,8 +201,10 @@ the player list order from the round's random starting point, skipping eliminate
   more cycles: the Ledger's cycle grouping and the cycle counter must scale gracefully to
   arbitrary cycle counts.
 - At the round result, the app **replays the round**: every clue in sequence, annotated with
-  who said it and where the votes landed — "here's where the room's suspicion turned." This
-  post-game replay is the shareable moment of the app.
+  who said it and where the votes landed — "here's where the room's suspicion turned."
+  Suspicion markers (◆) flag clues whose author drew votes in the ballot that followed,
+  derived **solely from vote tallies**, and they exist **only in the post-round replay** —
+  never in the live Ledger. This post-game replay is the shareable moment of the app.
 
 ### 3.6 The Whisper
 
