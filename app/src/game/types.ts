@@ -20,7 +20,7 @@ export interface WordPair {
 }
 
 export interface Settings {
-  /** null = auto scaling (1 for 4-7 players, 2 for 8+) */
+  /** null = auto scaling (1 for 3-7 players, 2 for 8+) */
   charlatanOverride: number | null
   cluesPerPlayer: number
   whisperCardsPerPlayer: number
@@ -131,7 +131,7 @@ export interface GameState {
   round: RoundState | null
 }
 
-export const MIN_PLAYERS = 4
+export const MIN_PLAYERS = 3
 export const MAX_PLAYERS = 12
 export const TIE_LIMIT = 3
 

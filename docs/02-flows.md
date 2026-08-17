@@ -19,7 +19,7 @@ flowchart TD
     Resume --> Round
     S1 -->|Start game| Round["ROUND<br/>(see diagram 2)"]
     Round --> S9["S9 · Scoreboard<br/>cumulative session scores"]
-    S9 -->|"Edit players — join/leave between rounds:<br/>re-validate 4–12, re-derive scaling,<br/>leavers grayed out, same-name rejoin<br/>restores score + remaining Whisper cards"| S9
+    S9 -->|"Edit players — join/leave between rounds:<br/>re-validate 3–12, re-derive scaling,<br/>leavers grayed out, same-name rejoin<br/>restores score + remaining Whisper cards"| S9
     S9 -->|Next round<br/>new word pair, new roles| Round
     S9 -->|End session| Launch
 ```
@@ -132,7 +132,7 @@ flowchart TD
 | Resume prompt (conditional) | "Resume or new game?" when an unfinished round exists; "new game" explicitly ends it |
 | Player name list | Add / remove / reorder; order = seating & pass order; min 4, max 12; unique non-empty names; no mid-session renames |
 | Name input + add button | 56 px targets |
-| Charlatan count stepper | Auto default (1 for 4–7, 2 for 8+), override clamped 1…⌊players/3⌋ |
+| Charlatan count stepper | Auto default (1 for 3–7, 2 for 8+), override clamped 1…⌊players/3⌋ |
 | Clues-per-player stepper | Default 2, range 1–4 |
 | Whisper cards per player stepper | Default 1; personal session-long allotment; setup-only, never changed mid-session |
 | Language selector | Dutch (default) / English; fixed for the session |
@@ -210,6 +210,6 @@ accent per act. The phone-holder narrates like a game-show host, act by act.
 |---|---|
 | Cumulative score table | All rounds this session; shown between every round; leavers' rows grayed out, restored on same-name rejoin |
 | Round history strip | Compact per-round outcomes |
-| Edit-players control | Join/leave between rounds; re-validates 4–12, re-derives Charlatan scaling; joiners start at 0 with the configured Whisper allotment; same-name rejoin restores score + remaining cards |
+| Edit-players control | Join/leave between rounds; re-validates 3–12, re-derives Charlatan scaling; joiners start at 0 with the configured Whisper allotment; same-name rejoin restores score + remaining cards |
 | Next-round button | New assignment with current roster |
 | End-session button | Back to launch/setup |

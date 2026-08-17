@@ -63,13 +63,14 @@ function voteAll(state: GameState, targets: Record<string, string>): GameState {
 }
 
 describe('charlatan scaling and clamp (§2.1)', () => {
-  it('scales 1 for 4-7 and 2 for 8+', () => {
-    expect(charlatanCount(4, null)).toBe(1)
+  it('scales 1 for 3-7 and 2 for 8+', () => {
+    expect(charlatanCount(3, null)).toBe(1)
     expect(charlatanCount(7, null)).toBe(1)
     expect(charlatanCount(8, null)).toBe(2)
     expect(charlatanCount(12, null)).toBe(2)
   })
   it('clamps the override to 1..floor(n/3)', () => {
+    expect(maxCharlatans(3)).toBe(1)
     expect(maxCharlatans(4)).toBe(1)
     expect(charlatanCount(5, 3)).toBe(1)
     expect(charlatanCount(9, 3)).toBe(3)
@@ -86,14 +87,24 @@ describe('setup', () => {
     ])
     expect(s.setupNames).toEqual(['Jan'])
   })
-  it('refuses to start under 4 players', () => {
+  it('refuses to start under 3 players', () => {
+    const s = run(initialState, [
+      { type: 'ADD_NAME', name: 'A' },
+      { type: 'ADD_NAME', name: 'B' },
+      { type: 'START_SESSION' },
+    ])
+    expect(s.phase).toBe('setup')
+  })
+
+  it('starts a session with exactly 3 players', () => {
     const s = run(initialState, [
       { type: 'ADD_NAME', name: 'A' },
       { type: 'ADD_NAME', name: 'B' },
       { type: 'ADD_NAME', name: 'C' },
       { type: 'START_SESSION' },
     ])
-    expect(s.phase).toBe('setup')
+    expect(s.phase).toBe('scoreboard')
+    expect(s.session!.players).toHaveLength(3)
   })
 })
 
@@ -204,6 +215,16 @@ describe('verdict, eliminations, parity and ties (§3.7)', () => {
     s = voteAll(s, { Jan: 'Lotte', Tom: 'Lotte', Lotte: 'Jan' })
     s = reducer(s, { type: 'VERDICT_CONTINUE' })
     expect(s.phase).toBe('result') // 1v1 parity
+    expect(s.round!.outcome).toEqual({ kind: 'charlatans-parity' })
+  })
+
+  it('at 3 players any civilian ejection is instant parity — charlatans win on the first wrong vote', () => {
+    // Jan + Sanne civilians, Tom (seat 2) the Charlatan.
+    let s = clueThrough(revealAll(startRound(freshSession(['Jan', 'Sanne', 'Tom']))))
+    s = voteAll(s, { Jan: 'Sanne', Tom: 'Sanne', Sanne: 'Tom' })
+    expect(s.round!.verdict).toMatchObject({ kind: 'ejection', ejected: 'Sanne', role: 'civilian' })
+    s = reducer(s, { type: 'VERDICT_CONTINUE' })
+    expect(s.phase).toBe('result') // 1v1: no slack at the minimum table
     expect(s.round!.outcome).toEqual({ kind: 'charlatans-parity' })
   })
 

@@ -47,13 +47,13 @@ is client-side React state, deployed as a static site, installable as an offline
 
 ### 2.1 Player count and Charlatan scaling
 
-- Supported player count: **4–12** players.
+- Supported player count: **3–12** players.
 - Default number of Charlatans scales with player count:
-  - **4–7 players → 1 Charlatan**
+  - **3–7 players → 1 Charlatan**
   - **8+ players → 2 Charlatans**
 - The **host may override** the Charlatan count at setup, clamped to 1 … ⌊players/3⌋.
 - **Players may join or leave between rounds** (§4, step 9). After any roster change the
-  player count is re-validated (4–12) and the Charlatan default is re-derived; a manual
+  player count is re-validated (3–12) and the Charlatan default is re-derived; a manual
   override is kept if still within 1 … ⌊players/3⌋, otherwise it resets to auto.
 - A leaver's score row **stays on the scoreboard, grayed out**, and is restored if they
   rejoin by the same name — their **remaining Whisper cards are restored too** (never a fresh
@@ -254,9 +254,11 @@ joiners receive it on joining, and a same-name rejoiner gets their remaining car
     - **Ejected Civilian:** they are eliminated. If the **threshold** now holds — remaining
       civilians **equal** remaining Charlatans — the round ends and the **Charlatans win**.
       Otherwise play continues: one clue cycle among survivors, then revote.
-      (The parity threshold is final. It deliberately gives minimum-size tables a mistake of slack: at 4
+      (The parity threshold is final. It deliberately gives small tables a mistake of slack: at 4
       players — 3 civilians + 1 Charlatan — the first wrong ejection leaves 2 v 1 and play
-      continues; only a second wrong ejection, reaching 1 v 1, ends the round.)
+      continues; only a second wrong ejection, reaching 1 v 1, ends the round. At the 3-player
+      minimum — 2 civilians + 1 Charlatan — there is no slack at all: any civilian ejection is
+      instant parity, so the Charlatans win on the first wrong vote.)
   - **Tie for most votes → no ejection.** One additional clue cycle is played, then the group
     revotes. Consecutive ties are counted:
     - **1st consecutive tie:** banner "No majority — one more clue each."
@@ -310,7 +312,7 @@ The app is **one phase state machine**; the full phase set is:
 
 1. **Setup flow.** The host enters player names in seating order, adjusts Charlatan count,
    clues-per-player, Whisper cards per player, and language, and taps **Start**. Validation:
-   4–12 unique, non-empty names.
+   3–12 unique, non-empty names.
 2. **Assign flow (invisible).** The app draws an unused word pair from the locale's list,
    picks real/decoy orientation, assigns Charlatan roles uniformly at random, and picks a
    random first speaker.
@@ -357,7 +359,7 @@ The app is **one phase state machine**; the full phase set is:
    drill-in scrolls internally); one motion accent per act, per the "let one thing move"
    design rule.
 9. **Scoreboard flow.** Cumulative session scores; **Next round** (back to Assign);
-   **Edit players** — add or remove players between rounds (re-validate 4–12, re-derive
+   **Edit players** — add or remove players between rounds (re-validate 3–12, re-derive
    Charlatan scaling per §2.1; new players join the scoreboard at 0; leavers' rows gray out
    and are restored on same-name rejoin); or **End session**.
 
