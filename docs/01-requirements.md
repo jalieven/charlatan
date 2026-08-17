@@ -347,7 +347,9 @@ The app is **one phase state machine**; the full phase set is:
    - **Act 2 — The secrets:** the steal guess (judge the near-miss), who peeked, blind
      doubles earned, and the Whisper — who burned it, on whom, and the fake word. The "you
      did THAT on no information?!" beats.
-   - **Act 3 — The damage:** per-player point deltas → Continue to scoreboard.
+   - **Act 3 — The damage:** the round's points as a **score matrix** — players down the
+     left, the round's subscore columns across the top (e.g. win / blind / correct vote),
+     totals on the right; columns adapt to the round outcome → Continue to scoreboard.
 
    Mechanics: tap anywhere (or a ≥56 px Continue) advances; a **three-dot progress strip**
    shows position; back-swiping to a previous act is allowed — everything on S8 is public,
