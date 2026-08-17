@@ -83,8 +83,6 @@
   .seg { display: flex; border: 1px solid #3D3D3D; border-radius: 8px; overflow: hidden; font-size: 11px; letter-spacing: .1em; }
   .seg span { padding: 5px 12px; color: #737373; }
   .seg span.on { background: #FAFAFA; color: #0A0A0A; font-weight: 800; }
-  .toggle { width: 34px; height: 20px; border-radius: 999px; border: 1px solid #3D3D3D; position: relative; }
-  .toggle::after { content: ""; position: absolute; top: 2px; right: 2px; width: 14px; height: 14px; border-radius: 999px; background: #FAFAFA; }
   .cta { border: 1px solid #FAFAFA; border-radius: 10px; text-align: center; padding: 15px; font-weight: 900; letter-spacing: .12em; font-size: 13px; }
   .cta.quiet { border-color: #3D3D3D; color: #A3A3A3; font-weight: 600; letter-spacing: .1em; }
 
@@ -155,9 +153,10 @@
   <!-- ============ S1 SETUP ============ -->
   <section class="block">
     <p class="sec-eyebrow">S1 · Setup</p>
-    <h2>One screen, six decisions</h2>
+    <h2>One screen, five decisions</h2>
     <p class="sec-note">Names in seating order (the pass order), the four game options, and Start.
-    Type does the hierarchy: player names in weight, options as quiet rows, one loud button.</p>
+    Type does the hierarchy: player names in weight, options as quiet rows, one loud button. The
+    accent color is part of the design, not a setting.</p>
 
     <div class="frames">
       <div class="mock">
@@ -185,7 +184,6 @@
               <span class="stepper"><span class="btn">−</span><span class="val">1</span><span class="btn">+</span></span></div>
             <div class="row"><span class="eb2">Taal</span>
               <span class="seg"><span class="on">NL</span><span>EN</span></span></div>
-            <div class="row"><span class="eb2">Accentkleur</span><span class="toggle"></span></div>
           </div>
           <div class="grow"></div>
           <div class="cta">START HET SPEL</div>
@@ -193,9 +191,9 @@
         <div class="cap">
           <h4>Setup, ready to start</h4>
           <p>Drag handles reorder seating; the Charlatan stepper shows <em>AUTO·1</em> until the host
-          overrides (clamped 1…⌊n/3⌋, §2.1). Rows here are compressed — built targets are ≥ 56 px.
-          On launch with an unfinished round, a "Hervatten of nieuw spel?" prompt precedes this
-          screen (§4).</p>
+          overrides (clamped 1…⌊n/3⌋, §2.1). Four options only — no accent toggle, no timers. Rows
+          here are compressed — built targets are ≥ 56 px. On launch with an unfinished round, a
+          "Hervatten of nieuw spel?" prompt precedes this screen (§4).</p>
         </div>
       </div>
     </div>

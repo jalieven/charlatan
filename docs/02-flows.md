@@ -15,7 +15,7 @@ condition — the group simply stops. The roster may change between rounds.
 flowchart TD
     Launch(["App launch"]) --> Choice{"Unfinished round<br/>in storage?"}
     Choice -->|"yes — 'resume or new game?'"| Resume["Resume via handoff<br/>interstitial at current cursor"]
-    Choice -->|no, or 'new game' chosen<br/>= old round explicitly ended| S1["S1 · Setup<br/>names, Charlatan count, clues per player,<br/>Whisper cards per player, language, accent"]
+    Choice -->|no, or 'new game' chosen<br/>= old round explicitly ended| S1["S1 · Setup<br/>names, Charlatan count, clues per player,<br/>Whisper cards per player, language"]
     Resume --> Round
     S1 -->|Start game| Round["ROUND<br/>(see diagram 2)"]
     Round --> S9["S9 · Scoreboard<br/>cumulative session scores"]
@@ -136,7 +136,6 @@ flowchart TD
 | Clues-per-player stepper | Default 2, range 1–4 |
 | Whisper cards per player stepper | Default 1; personal session-long allotment; setup-only, never changed mid-session |
 | Language selector | Dutch (default) / English; fixed for the session |
-| Accent color toggle | On by default |
 | Start button | Disabled until valid; primary action |
 
 ### S2 · Handoff interstitial (shared by reveal & vote)

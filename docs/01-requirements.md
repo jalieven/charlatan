@@ -68,7 +68,6 @@ is client-side React state, deployed as a static site, installable as an offline
 | Charlatan count | Auto by player count | Host override allowed, clamped to 1 … ⌊players/3⌋. |
 | Clues per player before voting | **2** | Configurable at game start (range 1–4). Voting opens only after this many full clue cycles. |
 | Whisper cards **per player** | **1** | Personal, session-long allotment (§3.6). Setup-only — the allotment cannot be changed between rounds; mid-session joiners receive it on joining. |
-| Accent color on/off | On | Single accent color used exclusively for the Charlatan reveal moment (§6.5). |
 | Language | **Dutch** | Dutch (default) or English UI (§6.4). Locale is fixed for the session. |
 
 There is deliberately **no timer of any kind, anywhere in the app**. The game gates on clue
@@ -302,8 +301,8 @@ The app is **one phase state machine**; the full phase set is:
 `setup → assign → reveal → clues → vote → verdict → guess → result → scoreboard → (next round | roster edit | end)`
 
 1. **Setup flow.** The host enters player names in seating order, adjusts Charlatan count,
-   clues-per-player, Whisper cards per player, language, and accent option, and taps
-   **Start**. Validation: 4–12 unique, non-empty names.
+   clues-per-player, Whisper cards per player, and language, and taps **Start**. Validation:
+   4–12 unique, non-empty names.
 2. **Assign flow (invisible).** The app draws an unused word pair from the locale's list,
    picks real/decoy orientation, assigns Charlatan roles uniformly at random, and picks a
    random first speaker.
@@ -472,7 +471,8 @@ Monochrome with default styling just reads as unstyled. What carries it:
   subtle scale on the revealed word, the cover-panel physics, the long-press fill, animated
   phase transitions. (There is no timer in the app, so no timer visualization exists.)
 - **One accent color, used once.** A single hot color reserved exclusively for the Charlatan
-  reveal at the round result. Optional, but it makes the payoff moment land.
+  reveal at the round result — it makes the payoff moment land. Always on: part of the
+  design, not a setting.
 - **Ergonomics:** tap targets ≥ **56 px**; text readable at arm's length — the phone is
   passed around a room, not held six inches from one face. (Beyond these ergonomics,
   dedicated accessibility work is explicitly out of scope for v1.)
