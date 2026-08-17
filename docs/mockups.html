@@ -128,6 +128,19 @@
   .backlink { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: #A3A3A3; }
   .fadeout { height: 26px; background: linear-gradient(#0A0A0A00, #0A0A0A); margin-top: -26px; position: relative; }
 
+  /* Clues, vote, verdict, steal, scoreboard */
+  .invert { background: #FAFAFA; color: #0A0A0A; border-radius: 8px; padding: 10px 12px; font-weight: 900; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; text-align: center; line-height: 1.4; }
+  .strip { display: flex; flex-wrap: wrap; gap: 5px; }
+  .strip span { border: 1px solid #262626; border-radius: 999px; padding: 3px 9px; font-size: 10px; letter-spacing: .06em; color: #A3A3A3; }
+  .strip .now { background: #FAFAFA; color: #0A0A0A; font-weight: 800; border-color: #FAFAFA; }
+  .strip .done { color: #737373; }
+  .strip .out { text-decoration: line-through; color: #3D3D3D; }
+  .input { border: 1px solid #FAFAFA; border-radius: 10px; padding: 13px 12px; font-size: 17px; font-weight: 800; }
+  .input .caret { display: inline-block; width: 2px; height: 1em; background: #FAFAFA; vertical-align: -2px; }
+  .radio { width: 16px; height: 16px; border-radius: 999px; border: 1px solid #3D3D3D; flex: none; }
+  .radio.on { border-color: #FAFAFA; background: #FAFAFA; box-shadow: inset 0 0 0 3px #0A0A0A; }
+  .bigline { font-size: 26px; font-weight: 900; letter-spacing: -.01em; line-height: 1.12; }
+
   footer.foot { padding-top: 28px; color: var(--muted); font-size: 13px; max-width: 72ch; }
   footer.foot p { margin: 0 0 8px; }
 
@@ -138,9 +151,10 @@
   <header class="top">
     <p class="kicker">Charlatan · Design review</p>
     <h1>Charlatan Mockups</h1>
-    <p class="lede">Ten frames covering the three screens that carry the game: Setup (S1), the Reveal
-    (S3) in its four states, and the three-act Result (S8) with both drill-ins. In-app copy is Dutch —
-    the default locale per §6.4. Annotations under each frame say what to validate.</p>
+    <p class="lede">Eighteen frames covering all nine screens, S1–S9, in flow order — including the
+    reveal's four states, the second-tie warning, and the three-act result. In-app copy is Dutch —
+    the default locale per §6.4. One running scenario throughout: six players, koffie/thee, Tom is
+    the Charlatan. Annotations under each frame say what to validate.</p>
     <div class="chips">
       <span class="chip">Ground #0A0A0A · text #FAFAFA</span>
       <span class="chip">Borders, no shadows</span>
@@ -192,8 +206,56 @@
           <h4>Setup, ready to start</h4>
           <p>Drag handles reorder seating; the Charlatan stepper shows <em>AUTO·1</em> until the host
           overrides (clamped 1…⌊n/3⌋, §2.1). Four options only — no accent toggle, no timers. Rows
-          here are compressed — built targets are ≥ 56 px. On launch with an unfinished round, a
-          "Hervatten of nieuw spel?" prompt precedes this screen (§4).</p>
+          here are compressed — built targets are ≥ 56 px.</p>
+        </div>
+      </div>
+
+      <div class="mock">
+        <div class="phone">
+          <div class="logo">CHARLATAN</div>
+          <div class="hairline"></div>
+          <div class="grow" style="display:flex;flex-direction:column;justify-content:center;gap:12px">
+            <div class="eb2">Onafgewerkte ronde gevonden</div>
+            <div class="bigline">RONDE 3 —<br>HINTFASE</div>
+            <div style="font-size:12px;color:#737373;line-height:1.5">6 spelers · de geheime woorden blijven veilig achter de vasthoud-gebaren</div>
+          </div>
+          <div class="cta">HERVATTEN</div>
+          <div style="height:8px"></div>
+          <div class="cta quiet">NIEUW SPEL — beëindigt de oude ronde</div>
+        </div>
+        <div class="cap">
+          <h4>Launch — resume or new game</h4>
+          <p>An unfinished round survives indefinitely (§4). Choosing "nieuw spel" is the explicit end
+          of the old round; resuming re-enters via the handoff interstitial, never on private data
+          (§6.3).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ S2 HANDOFF ============ -->
+  <section class="block">
+    <p class="sec-eyebrow">S2 · Handoff</p>
+    <h2>The privacy gate</h2>
+    <p class="sec-note">Every transition between two players' private screens passes through this
+    interstitial — reveal and vote alike (§6.3). Nothing secret is on screen; the slide is a
+    deliberate gesture so nobody inherits the previous player's screen.</p>
+
+    <div class="frames">
+      <div class="mock">
+        <div class="phone">
+          <div class="eb">Speler 4 van 6</div>
+          <div class="grow" style="display:flex;flex-direction:column;justify-content:center;gap:10px;text-align:center">
+            <div class="eb2">Geef de telefoon aan</div>
+            <div style="font-size:46px;font-weight:900;letter-spacing:-.02em">LOTTE</div>
+          </div>
+          <div class="slide"><span class="knob">→</span> Schuif om verder te gaan</div>
+        </div>
+        <div class="cap">
+          <h4>Handoff, reveal phase</h4>
+          <p>Tiny label, massive name — readable across the table. The identical screen appears
+          between ballots in the vote phase, with the progress indicator counting active players
+          only.</p>
         </div>
       </div>
     </div>
@@ -261,10 +323,11 @@
           <div style="height:12px"></div>
           <div class="cover folded"><div class="grab"></div></div>
           <div class="wordstage">
-            <div class="eb2">Jouw woord</div>
-            <div class="theword">KOFFIE</div>
-            <div style="height:4px"></div>
-            <div class="whisper"><b>PSST —</b> <span>het woord is <b>ESPRESSO</b></span></div>
+            <div class="whisper"><b>PSST —</b> <span>één van deze werd je toegefluisterd</span></div>
+            <div style="height:2px"></div>
+            <div class="theword" style="font-size:38px">ESPRESSO</div>
+            <div class="theword" style="font-size:38px">KOFFIE</div>
+            <div style="font-size:11px;color:#737373;max-width:24ch;line-height:1.5">identieke stijl, willekeurige volgorde — de positie verraadt niets</div>
             <div class="holdnote">laat los om te verbergen</div>
           </div>
           <div class="rolebtn dim"><span>Hou ingedrukt voor je rol</span></div>
@@ -272,9 +335,11 @@
           <div class="slide dim"><span class="knob">→</span> Schuif door</div>
         </div>
         <div class="cap">
-          <h4>3 · Word + Whisper banner</h4>
-          <p>A Whispered player sees the fake hint inside the same hold-state as their word (§3.6).
-          Monochrome on purpose — the accent is reserved for the verdict. Eva now mistrusts both words.</p>
+          <h4>3 · Word — Whispered</h4>
+          <p>A Whispered player sees <em>two</em> words in identical styling and <em>random order</em> —
+          their assigned word and the distractor. Position and treatment never betray which one was
+          Whispered (§3.6). Eva now mistrusts both. Monochrome on purpose — the accent is reserved
+          for the verdict.</p>
         </div>
       </div>
 
@@ -308,14 +373,192 @@
     </div>
   </section>
 
+  <!-- ============ S4 CLUES ============ -->
+  <section class="block">
+    <p class="sec-eyebrow">S4 · Clue entry &amp; Ledger</p>
+    <h2>Type it, then say it aloud</h2>
+    <p class="sec-note">The active player types their one-word clue, confirms, and says it aloud
+    (§3.5). The Ledger — every clue this round, grouped by cycle — is always visible below.
+    Warnings are private and never block. No timer anywhere.</p>
+
+    <div class="frames">
+      <div class="mock">
+        <div class="phone">
+          <div class="eb">Hintronde 1 van 2</div>
+          <div style="font-size:22px;font-weight:900;margin-top:4px">SANNE, JOUW HINT</div>
+          <div style="height:10px"></div>
+          <div class="strip">
+            <span class="done">Jan ✓</span><span class="now">Sanne</span><span>Tom</span><span>Lotte</span><span>Eva</span><span>Bram</span>
+          </div>
+          <div style="height:12px"></div>
+          <div class="input">warm<span class="caret"></span></div>
+          <div style="height:8px"></div>
+          <div class="cta" style="padding:12px;font-size:11px">BEVESTIG &amp; ZEG HET LUIDOP</div>
+          <div class="hairline"></div>
+          <div class="eb2">Logboek · hintronde 1</div>
+          <div class="list">
+            <div><span class="who">Jan</span><span>"zwart"</span></div>
+          </div>
+          <div class="grow"></div>
+        </div>
+        <div class="cap">
+          <h4>1 · Clue turn, first cycle</h4>
+          <p>Speaking order runs from the round's random first speaker (§3.4). The input warns —
+          privately, non-blocking — on multiple words, the player's own secret word, or a duplicate
+          of an earlier clue (§3.5).</p>
+        </div>
+      </div>
+
+      <div class="mock">
+        <div class="phone">
+          <div class="invert">Nog één gelijkspel en de Charlatans winnen</div>
+          <div style="height:10px"></div>
+          <div class="eb">Hintronde 5 · extra</div>
+          <div style="font-size:22px;font-weight:900;margin-top:4px">EVA, JOUW HINT</div>
+          <div style="height:10px"></div>
+          <div class="strip">
+            <span class="done">Jan ✓</span><span class="done">Sanne ✓</span><span class="done">Tom ✓</span><span class="done">Lotte ✓</span><span class="now">Eva</span><span class="out">Bram</span>
+          </div>
+          <div style="height:12px"></div>
+          <div class="input"><span class="caret"></span></div>
+          <div style="height:8px"></div>
+          <div class="cta quiet" style="padding:12px;font-size:11px">BEVESTIG &amp; ZEG HET LUIDOP</div>
+          <div class="hairline"></div>
+          <div class="eb2">Logboek · hintronde 5</div>
+          <div class="list">
+            <div><span class="who">Jan</span><span>"filter"</span></div>
+            <div><span class="who">Sanne</span><span>"mok"</span></div>
+            <div><span class="who">Tom</span><span>"sterk" <span class="flag">◆</span></span></div>
+          </div>
+          <div class="fadeout"></div>
+        </div>
+        <div class="cap">
+          <h4>2 · Extra cycle after the second tie</h4>
+          <p>The tie-stakes banner is a hard requirement: it appears the moment the second
+          consecutive tie happens and persists through this cycle and the next ballot (§3.7).
+          Bram, voted out earlier, is struck from the order — which stays otherwise stable within
+          the round (§3.4). Cycle counters grow past the base 2 with every tie/ejection loop.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ S5–S7 VOTE, VERDICT, STEAL ============ -->
+  <section class="block">
+    <p class="sec-eyebrow">S5 · S6 · S7 — Vote, verdict &amp; the steal</p>
+    <h2>Private ballots, open verdicts</h2>
+    <p class="sec-note">Ballots are individual and private via the handoff (§3.7): no self-votes,
+    no abstentions, eliminated players excluded. The verdict announces roles openly; a caught
+    Charlatan immediately gets one typed guess at the real word (§3.8).</p>
+
+    <div class="frames">
+      <div class="mock">
+        <div class="phone">
+          <div class="eb">Stemming · Speler 2 van 6</div>
+          <div style="font-size:22px;font-weight:900;margin-top:4px;line-height:1.15">SANNE, WIE IS<br>DE CHARLATAN?</div>
+          <div style="height:12px"></div>
+          <div class="rows">
+            <div class="row"><span><b>Jan</b></span><span class="radio"></span></div>
+            <div class="row" style="border-color:#FAFAFA"><span><b>Tom</b></span><span class="radio on"></span></div>
+            <div class="row"><span><b>Lotte</b></span><span class="radio"></span></div>
+            <div class="row"><span><b>Eva</b></span><span class="radio"></span></div>
+            <div class="row"><span><b>Bram</b></span><span class="radio"></span></div>
+          </div>
+          <div style="height:10px"></div>
+          <div class="eb2" style="color:#737373">Logboek bekijken ↓</div>
+          <div class="grow"></div>
+          <div class="cta">BEVESTIG STEM</div>
+        </div>
+        <div class="cap">
+          <h4>S5 · The ballot</h4>
+          <p>Sanne can't vote for herself — her name simply isn't a row (§3.7). The Ledger stays
+          reachable, collapsed. Confirm locks the ballot; only aggregate tallies are ever shown
+          afterwards (§6.3).</p>
+        </div>
+      </div>
+
+      <div class="mock">
+        <div class="phone">
+          <div class="eb">Uitslag van de stemming</div>
+          <div style="height:8px"></div>
+          <div class="list">
+            <div><span class="who">Bram</span><span class="delta">4 stemmen</span></div>
+            <div><span class="who">Tom</span><span class="m">1 stem</span></div>
+            <div><span class="who">Jan</span><span class="m">1 stem</span></div>
+          </div>
+          <div class="grow" style="display:flex;flex-direction:column;justify-content:center;gap:10px">
+            <div class="bigline">BRAM IS<br>WEGGESTEMD</div>
+            <div style="font-size:14px;color:#A3A3A3">Bram was een <b style="color:#FAFAFA">BURGER</b></div>
+            <div style="font-size:12px;color:#737373">4 burgers en 1 charlatan over — geen pariteit, verder met hints</div>
+          </div>
+          <div class="cta">VERDER</div>
+        </div>
+        <div class="cap">
+          <h4>S6 · Verdict — ejection</h4>
+          <p>Aggregate tally only, role openly announced (§3.7), then the parity check: 4 ≠ 1, so
+          one more clue cycle and a revote. The consecutive-tie counter resets here. An ejected
+          Charlatan would route to the steal instead.</p>
+        </div>
+      </div>
+
+      <div class="mock">
+        <div class="phone">
+          <div class="eb">Uitslag van de stemming</div>
+          <div style="height:8px"></div>
+          <div class="list">
+            <div><span class="who">Tom</span><span class="m">2 stemmen</span></div>
+            <div><span class="who">Eva</span><span class="m">2 stemmen</span></div>
+            <div><span class="who">Jan</span><span class="m">1 stem</span></div>
+          </div>
+          <!-- 5 voters: Bram is eliminated -->
+
+          <div class="grow" style="display:flex;flex-direction:column;justify-content:center;gap:12px">
+            <div class="bigline">GELIJKSPEL #2</div>
+            <div class="invert">Nog één gelijkspel en de Charlatans winnen</div>
+            <div style="font-size:12px;color:#737373">iedereen geeft nog één hint, daarna stemmen jullie opnieuw</div>
+          </div>
+          <div class="cta">VERDER</div>
+        </div>
+        <div class="cap">
+          <h4>S6 · Verdict — second consecutive tie</h4>
+          <p>The mandatory stakes visualization (§3.7): the inverted block is the loudest thing
+          monochrome can say. It stays on screen through the following clue cycle and ballot. A
+          third tie ends the round for the Charlatans.</p>
+        </div>
+      </div>
+
+      <div class="mock">
+        <div class="phone">
+          <div class="eb">De gok</div>
+          <div class="grow" style="display:flex;flex-direction:column;justify-content:center;gap:12px">
+            <div class="bigline">TOM —<br>GESNAPT.</div>
+            <div style="font-size:13px;color:#A3A3A3;line-height:1.5">Eén gok naar het echte woord.<br>Raad juist en steel de winst.</div>
+            <div class="input">melk<span class="caret"></span></div>
+          </div>
+          <div class="cta">GOK INDIENEN</div>
+          <div style="height:8px"></div>
+          <div class="tapnote">één poging · hoofdletters tellen niet</div>
+        </div>
+        <div class="cap">
+          <h4>S7 · The steal</h4>
+          <p>Typed, one attempt, case-insensitive with singular/plural tolerance (§3.8). The guess
+          is shown at the result so the table can judge a near-miss. A correct guess wins the round
+          for all Charlatans.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ============ S8 RESULT ============ -->
   <section class="block">
     <p class="sec-eyebrow">S8 · Result</p>
     <h2>Three acts, narrated by the phone-holder</h2>
     <p class="sec-note">One act per screen, advanced by tap, three-dot strip, back-swipe allowed —
     everything here is public. The words and the replay share a single drill-in behind one button on
-    the verdict (§4, step 8); the drill-in carries no dots — it is not an act. Scenario: round 4, Tom
-    caught, steal missed, burgers win.</p>
+    the verdict (§4, step 8); the drill-in carries no dots — it is not an act. Scenario: round 4 —
+    Bram (a burger) was voted out mid-round, then Tom was caught on the fourth vote; steal missed,
+    burgers win. Eliminated Bram still scores the team win (§3.9), but had no vote in the ejecting
+    ballot.</p>
 
     <div class="frames">
       <div class="mock">
@@ -366,7 +609,7 @@
           </div>
           <div class="fadeout"></div>
           <div style="height:8px"></div>
-          <div class="eb2" style="color:#737373">Stemming — 4× Tom · 1× Jan · 1× Sanne</div>
+          <div class="eb2" style="color:#737373">Laatste stemming — 3× Tom · 1× Jan · 1× Sanne</div>
         </div>
         <div class="cap">
           <h4>Drill-in · The words &amp; the replay</h4>
@@ -418,7 +661,7 @@
             <div><span class="who">Jan</span><span class="m">win +2 · blind +1 · stem +1</span><span class="delta">+4</span></div>
             <div><span class="who">Lotte</span><span class="m">win +2 · blind +1 · stem +1</span><span class="delta">+4</span></div>
             <div><span class="who">Eva</span><span class="m">win +2 · blind +1 · stem +1</span><span class="delta">+4</span></div>
-            <div><span class="who">Bram</span><span class="m">win +2 · blind +1 · stem +1</span><span class="delta">+4</span></div>
+            <div><span class="who">Bram</span><span class="m">win +2 · blind +1 · weggestemd</span><span class="delta">+3</span></div>
             <div><span class="who">Sanne</span><span class="m">win +2 · keek · stem mis</span><span class="delta">+2</span></div>
             <div><span class="who">Tom</span><span class="m">gesnapt, gok mis</span><span class="delta">+0</span></div>
           </div>
@@ -436,12 +679,53 @@
     </div>
   </section>
 
+  <!-- ============ S9 SCOREBOARD ============ -->
+  <section class="block">
+    <p class="sec-eyebrow">S9 · Scoreboard</p>
+    <h2>Between every round</h2>
+    <p class="sec-note">Cumulative session scores, the round history, and the only place the roster
+    changes (§4, step 9). Sessions have no end condition — the group simply stops.</p>
+
+    <div class="frames">
+      <div class="mock">
+        <div class="phone">
+          <div class="eb">Scorebord · na ronde 4</div>
+          <div style="height:8px"></div>
+          <div class="list" style="font-size:14px">
+            <div><span class="who">Jan</span><span class="delta">11</span></div>
+            <div><span class="who">Eva</span><span class="delta">9</span></div>
+            <div><span class="who">Bram</span><span class="delta">8</span></div>
+            <div><span class="who">Sanne</span><span class="delta">7</span></div>
+            <div><span class="who">Tom</span><span class="delta">6</span></div>
+            <div style="color:#3D3D3D"><span class="who" style="color:#3D3D3D">Lotte</span><span class="m" style="color:#3D3D3D">weggegaan na ronde 3</span><span class="delta" style="color:#3D3D3D">4</span></div>
+          </div>
+          <div style="height:10px"></div>
+          <div class="eb2">Rondes</div>
+          <div class="strip" style="margin-top:6px">
+            <span class="done">1 · Burgers</span><span class="done">2 · Charlatan</span><span class="done">3 · Steal</span><span class="done">4 · Burgers</span>
+          </div>
+          <div class="grow"></div>
+          <div class="cta">VOLGENDE RONDE</div>
+          <div style="height:8px"></div>
+          <div class="cta quiet">SPELERS BEWERKEN · EINDE SESSIE</div>
+        </div>
+        <div class="cap">
+          <h4>Scoreboard with a leaver</h4>
+          <p>Lotte left after round 3: her row stays, grayed out, and is restored — score and
+          remaining Whisper cards — if she rejoins by the same name (§2.1). Roster edits re-validate
+          4–12 and re-derive Charlatan scaling. Joiners start at 0 with the configured Whisper
+          allotment.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <footer class="foot">
     <p><strong>Type note:</strong> these frames render in the system font; the built app ships Space
     Grotesk (or Inter Tight) per §6.5 — expect the words and verdicts to gain more character at the
     same weights.</p>
-    <p><strong>Not mocked:</strong> the handoff interstitial (S2), clue entry (S4), ballot (S5),
-    verdict incl. the second-tie warning (S6), the guess (S7), and the scoreboard (S9) — say the word
-    and I'll extend the set.</p>
+    <p><strong>Coverage:</strong> all nine screens are mocked. Not shown as separate frames: the
+    civilian role card (identical geometry to the Charlatan's, targets close-only) and the
+    vote-phase handoff (identical to the reveal-phase one).</p>
   </footer>
 </div>

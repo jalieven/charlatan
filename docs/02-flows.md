@@ -82,7 +82,7 @@ commitment a release-on-target, no simultaneous gestures anywhere.
 flowchart TD
     H["S2 · Handoff: 'Pass the phone to NAME'"] -->|slide to continue| Covered["S3 · Covered (resting state)<br/>cover panel + 'hold to check your role' button"]
 
-    Covered -->|"swipe up + hold on cover"| Word["WORD visible while held<br/>(+ 'psst, the word is X' banner<br/>if Whispered)"]
+    Covered -->|"swipe up + hold on cover"| Word["WORD visible while held<br/>(if Whispered: two words, identical<br/>styling, random order — position<br/>never betrays which was Whispered)"]
     Word -->|"release — cover snaps shut"| Covered
 
     Covered -->|"long-press 'check your role'<br/>(~800 ms visible fill — no accidental peeks)"| Card["ROLE CARD visible while held<br/>identical geometry for both roles"]
@@ -151,7 +151,7 @@ flowchart TD
 |---|---|
 | Cover panel (resting state) | Full-bleed; swipe up **and hold** to expose, snaps shut on release; Motion-driven physics |
 | Secret word | Massive heavy type; identical layout for civilian & Charlatan; visible only while cover held; positioned in the lower half of the screen, directly above the role button (the holding thumb's home zone) |
-| Whisper banner (conditional) | "psst, the word is X" alongside the word when a Whisper targets this player |
+| Whispered word state (conditional) | Target sees two words — assigned + distractor — in identical styling and **random order** under a "psst — one of these was whispered to you" note; position never betrays which was Whispered |
 | "Hold to check your role" button | On the covered state, identical for every player; long-press with ~800 ms visible fill (an affordance, not a timer) |
 | Role card | Visible only while held, snaps away on release; grows upward from the held role button so targets sit directly above the thumb; identical geometry & dwell for both roles |
 | Release targets on role card | Charlatan: "burn a Whisper" target (only while eligible **and** the round's single Whisper is unburned — its absence is an accepted, deliberate tell) — commit by releasing on it; Civilian: same-position targets that simply close the card |

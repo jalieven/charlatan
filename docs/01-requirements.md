@@ -149,8 +149,9 @@ secret is only-visible-while-touching, and every commitment is a release-on-targ
 - **Resting state — covered:** a full-screen cover panel; nothing secret is visible.
 - **Word (hold-state 1):** swipe up **and hold** on the cover → the word is visible only
   while the cover is actively held open → release → the cover **snaps shut instantly**.
-  Never tap-to-toggle, never a persistent uncover. If a Whisper targets this player, the
-  *"psst, the word is X"* banner (§3.6) appears alongside the word in this state.
+  Never tap-to-toggle, never a persistent uncover. If a Whisper targets this player, this
+  state shows **two words in identical styling and random order** — see §3.6; position must
+  never betray which word was Whispered.
 - **Peek (hold-state 2):** a separate **"hold to check your role"** button sits on the
   *covered* state — not behind the cover, so the two hold-states are never needed at once.
   It is a **long-press with a visible fill (~800 ms)** before the role card appears, so
@@ -220,10 +221,13 @@ joiners receive it on joining, and a same-name rejoiner gets their remaining car
   round. (Accepted micro-leak: a later-revealing, peeked Charlatan who holds an unspent card,
   is not last, and still sees no Whisper target can deduce their unknown partner already
   whispered. Deliberately kept — it is part of what makes the Whisper strong.)
-- **Effect:** a **uniformly random player among those who reveal after the Charlatan** gets
-  an extra fake message on their reveal screen — *"psst, the word is X"* — where X is a wrong
-  word drawn from the word pair's curated distractor list (Appendix A). That player now
-  cannot be sure whether their originally revealed word or the whispered word is real.
+- **Effect:** a **uniformly random player among those who reveal after the Charlatan** is
+  targeted. The target's word state shows **two words** — their assigned word and a wrong
+  word X drawn from the word pair's curated distractor list (Appendix A) — under a *"psst —
+  one of these was whispered to you"* note. **Random positioning is a hard requirement: the
+  two words render in identical styling and in random order, so neither position nor
+  treatment ever reveals which word was the player's own and which was Whispered.** The
+  target now cannot be sure which word is real.
 - **Friendly fire is allowed:** if the random target is the other Charlatan, the Whisper is
   **not** wasted — Charlatans can sabotage each other (they don't know who their partner is).
 - **Disclosure:** who burned a Whisper, on whom, and the fake word are revealed on the round
