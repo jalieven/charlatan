@@ -331,10 +331,12 @@ The app is **one phase state machine**; the full phase set is:
    game-show host instead of everyone squinting at a wall of data:
    - **Act 1 — The verdict:** who won, huge type, and the Charlatan identities — the app's
      single accent-color moment. The loudest beat first; everything after is explanation.
-     Two drill-ins sit **behind buttons on this page**: **The words** (real vs decoy, side by
-     side — the "OHHH *that's* why you said 'beans'" beat) and **The replay** (every clue in
-     order, grouped by cycle, annotated with vote outcomes — the shareable,
-     screenshot-friendly moment; scrolls internally; closing returns to the verdict).
+     One drill-in sits **behind a button on this page**: **the words & the replay**, a single
+     screen with a back-to-verdict link pinned at the very top, the word pair (real vs decoy,
+     side by side — the "OHHH *that's* why you said 'beans'" beat) fixed beneath it, and the
+     replay (every clue in order, grouped by cycle, annotated with vote outcomes — the
+     shareable, screenshot-friendly moment) scrolling below. The drill-in shows **no progress
+     dots** — it is not an act; closing returns to the verdict.
    - **Act 2 — The secrets:** the steal guess (judge the near-miss), who peeked, blind
      doubles earned, and the Whisper — who burned it, on whom, and the fake word. The "you
      did THAT on no information?!" beats.

@@ -117,8 +117,6 @@
   .dots i.on { background: #FAFAFA; }
   .verdict { font-size: 40px; font-weight: 900; letter-spacing: -.02em; line-height: 1.04; }
   .accent { color: #FF3D8A; }
-  .drills { display: flex; gap: 8px; }
-  .drills .cta { flex: 1; padding: 13px 6px; font-size: 10px; }
   .tapnote { font-size: 10px; color: #737373; letter-spacing: .1em; text-transform: uppercase; text-align: center; }
   .pair { display: flex; gap: 8px; }
   .pair > div { flex: 1; border: 1px solid #262626; border-radius: 12px; padding: 16px 8px; text-align: center; }
@@ -317,8 +315,9 @@
     <p class="sec-eyebrow">S8 · Result</p>
     <h2>Three acts, narrated by the phone-holder</h2>
     <p class="sec-note">One act per screen, advanced by tap, three-dot strip, back-swipe allowed —
-    everything here is public. The words and the replay sit behind buttons on the verdict (§4, step 8).
-    Scenario: round 4, Tom caught, steal missed, burgers win.</p>
+    everything here is public. The words and the replay share a single drill-in behind one button on
+    the verdict (§4, step 8); the drill-in carries no dots — it is not an act. Scenario: round 4, Tom
+    caught, steal missed, burgers win.</p>
 
     <div class="frames">
       <div class="mock">
@@ -328,10 +327,7 @@
             <div class="verdict">DE BURGERS<br>WINNEN</div>
             <div style="font-size:15px"><span class="accent" style="font-weight:900">TOM</span>
               <span style="color:#A3A3A3">was de Charlatan</span></div>
-            <div class="drills">
-              <div class="cta quiet">DE WOORDEN</div>
-              <div class="cta quiet">DE TERUGBLIK</div>
-            </div>
+            <div class="cta quiet">DE WOORDEN &amp; DE TERUGBLIK</div>
           </div>
           <div class="tapnote">tik om verder te gaan</div>
           <div style="height:10px"></div>
@@ -340,37 +336,20 @@
         <div class="cap">
           <h4>Act 1 · The verdict</h4>
           <p>The loudest beat first — and the app's <em>only</em> accent-color moment: the Charlatan's
-          name. Two quiet drill-in buttons hold the words and the replay for whoever asks "wait,
+          name. One quiet drill-in button holds the words and the replay for whoever asks "wait,
           what was it?"</p>
         </div>
       </div>
 
       <div class="mock">
         <div class="phone">
-          <div class="eb">Uitslag · De woorden</div>
-          <div class="grow" style="display:flex;flex-direction:column;justify-content:center;gap:10px">
-            <div class="pair">
-              <div><div class="eb2">Echt</div><div class="w">KOFFIE</div></div>
-              <div><div class="eb2">Lokaas</div><div class="w">THEE</div></div>
-            </div>
-            <div style="font-size:12px;color:#737373;text-align:center;line-height:1.5">
-              vijf burgers met <b style="color:#A3A3A3">koffie</b>, één charlatan met <b style="color:#A3A3A3">thee</b></div>
-          </div>
           <div class="backlink">← Terug naar de uitslag</div>
-          <div style="height:10px"></div>
-          <div class="dots"><i class="on"></i><i></i><i></i></div>
-        </div>
-        <div class="cap">
-          <h4>Drill-in · The words</h4>
-          <p>Real vs decoy, side by side — the "OHHH, <em>that's</em> why you said 'melk'" beat.
-          Closing returns to the verdict; the dot strip stays on act 1.</p>
-        </div>
-      </div>
-
-      <div class="mock">
-        <div class="phone">
-          <div class="eb">Uitslag · De terugblik</div>
-          <div style="height:8px"></div>
+          <div style="height:12px"></div>
+          <div class="pair">
+            <div><div class="eb2">Echt</div><div class="w">KOFFIE</div></div>
+            <div><div class="eb2">Lokaas</div><div class="w">THEE</div></div>
+          </div>
+          <div class="hairline"></div>
           <div class="eb2">Hintronde 1</div>
           <div class="list">
             <div><span class="who">Jan</span><span>"zwart"</span></div>
@@ -386,20 +365,17 @@
             <div><span class="who">Jan</span><span>"espresso"</span></div>
             <div><span class="who">Sanne</span><span>"bruin"</span></div>
             <div><span class="who">Tom</span><span>"melk" <span class="flag">◆◆</span></span></div>
-            <div><span class="who">Lotte</span><span>"cafeïne"</span></div>
           </div>
           <div class="fadeout"></div>
           <div style="height:8px"></div>
           <div class="eb2" style="color:#737373">Stemming — 4× Tom · 1× Jan · 1× Sanne</div>
-          <div style="height:10px"></div>
-          <div class="backlink">← Terug naar de uitslag</div>
-          <div style="height:10px"></div>
-          <div class="dots"><i class="on"></i><i></i><i></i></div>
         </div>
         <div class="cap">
-          <h4>Drill-in · The replay</h4>
-          <p>Every clue in order, grouped by cycle, ◆-marks where suspicion turned, vote tally at the
-          end — the screenshot-friendly, shareable moment. The one surface that scrolls (internally).</p>
+          <h4>Drill-in · The words &amp; the replay</h4>
+          <p>One screen: back to the verdict pinned at the very top, the word pair fixed beneath it,
+          and the replay scrolling under that — clues grouped by cycle, ◆-marks where suspicion
+          turned, vote tally at the end. The screenshot-friendly, shareable moment. No progress
+          dots — this is a drill-in, not an act.</p>
         </div>
       </div>
 
