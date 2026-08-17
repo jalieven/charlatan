@@ -11,7 +11,7 @@ Severity: **High** = changes game rules, scoring, or core UX; build is blocked u
 | # | Severity | Type |
 |---|---|---|
 | OQ-4, OQ-12, OQ-13, OQ-15, OQ-18 | High | Contradiction / rule gap |
-| OQ-2, OQ-3, OQ-9, OQ-11, OQ-19, OQ-20 | Medium | Ambiguity / gap |
+| OQ-2, OQ-3, OQ-9, OQ-11, OQ-19, OQ-20, OQ-21 | Medium | Ambiguity / gap |
 | OQ-1, OQ-5, OQ-6, OQ-7, OQ-8, OQ-10, OQ-14, OQ-16, OQ-17 | Low–Medium | Under-specification |
 
 ---
@@ -42,7 +42,7 @@ example.
 
 **Proposed resolution:** there is no timer anywhere in the app; the design section's example
 is replaced by "a subtle scale on the revealed word" and animated phase transitions, which the
-same sentence also suggests. (Adopted in 01-requirements §6.4.)
+same sentence also suggests. (Adopted in 01-requirements §6.5.)
 
 ### OQ-17 · **Low** — The stated phase machine is missing phases the features require
 The implementation section says the app is *"one phase state machine (setup → assign → reveal
@@ -126,6 +126,20 @@ tool); X comes from the word pair's curated distractor list (see the generation 
 Appendix A); if it hits the other Charlatan it is silently wasted; usage is disclosed on the
 result screen.
 
+### OQ-21 · **Medium** — i18n scope details (Dutch)
+The i18n requirement (01-requirements §6.4) mandates English-only code, an i18n layer for all
+frontend strings, and a complete `dutch-i18n.properties` file. Three details are assumed and
+need confirmation: (a) the **default locale** — assumed Dutch, switchable to English on the
+Setup screen; (b) whether English UI strings must be human-polished or may remain
+developer-written source strings; (c) whether the **word-pair list** (game content, ~200
+pairs) must also exist in Dutch for v1, or whether a single-language pair list is acceptable.
+Note that word pairs cannot be translated 1:1 — confusability differs per language (e.g.
+koffie/thee works, but many English pairs won't) — so a Dutch pair list is a curation effort,
+not a translation task.
+**Proposed resolution:** default locale Dutch; English source strings acceptable as-is for
+v1; word pairs ship as a separately curated Dutch list (generated with the Appendix A prompt
+adapted to Dutch), since a Dutch-UI game with English words would be jarring.
+
 ### OQ-2 · **Medium** — Host override bounds for Charlatan count
 Override is required but unbounded: could a host pick 3 Charlatans among 5 players?
 **Proposed resolution:** clamp to 1…⌊players/3⌋.
@@ -187,7 +201,8 @@ device.
 - **Late joiners / early leavers:** players joining or leaving between rounds of a session.
 - **Accessibility:** hold-to-reveal excludes some motor-impaired players; no alternative is
   specified.
-- **Localization:** word pairs are language-bound; the 200-pair list is single-language in v1.
+- ~~**Localization**~~ — now specified: English code, i18n layer for all frontend strings,
+  `dutch-i18n.properties` required (01-requirements §6.4); remaining details tracked as OQ-21.
 - **Clue validation:** "one-word" is enforced how? (single token proposed) Duplicate clues,
   saying the secret word itself, or clueing with a proper noun are all unregulated — party
   convention says the group polices this, but the app could warn.

@@ -55,7 +55,8 @@ is client-side React state, deployed as a static site, installable as an offline
 | Player names | — | Ordered list, add/remove/reorder. Names are the identity key for Dossiers (§3.9). |
 | Charlatan count | Auto by player count | Host override allowed. |
 | Clues per player before voting | **2** | Configurable at game start (range 1–4 `⚠️ OQ-3`). Voting opens only after this many full clue cycles. |
-| Accent color on/off | On | Single accent color used exclusively for the Charlatan reveal moment (§7.3). |
+| Accent color on/off | On | Single accent color used exclusively for the Charlatan reveal moment (§6.5). |
+| Language | Dutch | Dutch or English UI (§6.4). `⚠️ OQ-21` (default locale is assumed Dutch) |
 
 There is deliberately **no timer of any kind**: after each player has given the configured
 number of clues, it is in practice clear who the Charlatan might be, so the game gates on clue
@@ -311,7 +312,32 @@ sub-state so a dropped phone never shows private data.
    by screen layout, timing, or required interaction length (`⚠️ OQ-7`).
 4. Ballot contents are never shown after confirmation; only aggregate results are revealed.
 
-### 6.4 Design system (making black-and-white actually look slick)
+### 6.4 Internationalization (i18n)
+
+- **All code is written in English**: identifiers, comments, commit messages, file names, and
+  internal state values (phase names, action types, storage keys).
+- **No hard-coded user-facing strings.** Every string rendered in the UI — labels, buttons,
+  banners, validation messages, result copy, dossier sentences — goes through an i18n layer
+  and is referenced by key. This includes interpolated/pluralized copy such as
+  "Sarah has survived 8 of 9 Charlatan rounds" and "Player 3 of 8", which must use
+  parameterized messages (never string concatenation) so word order can differ per language.
+- **Translation files use the `.properties` format**, one file per locale, shipped as static
+  assets. The implementation must include, from day one:
+  - `en-i18n.properties` — the source-of-truth English strings; and
+  - `dutch-i18n.properties` — a complete Dutch translation of **every** string key used in
+    the frontend. A key present in English but missing in Dutch is a build error, not a
+    silent English fallback. `⚠️ OQ-21`
+- Locale selection: Dutch or English, switchable on the Setup screen and persisted locally
+  alongside the dossier data. `⚠️ OQ-21`
+- **Scope boundary:** the word-pair list (Appendix A) is game *content*, not UI chrome; it is
+  not part of the `.properties` files. v1 ships with a single-language word-pair list — see
+  OQ-21 for whether a Dutch pair list is also required.
+- Implementation note: `.properties` is a Java-style format without a native JS loader; the
+  build includes a tiny parser (or a Vite plugin) that converts the files to message maps at
+  build time, keeping the runtime dependency-free. A lightweight library (e.g. i18next with a
+  properties loader) is acceptable if it stays within the no-backend, static-site constraint.
+
+### 6.5 Design system (making black-and-white actually look slick)
 
 Monochrome with default styling just reads as unstyled. What carries it:
 
