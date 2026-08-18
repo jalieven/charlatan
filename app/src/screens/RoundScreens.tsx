@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { Dispatch } from 'react'
 import type { Action } from '../game/reducer'
-import { activeSeats, canWhisper, speakingOrder, tally, wordFor } from '../game/reducer'
+import { canWhisper, speakingOrder, tally, wordFor } from '../game/reducer'
 import { burnWhisperAction } from '../game/actions'
 import type { GameState, RoundState } from '../game/types'
 import { useT } from '../i18n'
@@ -64,8 +64,9 @@ export function HandoffScreen({ state, dispatch }: { state: GameState; dispatch:
   const t = useT()
   const round = state.round!
   const voting = state.phase === 'vote'
-  const seats = voting ? activeSeats(round) : round.players.map((_, i) => i)
-  const name = round.players[voting ? seats[round.cursor] : round.cursor].name
+  // Both phases walk the round's shuffled order; voting skips eliminated players.
+  const seats = voting ? speakingOrder(round) : round.speakerOrder
+  const name = round.players[seats[round.cursor]].name
   const progress = t('handoff.progress', { i: round.cursor + 1, n: seats.length })
   return (
     <div className="flex h-full flex-col gap-3">
@@ -87,7 +88,7 @@ export function HandoffScreen({ state, dispatch }: { state: GameState; dispatch:
 export function RevealScreen({ state, dispatch }: { state: GameState; dispatch: Dispatch<Action> }) {
   const t = useT()
   const round = state.round!
-  const seat = round.cursor
+  const seat = round.speakerOrder[round.cursor]
   const player = round.players[seat]
   const word = wordFor(round, seat)
   const whispered = round.whisper && round.whisper.target === player.name
@@ -102,7 +103,7 @@ export function RevealScreen({ state, dispatch }: { state: GameState; dispatch: 
   return (
     <div className="flex h-full flex-col gap-3">
       <div>
-        <div className="eb">{t('handoff.progress', { i: seat + 1, n: round.players.length })}</div>
+        <div className="eb">{t('handoff.progress', { i: round.cursor + 1, n: round.players.length })}</div>
         <div className="text-xl font-bold">{player.name.toUpperCase()}</div>
       </div>
 
@@ -335,7 +336,7 @@ export function CluesScreen({ state, dispatch }: { state: GameState; dispatch: D
 export function BallotScreen({ state, dispatch }: { state: GameState; dispatch: Dispatch<Action> }) {
   const t = useT()
   const round = state.round!
-  const seats = activeSeats(round)
+  const seats = speakingOrder(round)
   const voter = round.players[seats[round.cursor]]
   const [choice, setChoice] = useState<string | null>(null)
   const candidates = seats

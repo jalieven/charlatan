@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import type { Action } from './reducer'
-import { activeSeats, canWhisper, guessMatches, reducer, speakingOrder } from './reducer'
+import {
+  activeSeats,
+  canWhisper,
+  guessMatches,
+  reducer,
+  revealSeat,
+  speakingOrder,
+  votingSeat,
+} from './reducer'
 import { burnWhisperAction } from './actions'
 import { scoreRound } from './scoring'
 import type { GameState } from './types'
@@ -124,6 +132,26 @@ describe('reveal flow (§3.3)', () => {
     s = revealAll(s)
     expect(s.phase).toBe('clues')
     expect(s.round!.players.filter((p) => p.peeked)).toHaveLength(1)
+  })
+
+  it("reveal and vote both walk the round's shuffled order", () => {
+    let s = startRound(freshSession(), [2], [3, 0, 5, 2, 4, 1])
+    const revealed: string[] = []
+    while (s.phase === 'reveal') {
+      s = reducer(s, { type: 'HANDOFF_CONTINUE' })
+      revealed.push(s.round!.players[revealSeat(s.round!)].name)
+      s = reducer(s, { type: 'REVEAL_NEXT' })
+    }
+    expect(revealed).toEqual(['Lotte', 'Jan', 'Bram', 'Tom', 'Eva', 'Sanne'])
+    s = clueThrough(s)
+    const voters: string[] = []
+    while (s.phase === 'vote') {
+      s = reducer(s, { type: 'HANDOFF_CONTINUE' })
+      const voter = s.round!.players[votingSeat(s.round!)].name
+      voters.push(voter)
+      s = reducer(s, { type: 'CAST_VOTE', target: voter === 'Jan' ? 'Sanne' : 'Jan' })
+    }
+    expect(voters).toEqual(['Lotte', 'Jan', 'Bram', 'Tom', 'Eva', 'Sanne'])
   })
 })
 

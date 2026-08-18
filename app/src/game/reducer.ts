@@ -64,14 +64,14 @@ export function currentSpeaker(round: RoundState): RoundPlayer | null {
   return round.turn < order.length ? round.players[order[round.turn]] : null
 }
 
-/** Seat currently holding the phone in the reveal phase. */
+/** Seat currently holding the phone in the reveal phase (cursor indexes into speakerOrder). */
 export function revealSeat(round: RoundState): number {
-  return round.cursor
+  return round.speakerOrder[round.cursor]
 }
 
-/** Seat currently voting (cursor indexes into activeSeats). */
+/** Seat currently voting (cursor indexes into the shuffled order minus eliminated). */
 export function votingSeat(round: RoundState): number {
-  return activeSeats(round)[round.cursor]
+  return speakingOrder(round)[round.cursor]
 }
 
 export function tally(votes: Record<string, string>): Record<string, number> {
@@ -89,8 +89,7 @@ export function wordFor(round: RoundState, seat: number): string {
 export function canWhisper(state: GameState): boolean {
   const round = state.round
   if (!round || state.phase !== 'reveal' || round.handoff) return false
-  const seat = round.cursor
-  const player = round.players[seat]
+  const player = round.players[revealSeat(round)]
   const session = state.session
   if (!session) return false
   const cards = session.players.find((p) => p.name === player.name)?.whisperCards ?? 0
@@ -99,7 +98,7 @@ export function canWhisper(state: GameState): boolean {
     player.peeked &&
     cards > 0 &&
     round.whisper === null &&
-    seat < round.players.length - 1
+    round.cursor < round.players.length - 1
   )
 }
 
@@ -278,18 +277,21 @@ export function reducer(state: GameState, action: Action): GameState {
     case 'PEEK': {
       const round = state.round
       if (!round || state.phase !== 'reveal' || round.handoff) return state
-      const players = round.players.map((p, i) => (i === round.cursor ? { ...p, peeked: true } : p))
+      const seat = revealSeat(round)
+      const players = round.players.map((p, i) => (i === seat ? { ...p, peeked: true } : p))
       return withRound(state, { players })
     }
     case 'BURN_WHISPER': {
       if (!canWhisper(state)) return state
       const round = state.round!
-      if (action.targetSeat <= round.cursor || action.targetSeat >= round.players.length)
-        return state
-      // Seat 0 → seat 1 would out the whisperer: seat 1's only prior revealer
-      // is seat 0, so a whisper there is a guaranteed Charlatan reveal.
-      if (round.cursor === 0 && action.targetSeat === 1) return state
-      const by = round.players[round.cursor].name
+      // Targets are validated by reveal position: only players who reveal later.
+      const targetPos = round.speakerOrder.indexOf(action.targetSeat)
+      if (targetPos <= round.cursor) return state
+      // First → second revealer would out the whisperer: the second revealer's
+      // only prior revealer is the first, so a whisper there is a guaranteed
+      // Charlatan reveal.
+      if (round.cursor === 0 && targetPos === 1) return state
+      const by = round.players[revealSeat(round)].name
       const target = round.players[action.targetSeat].name
       const session = state.session!
       return {
@@ -344,7 +346,7 @@ export function reducer(state: GameState, action: Action): GameState {
     case 'CAST_VOTE': {
       const round = state.round
       if (!round || state.phase !== 'vote' || round.handoff) return state
-      const seats = activeSeats(round)
+      const seats = speakingOrder(round)
       const voter = round.players[seats[round.cursor]].name
       const validTarget = seats.some(
         (s) => round.players[s].name === action.target && round.players[s].name !== voter,

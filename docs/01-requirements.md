@@ -64,7 +64,7 @@ is client-side React state, deployed as a static site, installable as an offline
 
 | Option | Default | Notes |
 |---|---|---|
-| Player names | — | Ordered list, add/remove/reorder; order = seating & pass order. Unique, non-empty names. |
+| Player names | — | Ordered list, add/remove/reorder; order = seating only — pass order is re-shuffled per round (§3.4). Unique, non-empty names. |
 | Charlatan count | Auto by player count | Host override allowed, clamped to 1 … ⌊players/3⌋. |
 | Clues per player before voting | **2** | Configurable at game start (range 1–4). Voting opens only after this many full clue cycles. |
 | Whisper cards **per player** | **1** | Personal, session-long allotment (§3.6). Setup-only — the allotment cannot be changed between rounds; mid-session joiners receive it on joining. |
@@ -125,8 +125,8 @@ word.
 ### 3.2 Round structure
 
 1. **Assign:** roles and words are assigned silently by the app.
-2. **Reveal:** the phone is passed player-to-player in seating order; each player privately
-   views their word and optionally peeks at their role (§3.3).
+2. **Reveal:** the phone is passed player-to-player in the round's shuffled order (§3.4);
+   each player privately views their word and optionally peeks at their role (§3.3).
 3. **Clue cycles:** in speaking order, each active player **types a one-word clue into the
    phone, then says it aloud**. The typed clue is appended to the Ledger, which is **always
    visible** to everyone for the rest of the round (§3.5).
@@ -180,11 +180,12 @@ optional slide-to-Whisper-target → covered → slide-to-pass.*
 
 ### 3.4 Speaking order
 
-**The entire speaking order is re-shuffled every round** — a fresh uniform-random permutation
+**The entire player order is re-shuffled every round** — a fresh uniform-random permutation
 of all players, not a rotation of the seating order from a random starting point. Going first
 is a genuine disadvantage and must not always fall on the same person, and no player may be
-able to predict who follows whom from the seating arrangement. Within a round the shuffled
-order is **stable**: every cycle walks the same permutation, skipping eliminated players.
+able to predict who follows whom from the seating arrangement. The same shuffled order drives
+the **reveal pass, every clue cycle, and the vote pass** of that round. Within a round the
+order is **stable**: every phase walks the same permutation, skipping eliminated players.
 
 ### 3.5 Clue ledger
 
