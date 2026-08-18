@@ -47,7 +47,11 @@ export function startRoundAction(state: GameState): Action | null {
 export function burnWhisperAction(state: GameState): Action | null {
   const round = state.round
   if (!round) return null
-  const laterSeats = round.players.map((_, i) => i).filter((i) => i > round.cursor)
+  // Seat 1 is never a target when seat 0 whispers: with only one revealer
+  // before them, the target would know exactly who the Charlatan is.
+  const laterSeats = round.players
+    .map((_, i) => i)
+    .filter((i) => i > round.cursor && !(round.cursor === 0 && i === 1))
   if (laterSeats.length === 0) return null
   return {
     type: 'BURN_WHISPER',

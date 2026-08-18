@@ -197,9 +197,11 @@ export function ResultScreen({ state, dispatch }: { state: GameState; dispatch: 
           <div>
             <div className="eb2">{t('result.peekedLabel')}</div>
             <div className="mt-1 text-sm" style={{ color: 'var(--color-g5)' }}>
-              {summary.peeked.length > 0
-                ? t('result.peekedList', { names: summary.peeked.join(', ') })
-                : t('result.nobodyPeeked')}
+              {summary.peeked.length === 0
+                ? t('result.nobodyPeeked')
+                : summary.peeked.length === 1
+                  ? t('result.peekedOne', { name: summary.peeked[0] })
+                  : t('result.peekedList', { names: summary.peeked.join(', ') })}
             </div>
           </div>
           <div className="hairline" />

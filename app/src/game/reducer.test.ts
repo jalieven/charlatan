@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { Action } from './reducer'
 import { activeSeats, canWhisper, guessMatches, reducer, speakingOrder } from './reducer'
+import { burnWhisperAction } from './actions'
 import { scoreRound } from './scoring'
 import type { GameState } from './types'
 import { charlatanCount, initialState, maxCharlatans } from './types'
@@ -161,6 +162,21 @@ describe('whisper (§3.6)', () => {
     const before = s2
     s2 = reducer(s2, { type: 'BURN_WHISPER', targetSeat: 1, fakeWord: 'espresso', swapped: false })
     expect(s2).toBe(before)
+  })
+
+  it('never targets the second revealer when the first revealer whispers', () => {
+    // Seat 1 would know seat 0 is the Charlatan: nobody else revealed yet.
+    let s = startRound(freshSession(['Jan', 'Sanne', 'Tom']), [0]) // Jan (seat 0) is the Charlatan
+    s = reducer(s, { type: 'HANDOFF_CONTINUE' })
+    s = reducer(s, { type: 'PEEK' })
+    expect(canWhisper(s)).toBe(true)
+    const before = s
+    s = reducer(s, { type: 'BURN_WHISPER', targetSeat: 1, fakeWord: 'espresso', swapped: false })
+    expect(s).toBe(before)
+    // The action creator only ever draws from the remaining valid seats.
+    expect(burnWhisperAction(before)).toMatchObject({ type: 'BURN_WHISPER', targetSeat: 2 })
+    s = reducer(before, { type: 'BURN_WHISPER', targetSeat: 2, fakeWord: 'espresso', swapped: false })
+    expect(s.round!.whisper!.target).toBe('Tom')
   })
 
   it('civilians can never whisper', () => {

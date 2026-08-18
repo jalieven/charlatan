@@ -292,6 +292,9 @@ export function reducer(state: GameState, action: Action): GameState {
       const round = state.round!
       if (action.targetSeat <= round.cursor || action.targetSeat >= round.players.length)
         return state
+      // Seat 0 → seat 1 would out the whisperer: seat 1's only prior revealer
+      // is seat 0, so a whisper there is a guaranteed Charlatan reveal.
+      if (round.cursor === 0 && action.targetSeat === 1) return state
       const by = round.players[round.cursor].name
       const target = round.players[action.targetSeat].name
       const session = state.session!
