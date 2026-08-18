@@ -180,10 +180,11 @@ optional slide-to-Whisper-target → covered → slide-to-pass.*
 
 ### 3.4 Speaking order
 
-**Who speaks first is re-randomized every round** — going first is a genuine disadvantage and
-must not always fall on the same person; consecutive rounds must not reuse the previous
-round's order deliberately. Within a round the order is **stable**: subsequent speakers follow
-the player list order from the round's random starting point, skipping eliminated players.
+**The entire speaking order is re-shuffled every round** — a fresh uniform-random permutation
+of all players, not a rotation of the seating order from a random starting point. Going first
+is a genuine disadvantage and must not always fall on the same person, and no player may be
+able to predict who follows whom from the seating arrangement. Within a round the shuffled
+order is **stable**: every cycle walks the same permutation, skipping eliminated players.
 
 ### 3.5 Clue ledger
 
@@ -314,8 +315,8 @@ The app is **one phase state machine**; the full phase set is:
    clues-per-player, Whisper cards per player, and language, and taps **Start**. Validation:
    3–12 unique, non-empty names.
 2. **Assign flow (invisible).** The app draws an unused word pair from the locale's list,
-   picks real/decoy orientation, assigns Charlatan roles uniformly at random, and picks a
-   random first speaker.
+   picks real/decoy orientation, assigns Charlatan roles uniformly at random, and shuffles
+   the full speaking order for the round.
 3. **Reveal flow.** For each player in pass order: a **handoff interstitial** ("Pass the phone
    to *name*", slide to continue) → the **reveal screen** (one-thumb grammar per §3.3: held
    word, optional long-press peek, optional Whisper release-on-target, Whisper banner if

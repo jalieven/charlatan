@@ -18,14 +18,15 @@ function freshSession(names: string[] = NAMES6, whisperCards = 1): GameState {
   ])
 }
 
-/** Deterministic round: Tom (seat 2) is the Charlatan, Jan (seat 0) speaks first. */
-function startRound(state: GameState, charlatanSeats = [2], firstSpeaker = 0): GameState {
+/** Deterministic round: Tom (seat 2) is the Charlatan, seating order speaks by default. */
+function startRound(state: GameState, charlatanSeats = [2], speakerOrder?: number[]): GameState {
+  const n = state.session!.players.filter((p) => !p.left).length
   return reducer(state, {
     type: 'START_ROUND',
     pairIndex: 0,
     orientation: true, // real = 'koffie', decoy = 'thee'
     charlatanSeats,
-    firstSpeaker,
+    speakerOrder: speakerOrder ?? Array.from({ length: n }, (_, i) => i),
     pair: { a: 'koffie', b: 'thee', distractors: ['espresso', 'cacao'] },
   })
 }
@@ -188,10 +189,10 @@ describe('whisper (§3.6)', () => {
 })
 
 describe('clues (§3.4, §3.5)', () => {
-  it('runs stable speaking order from the random first speaker', () => {
-    let s = revealAll(startRound(freshSession(), [2], 3)) // Lotte speaks first
+  it('runs the exact shuffled speaking order from the action payload', () => {
+    let s = revealAll(startRound(freshSession(), [2], [3, 0, 5, 2, 4, 1]))
     const order = speakingOrder(s.round!).map((i) => s.round!.players[i].name)
-    expect(order).toEqual(['Lotte', 'Eva', 'Bram', 'Jan', 'Sanne', 'Tom'])
+    expect(order).toEqual(['Lotte', 'Jan', 'Bram', 'Tom', 'Eva', 'Sanne'])
     s = reducer(s, { type: 'SUBMIT_CLUE', word: 'warm' })
     expect(s.round!.ledger[0]).toEqual({ author: 'Lotte', word: 'warm', cycle: 1 })
   })

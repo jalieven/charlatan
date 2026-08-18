@@ -27,7 +27,7 @@ export type Action =
       /** true = pair.a is the real word, false = pair.b */
       orientation: boolean
       charlatanSeats: number[]
-      firstSpeaker: number
+      speakerOrder: number[]
       pair: { a: string; b: string; distractors: [string, string] }
     }
   | { type: 'HANDOFF_CONTINUE' }
@@ -54,15 +54,9 @@ export function activeSeats(round: RoundState): number[] {
   return round.players.map((_, i) => i).filter((i) => !round.players[i].eliminated)
 }
 
-/** Speaking order for the current cycle: rotation from firstSpeaker, minus eliminated. */
+/** Speaking order for the current cycle: the round's shuffled seats, minus eliminated. */
 export function speakingOrder(round: RoundState): number[] {
-  const n = round.players.length
-  const order: number[] = []
-  for (let k = 0; k < n; k++) {
-    const seat = (round.firstSpeaker + k) % n
-    if (!round.players[seat].eliminated) order.push(seat)
-  }
-  return order
+  return round.speakerOrder.filter((seat) => !round.players[seat].eliminated)
 }
 
 export function currentSpeaker(round: RoundState): RoundPlayer | null {
@@ -248,7 +242,7 @@ export function reducer(state: GameState, action: Action): GameState {
         number: session.roundsPlayed + 1,
         pair: { real, decoy, distractors: action.pair.distractors },
         players,
-        firstSpeaker: action.firstSpeaker,
+        speakerOrder: action.speakerOrder,
         cursor: 0,
         handoff: true,
         cycle: 1,
@@ -522,7 +516,14 @@ export function reducer(state: GameState, action: Action): GameState {
 
     case 'RESUME': {
       // Rehydration always re-enters via the handoff interstitial (§6.3 inv. 6).
-      const s = action.state
+      let s = action.state
+      if (s.round && !s.round.speakerOrder) {
+        // Pre-shuffle saves carried a firstSpeaker rotation instead of a permutation.
+        const first = (s.round as RoundState & { firstSpeaker?: number }).firstSpeaker ?? 0
+        const n = s.round.players.length
+        const speakerOrder = Array.from({ length: n }, (_, k) => (first + k) % n)
+        s = { ...s, round: { ...s.round, speakerOrder } }
+      }
       if (s.round && (s.phase === 'reveal' || s.phase === 'vote')) {
         return { ...s, round: { ...s.round, handoff: true } }
       }

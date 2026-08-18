@@ -228,8 +228,8 @@ export function CluesScreen({ state, dispatch }: { state: GameState; dispatch: D
   if (clean && round.ledger.some((c) => c.word.toLowerCase() === clean.toLowerCase()))
     warnings.push(t('clues.warnDuplicate'))
 
-  // Full rotation, eliminated players struck through (§3.4).
-  const rotation = round.players.map((_, i) => (round.firstSpeaker + i) % round.players.length)
+  // The round's full shuffled order, eliminated players struck through (§3.4).
+  const seatOrder = round.speakerOrder
 
   return (
     <div className="flex h-full flex-col gap-3">
@@ -245,7 +245,7 @@ export function CluesScreen({ state, dispatch }: { state: GameState; dispatch: D
         </div>
       )}
       <div className="flex flex-wrap gap-1.5">
-        {rotation.map((seatIdx) => {
+        {seatOrder.map((seatIdx) => {
           const p = round.players[seatIdx]
           const orderIdx = order.indexOf(seatIdx)
           const status = p.eliminated

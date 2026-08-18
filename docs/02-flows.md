@@ -30,7 +30,7 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    Assign["ASSIGN (invisible)<br/>draw unused pair from locale list · pick real/decoy ·<br/>assign Charlatans · random first speaker"]
+    Assign["ASSIGN (invisible)<br/>draw unused pair from locale list · pick real/decoy ·<br/>assign Charlatans · shuffle full speaking order"]
     Assign --> H1["S2 · Handoff<br/>'Pass the phone to NAME'"]
 
     subgraph RevealLoop["REVEAL — once per player, in pass order"]
@@ -160,7 +160,7 @@ flowchart TD
 ### S4 · Clue entry + Ledger
 | Component | Notes |
 |---|---|
-| Turn banner | "NAME, your clue" — speaking order from random first speaker, re-randomized each round |
+| Turn banner | "NAME, your clue" — fully shuffled speaking order, re-shuffled each round |
 | Speaking-order strip | All players; eliminated players struck through and skipped |
 | One-word clue input | Private non-blocking warnings: multi-word, equals own secret word, duplicates an earlier clue this round |
 | Ledger | Every clue this round, in order, always visible; grouped by cycle; **must scale gracefully to 5+ cycles**; a neutral record — suspicion markers (◆) exist only in the post-round replay, never live |
