@@ -102,32 +102,6 @@ export function canWhisper(state: GameState): boolean {
   )
 }
 
-/**
- * True when a clue leans on the speaker's own secret word: an exact match,
- * containment either way, or any shared run of 3+ letters — "kapstok" blocks
- * "kapstick" (kap) and "lekstok" (stok). Case-, trim- and
- * diacritics-insensitive. Only ever compare against the speaker's OWN word:
- * checking the Charlatan against the real word would leak it to them.
- */
-export function clueTooClose(clue: string, secret: string): boolean {
-  const norm = (s: string) =>
-    s
-      .toLowerCase()
-      .trim()
-      .normalize('NFD')
-      .replace(/[̀-ͯ]/g, '')
-      .replace(/['’]/g, '')
-  const c = norm(clue)
-  const w = norm(secret)
-  if (!c || !w) return false
-  if (c.includes(w) || w.includes(c)) return true
-  for (let i = 0; i + 3 <= w.length; i++) {
-    const part = w.slice(i, i + 3)
-    if (!part.includes(' ') && c.includes(part)) return true
-  }
-  return false
-}
-
 // Steal matching: case-insensitive, trimmed, diacritics-insensitive, with
 // basic singular/plural tolerance (nl: -en/-s/-'s, en: -s/-es).
 export function guessMatches(guess: string, real: string): boolean {
@@ -348,9 +322,7 @@ export function reducer(state: GameState, action: Action): GameState {
       const word = action.word.trim()
       if (!word) return state
       const order = speakingOrder(round)
-      const seat = order[round.turn]
-      if (clueTooClose(word, wordFor(round, seat))) return state
-      const author = round.players[seat].name
+      const author = round.players[order[round.turn]].name
       const ledger = [...round.ledger, { author, word, cycle: round.cycle }]
       if (round.turn + 1 < order.length) {
         return withRound(state, { ledger, turn: round.turn + 1 })

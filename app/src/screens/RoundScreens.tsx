@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { Dispatch } from 'react'
 import type { Action } from '../game/reducer'
-import { canWhisper, clueTooClose, speakingOrder, tally, wordFor } from '../game/reducer'
+import { canWhisper, speakingOrder, tally, wordFor } from '../game/reducer'
 import { burnWhisperAction } from '../game/actions'
 import type { GameState, RoundState } from '../game/types'
 import { useT } from '../i18n'
@@ -220,17 +220,12 @@ export function CluesScreen({ state, dispatch }: { state: GameState; dispatch: D
   const warnings: string[] = []
   const clean = draft.trim()
   if (clean.includes(' ')) warnings.push(t('clues.warnMultiword'))
-  // Hard block: the clue may not lean on the speaker's own secret word
-  // (exact, containment, or a shared run of 3+ letters). The reducer
-  // rejects these too; the disabled confirm makes the rule visible.
-  const tooClose =
-    speaker !== null && clean !== '' && clueTooClose(clean, wordFor(round, speakerSeat!))
-  if (tooClose)
-    warnings.push(
-      clean.toLowerCase() === wordFor(round, speakerSeat!).toLowerCase()
-        ? t('clues.warnOwnWord')
-        : t('clues.warnTooClose'),
-    )
+  if (
+    speaker &&
+    clean &&
+    clean.toLowerCase() === wordFor(round, speakerSeat!).toLowerCase()
+  )
+    warnings.push(t('clues.warnOwnWord'))
   if (clean && round.ledger.some((c) => c.word.toLowerCase() === clean.toLowerCase()))
     warnings.push(t('clues.warnDuplicate'))
 
@@ -306,7 +301,7 @@ export function CluesScreen({ state, dispatch }: { state: GameState; dispatch: D
             maxLength={24}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' && clean && !tooClose) {
+              if (e.key === 'Enter' && clean) {
                 dispatch({ type: 'SUBMIT_CLUE', word: clean })
                 setDraft('')
               }
@@ -321,7 +316,7 @@ export function CluesScreen({ state, dispatch }: { state: GameState; dispatch: D
             type="button"
             className="cta"
             data-testid="clues.confirm"
-            disabled={!clean || tooClose}
+            disabled={!clean}
             onClick={() => {
               dispatch({ type: 'SUBMIT_CLUE', word: clean })
               setDraft('')
