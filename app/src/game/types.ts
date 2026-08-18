@@ -16,7 +16,8 @@ export interface WordPair {
   a: string
   b: string
   domain: string
-  distractors: [string, string]
+  /** Same-domain fake words for the Whisper; every pair carries at least 5. */
+  distractors: string[]
 }
 
 export interface Settings {
@@ -89,7 +90,7 @@ export type VerdictInfo =
 
 export interface RoundState {
   number: number
-  pair: { real: string; decoy: string; distractors: [string, string] }
+  pair: { real: string; decoy: string; distractors: string[] }
   players: RoundPlayer[]
   /** Seat index of the round's random first speaker; order is stable within the round. */
   firstSpeaker: number

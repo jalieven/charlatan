@@ -28,7 +28,7 @@ export type Action =
       orientation: boolean
       charlatanSeats: number[]
       firstSpeaker: number
-      pair: { a: string; b: string; distractors: [string, string] }
+      pair: { a: string; b: string; distractors: string[] }
     }
   | { type: 'HANDOFF_CONTINUE' }
   | { type: 'PEEK' }
