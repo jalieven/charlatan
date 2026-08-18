@@ -92,8 +92,8 @@ export interface RoundState {
   number: number
   pair: { real: string; decoy: string; distractors: string[] }
   players: RoundPlayer[]
-  /** Seat index of the round's random first speaker; order is stable within the round. */
-  firstSpeaker: number
+  /** Fresh uniform-random permutation of all seats, drawn at round start; stable within the round. */
+  speakerOrder: number[]
   /** Reveal/vote progress: position within the phase's seat order. */
   cursor: number
   /** Handoff interstitial active (privacy gate). */

@@ -30,7 +30,7 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    Assign["ASSIGN (invisible)<br/>draw unused pair from locale list · pick real/decoy ·<br/>assign Charlatans · random first speaker"]
+    Assign["ASSIGN (invisible)<br/>draw unused pair from locale list · pick real/decoy ·<br/>assign Charlatans · shuffle full speaking order"]
     Assign --> H1["S2 · Handoff<br/>'Pass the phone to NAME'"]
 
     subgraph RevealLoop["REVEAL — once per player, in pass order"]
@@ -130,7 +130,7 @@ flowchart TD
 |---|---|
 | Title / logo lockup | Heavy display type, monochrome |
 | Resume prompt (conditional) | "Resume or new game?" when an unfinished round exists; "new game" explicitly ends it |
-| Player name list | Add / remove / reorder; order = seating & pass order; min 4, max 12; unique non-empty names; no mid-session renames |
+| Player name list | Add / remove / reorder; order = seating only — pass order is re-shuffled per round; min 4, max 12; unique non-empty names; no mid-session renames |
 | Name input + add button | 56 px targets |
 | Charlatan count stepper | Auto default (1 for 3–7, 2 for 8+), override clamped 1…⌊players/3⌋ |
 | Clues-per-player stepper | Default 2, range 1–4 |
@@ -160,7 +160,7 @@ flowchart TD
 ### S4 · Clue entry + Ledger
 | Component | Notes |
 |---|---|
-| Turn banner | "NAME, your clue" — speaking order from random first speaker, re-randomized each round |
+| Turn banner | "NAME, your clue" — fully shuffled speaking order, re-shuffled each round |
 | Speaking-order strip | All players; eliminated players struck through and skipped |
 | One-word clue input | Private non-blocking warnings: multi-word, equals own secret word, duplicates an earlier clue this round |
 | Ledger | Every clue this round, in order, always visible; grouped by cycle; **must scale gracefully to 5+ cycles**; a neutral record — suspicion markers (◆) exist only in the post-round replay, never live |
