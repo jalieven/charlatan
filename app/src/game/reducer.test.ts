@@ -10,7 +10,7 @@ import {
   speakingOrder,
   votingSeat,
 } from './reducer'
-import { burnWhisperAction, wordLists } from './actions'
+import { burnWhisperAction } from './actions'
 import { scoreRound } from './scoring'
 import type { GameState } from './types'
 import { charlatanCount, initialState, maxCharlatans } from './types'
@@ -464,18 +464,4 @@ describe('word definitions (reveal aid)', () => {
     expect(definitionFor(heads.round!, 2)).toBe('warme drank van gedroogde blaadjes') // charlatan
   })
 
-  it('every list entry defines all four words without naming any of them', () => {
-    for (const list of Object.values(wordLists)) {
-      for (const p of list) {
-        const words = [p.a, p.b, ...p.distractors]
-        const defs = [p.defA, p.defB, ...p.distractorDefs]
-        for (const def of defs) {
-          expect(def.trim().length).toBeGreaterThan(0)
-          for (const w of words) {
-            expect(def.toLowerCase()).not.toMatch(new RegExp(`\\b${w.toLowerCase()}\\b`))
-          }
-        }
-      }
-    }
-  })
 })

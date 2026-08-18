@@ -19,8 +19,10 @@ export interface WordPair {
   defA: string
   defB: string
   domain: string
-  distractors: [string, string]
-  distractorDefs: [string, string]
+  /** Same-domain fake words for the Whisper; every pair carries at least 5. */
+  distractors: string[]
+  /** distractorDefs[i] defines distractors[i]. */
+  distractorDefs: string[]
 }
 
 export interface Settings {
@@ -98,8 +100,8 @@ export interface RoundState {
     realDef: string
     decoy: string
     decoyDef: string
-    distractors: [string, string]
-    distractorDefs: [string, string]
+    distractors: string[]
+    distractorDefs: string[]
   }
   players: RoundPlayer[]
   /** Fresh uniform-random permutation of all seats, drawn at round start; stable within the round. */

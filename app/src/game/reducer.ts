@@ -33,8 +33,8 @@ export type Action =
         b: string
         defA: string
         defB: string
-        distractors: [string, string]
-        distractorDefs: [string, string]
+        distractors: string[]
+        distractorDefs: string[]
       }
     }
   | { type: 'HANDOFF_CONTINUE' }
