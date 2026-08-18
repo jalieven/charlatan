@@ -3,13 +3,14 @@ import type { Action } from './reducer'
 import {
   activeSeats,
   canWhisper,
+  definitionFor,
   guessMatches,
   reducer,
   revealSeat,
   speakingOrder,
   votingSeat,
 } from './reducer'
-import { burnWhisperAction } from './actions'
+import { burnWhisperAction, wordLists } from './actions'
 import { scoreRound } from './scoring'
 import type { GameState } from './types'
 import { charlatanCount, initialState, maxCharlatans } from './types'
@@ -35,7 +36,14 @@ function startRound(state: GameState, charlatanSeats = [2], speakerOrder?: numbe
     orientation: true, // real = 'koffie', decoy = 'thee'
     charlatanSeats,
     speakerOrder: speakerOrder ?? Array.from({ length: n }, (_, i) => i),
-    pair: { a: 'koffie', b: 'thee', distractors: ['espresso', 'cacao'] },
+    pair: {
+      a: 'koffie',
+      b: 'thee',
+      defA: 'warme drank van gebrande bonen',
+      defB: 'warme drank van gedroogde blaadjes',
+      distractors: ['espresso', 'cacao'],
+      distractorDefs: ['klein sterk kopje', 'poeder voor chocolade'],
+    },
   })
 }
 
@@ -170,8 +178,14 @@ describe('whisper (§3.6)', () => {
     expect(canWhisper(s)).toBe(false) // not peeked yet
     s = reducer(s, { type: 'PEEK' })
     expect(canWhisper(s)).toBe(true)
-    s = reducer(s, { type: 'BURN_WHISPER', targetSeat: 4, fakeWord: 'espresso', swapped: false })
-    expect(s.round!.whisper).toEqual({ by: 'Tom', target: 'Eva', fakeWord: 'espresso', swapped: false })
+    s = reducer(s, { type: 'BURN_WHISPER', targetSeat: 4, fakeWord: 'espresso', fakeWordDef: 'klein sterk kopje', swapped: false })
+    expect(s.round!.whisper).toEqual({
+      by: 'Tom',
+      target: 'Eva',
+      fakeWord: 'espresso',
+      fakeWordDef: 'klein sterk kopje',
+      swapped: false,
+    })
     expect(s.session!.players.find((p) => p.name === 'Tom')!.whisperCards).toBe(0)
     expect(canWhisper(s)).toBe(false) // one per round, and Tom is out of cards
   })
@@ -189,7 +203,7 @@ describe('whisper (§3.6)', () => {
     let s2 = toTomReveal(startRound(freshSession()))
     s2 = reducer(s2, { type: 'PEEK' })
     const before = s2
-    s2 = reducer(s2, { type: 'BURN_WHISPER', targetSeat: 1, fakeWord: 'espresso', swapped: false })
+    s2 = reducer(s2, { type: 'BURN_WHISPER', targetSeat: 1, fakeWord: 'espresso', fakeWordDef: 'klein sterk kopje', swapped: false })
     expect(s2).toBe(before)
   })
 
@@ -200,11 +214,11 @@ describe('whisper (§3.6)', () => {
     s = reducer(s, { type: 'PEEK' })
     expect(canWhisper(s)).toBe(true)
     const before = s
-    s = reducer(s, { type: 'BURN_WHISPER', targetSeat: 1, fakeWord: 'espresso', swapped: false })
+    s = reducer(s, { type: 'BURN_WHISPER', targetSeat: 1, fakeWord: 'espresso', fakeWordDef: 'klein sterk kopje', swapped: false })
     expect(s).toBe(before)
     // The action creator only ever draws from the remaining valid seats.
     expect(burnWhisperAction(before)).toMatchObject({ type: 'BURN_WHISPER', targetSeat: 2 })
-    s = reducer(before, { type: 'BURN_WHISPER', targetSeat: 2, fakeWord: 'espresso', swapped: false })
+    s = reducer(before, { type: 'BURN_WHISPER', targetSeat: 2, fakeWord: 'espresso', fakeWordDef: 'klein sterk kopje', swapped: false })
     expect(s.round!.whisper!.target).toBe('Tom')
   })
 
@@ -438,5 +452,30 @@ describe('roster and session (§2.1, §4)', () => {
   it('draw pool avoids repeats within a session', () => {
     const s = startRound(freshSession())
     expect(s.session!.usedPairIndexes).toEqual([0])
+  })
+})
+
+describe('word definitions (reveal aid)', () => {
+  it('maps definitions along with the orientation', () => {
+    const heads = startRound(freshSession())
+    expect(heads.round!.pair.realDef).toBe('warme drank van gebrande bonen')
+    expect(heads.round!.pair.decoyDef).toBe('warme drank van gedroogde blaadjes')
+    expect(definitionFor(heads.round!, 0)).toBe('warme drank van gebrande bonen') // civilian
+    expect(definitionFor(heads.round!, 2)).toBe('warme drank van gedroogde blaadjes') // charlatan
+  })
+
+  it('every list entry defines all four words without naming any of them', () => {
+    for (const list of Object.values(wordLists)) {
+      for (const p of list) {
+        const words = [p.a, p.b, ...p.distractors]
+        const defs = [p.defA, p.defB, ...p.distractorDefs]
+        for (const def of defs) {
+          expect(def.trim().length).toBeGreaterThan(0)
+          for (const w of words) {
+            expect(def.toLowerCase()).not.toMatch(new RegExp(`\\b${w.toLowerCase()}\\b`))
+          }
+        }
+      }
+    }
   })
 })

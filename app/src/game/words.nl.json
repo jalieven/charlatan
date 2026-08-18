@@ -1,42 +1,282 @@
 [
-  { "a": "koffie", "b": "thee", "domain": "drinken", "distractors": ["espresso", "cacao"] },
-  { "a": "strand", "b": "woestijn", "domain": "plaatsen", "distractors": ["duin", "oase"] },
-  { "a": "gitaar", "b": "viool", "domain": "muziek", "distractors": ["cello", "banjo"] },
-  { "a": "fiets", "b": "step", "domain": "vervoer", "distractors": ["skateboard", "bromfiets"] },
-  { "a": "winter", "b": "herfst", "domain": "seizoenen", "distractors": ["lente", "vorst"] },
-  { "a": "pizza", "b": "pannenkoek", "domain": "eten", "distractors": ["quiche", "wrap"] },
-  { "a": "kat", "b": "hond", "domain": "dieren", "distractors": ["konijn", "hamster"] },
-  { "a": "zon", "b": "maan", "domain": "natuur", "distractors": ["ster", "komeet"] },
-  { "a": "bibliotheek", "b": "boekenwinkel", "domain": "plaatsen", "distractors": ["archief", "kiosk"] },
-  { "a": "trein", "b": "tram", "domain": "vervoer", "distractors": ["metro", "bus"] },
-  { "a": "zwembad", "b": "meer", "domain": "plaatsen", "distractors": ["vijver", "zee"] },
-  { "a": "appel", "b": "peer", "domain": "eten", "distractors": ["pruim", "perzik"] },
-  { "a": "tent", "b": "caravan", "domain": "kamperen", "distractors": ["hut", "iglo"] },
-  { "a": "voetbal", "b": "rugby", "domain": "sport", "distractors": ["handbal", "hockey"] },
-  { "a": "schilder", "b": "beeldhouwer", "domain": "beroepen", "distractors": ["fotograaf", "architect"] },
-  { "a": "ontbijt", "b": "brunch", "domain": "eten", "distractors": ["lunch", "dessert"] },
-  { "a": "berg", "b": "heuvel", "domain": "natuur", "distractors": ["klif", "vulkaan"] },
-  { "a": "sneeuw", "b": "hagel", "domain": "weer", "distractors": ["regen", "ijzel"] },
-  { "a": "piano", "b": "orgel", "domain": "muziek", "distractors": ["accordeon", "keyboard"] },
-  { "a": "dokter", "b": "tandarts", "domain": "beroepen", "distractors": ["apotheker", "chirurg"] },
-  { "a": "bruiloft", "b": "verjaardag", "domain": "feesten", "distractors": ["doopfeest", "jubileum"] },
-  { "a": "bier", "b": "wijn", "domain": "drinken", "distractors": ["cider", "champagne"] },
-  { "a": "vliegtuig", "b": "helikopter", "domain": "vervoer", "distractors": ["zeppelin", "raket"] },
-  { "a": "bos", "b": "park", "domain": "natuur", "distractors": ["tuin", "jungle"] },
-  { "a": "soep", "b": "stoofpot", "domain": "eten", "distractors": ["saus", "puree"] },
-  { "a": "schaken", "b": "dammen", "domain": "spellen", "distractors": ["poker", "scrabble"] },
-  { "a": "leraar", "b": "professor", "domain": "beroepen", "distractors": ["coach", "mentor"] },
-  { "a": "krant", "b": "tijdschrift", "domain": "media", "distractors": ["folder", "roman"] },
-  { "a": "schoen", "b": "laars", "domain": "kleding", "distractors": ["sandaal", "pantoffel"] },
-  { "a": "keuken", "b": "badkamer", "domain": "huis", "distractors": ["kelder", "zolder"] },
-  { "a": "haai", "b": "dolfijn", "domain": "dieren", "distractors": ["orka", "walvis"] },
-  { "a": "honing", "b": "siroop", "domain": "eten", "distractors": ["confituur", "suiker"] },
-  { "a": "kasteel", "b": "kerk", "domain": "gebouwen", "distractors": ["toren", "paleis"] },
-  { "a": "camping", "b": "hotel", "domain": "reizen", "distractors": ["hostel", "resort"] },
-  { "a": "mier", "b": "spin", "domain": "dieren", "distractors": ["kever", "wesp"] },
-  { "a": "gordijn", "b": "rolluik", "domain": "huis", "distractors": ["hor", "luifel"] },
-  { "a": "marathon", "b": "wielerwedstrijd", "domain": "sport", "distractors": ["triatlon", "sprint"] },
-  { "a": "museum", "b": "galerie", "domain": "cultuur", "distractors": ["expo", "atelier"] },
-  { "a": "friet", "b": "chips", "domain": "eten", "distractors": ["popcorn", "kroket"] },
-  { "a": "regenboog", "b": "zonsondergang", "domain": "natuur", "distractors": ["dageraad", "noorderlicht"] }
+  {
+    "a": "koffie", "b": "thee", "domain": "drinken",
+    "defA": "warme drank gezet van gebrande en gemalen bonen",
+    "defB": "warme drank van gedroogde blaadjes die je laat trekken",
+    "distractors": ["espresso", "cacao"],
+    "distractorDefs": ["klein, sterk kopje gezet onder hoge druk", "poeder van tropische bonen, de basis van chocolade"]
+  },
+  {
+    "a": "strand", "b": "woestijn", "domain": "plaatsen",
+    "defA": "brede strook zand of kiezels langs de waterlijn",
+    "defB": "uitgestrekt, kurkdroog gebied waar bijna niets groeit",
+    "distractors": ["duin", "oase"],
+    "distractorDefs": ["door de wind opgeworpen zandheuvel, vaak begroeid met helmgras", "vruchtbare plek met water midden in dor gebied"]
+  },
+  {
+    "a": "gitaar", "b": "viool", "domain": "muziek",
+    "defA": "snaarinstrument dat je tokkelend of slaand bespeelt",
+    "defB": "klein strijkinstrument dat je onder je kin klemt",
+    "distractors": ["cello", "banjo"],
+    "distractorDefs": ["groot strijkinstrument dat tussen de knieën staat", "tokkelinstrument met ronde klankkast en heldere klank"]
+  },
+  {
+    "a": "fiets", "b": "step", "domain": "vervoer",
+    "defA": "tweewieler met pedalen en een ketting",
+    "defB": "plankje met stuur dat je met één voet vooruit duwt",
+    "distractors": ["skateboard", "bromfiets"],
+    "distractorDefs": ["plank op vier wieltjes, zonder stuur", "lichte gemotoriseerde tweewieler met kenteken"]
+  },
+  {
+    "a": "winter", "b": "herfst", "domain": "seizoenen",
+    "defA": "koudste seizoen van het jaar, met korte dagen",
+    "defB": "seizoen waarin bladeren verkleuren en vallen",
+    "distractors": ["lente", "vorst"],
+    "distractorDefs": ["seizoen waarin alles begint te bloeien en groeien", "temperatuur onder nul waarbij alles bevriest"]
+  },
+  {
+    "a": "pizza", "b": "pannenkoek", "domain": "eten",
+    "defA": "platte bodem uit de oven met saus en beleg",
+    "defB": "dun gebakken beslag uit de pan, zoet of hartig",
+    "distractors": ["quiche", "wrap"],
+    "distractorDefs": ["hartige taart met een vulling van ei en room", "dun broodvel dat je oprolt rond een vulling"]
+  },
+  {
+    "a": "kat", "b": "hond", "domain": "dieren",
+    "defA": "eigenzinnig huisdier dat spint en muizen vangt",
+    "defB": "trouw huisdier dat blaft en graag gaat wandelen",
+    "distractors": ["konijn", "hamster"],
+    "distractorDefs": ["huisdier met lange oren en een wipneus", "klein knaagdier dat eten in zijn wangzakken propt"]
+  },
+  {
+    "a": "zon", "b": "maan", "domain": "natuur",
+    "defA": "hemellichaam dat ons overdag licht en warmte geeft",
+    "defB": "hemellichaam dat 's nachts schijnt en van vorm lijkt te veranderen",
+    "distractors": ["ster", "komeet"],
+    "distractorDefs": ["twinkelend lichtpuntje aan de nachtelijke hemel", "hemellichaam met een lange lichtende staart"]
+  },
+  {
+    "a": "bibliotheek", "b": "boekenwinkel", "domain": "plaatsen",
+    "defA": "plek waar je gratis boeken kunt lenen",
+    "defB": "zaak waar je nieuwe boeken koopt",
+    "distractors": ["archief", "kiosk"],
+    "distractorDefs": ["bewaarplaats voor oude documenten en dossiers", "klein stalletje voor kranten en snoep"]
+  },
+  {
+    "a": "trein", "b": "tram", "domain": "vervoer",
+    "defA": "lange rij wagons over het spoor tussen steden",
+    "defB": "railvoertuig dat door de stadsstraten rijdt",
+    "distractors": ["metro", "bus"],
+    "distractorDefs": ["ondergronds vervoer met eigen stations", "groot wegvoertuig met vaste haltes"]
+  },
+  {
+    "a": "zwembad", "b": "meer", "domain": "plaatsen",
+    "defA": "aangelegd bassin met chloorwater om baantjes te trekken",
+    "defB": "grote natuurlijke watervlakte omringd door land",
+    "distractors": ["vijver", "zee"],
+    "distractorDefs": ["klein aangelegd water in tuin of park", "uitgestrekt zout water met golven en getijden"]
+  },
+  {
+    "a": "appel", "b": "peer", "domain": "eten",
+    "defA": "rond, knapperig stuk fruit met een klokhuis",
+    "defB": "zacht stuk fruit, smal bovenaan en breed onderaan",
+    "distractors": ["pruim", "perzik"],
+    "distractorDefs": ["klein donker steenfruit met een gladde schil", "zacht steenfruit met een fluweelzachte schil"]
+  },
+  {
+    "a": "tent", "b": "caravan", "domain": "kamperen",
+    "defA": "opvouwbaar doek op stokken om in te slapen",
+    "defB": "verrijdbaar huisje dat je achter de auto hangt",
+    "distractors": ["hut", "iglo"],
+    "distractorDefs": ["eenvoudig optrekje van hout of takken", "koepelvormig onderkomen van sneeuwblokken"]
+  },
+  {
+    "a": "voetbal", "b": "rugby", "domain": "sport",
+    "defA": "teamsport waarbij je de bal in het doel trapt",
+    "defB": "stevige teamsport met een ovale bal die je mag dragen",
+    "distractors": ["handbal", "hockey"],
+    "distractorDefs": ["snelle zaalsport waarbij je op een doel werpt", "teamsport waarbij je de bal met een stick slaat"]
+  },
+  {
+    "a": "schilder", "b": "beeldhouwer", "domain": "beroepen",
+    "defA": "kunstenaar die met verf op doek werkt",
+    "defB": "kunstenaar die figuren uit steen of hout hakt",
+    "distractors": ["fotograaf", "architect"],
+    "distractorDefs": ["legt momenten vast met een camera", "ontwerper van gebouwen en plattegronden"]
+  },
+  {
+    "a": "ontbijt", "b": "brunch", "domain": "eten",
+    "defA": "eerste maaltijd van de dag, vlak na het opstaan",
+    "defB": "late ochtendmaaltijd die twee maaltijden in één combineert",
+    "distractors": ["lunch", "dessert"],
+    "distractorDefs": ["middagmaal, vaak met boterhammen", "zoete afsluiter na de hoofdmaaltijd"]
+  },
+  {
+    "a": "berg", "b": "heuvel", "domain": "natuur",
+    "defA": "hoge rotsachtige verheffing, soms met sneeuwtop",
+    "defB": "zachte glooiing in het landschap, makkelijk te beklimmen",
+    "distractors": ["klif", "vulkaan"],
+    "distractorDefs": ["steile rotswand die loodrecht naar beneden valt", "opening in de aardkorst die as en lava kan uitspuwen"]
+  },
+  {
+    "a": "sneeuw", "b": "hagel", "domain": "weer",
+    "defA": "witte vlokken die zachtjes neerdwarrelen",
+    "defB": "harde ijskorreltjes die kletterend neervallen",
+    "distractors": ["regen", "ijzel"],
+    "distractorDefs": ["waterdruppels die uit de wolken vallen", "neerslag die meteen vastvriest tot een spekgladde laag"]
+  },
+  {
+    "a": "piano", "b": "orgel", "domain": "muziek",
+    "defA": "groot toetsinstrument met hamertjes en snaren",
+    "defB": "toetsinstrument met pijpen, vaak in kerken",
+    "distractors": ["accordeon", "keyboard"],
+    "distractorDefs": ["instrument met een balg die je in- en uitschuift", "elektronisch toetsinstrument met honderden klanken"]
+  },
+  {
+    "a": "dokter", "b": "tandarts", "domain": "beroepen",
+    "defA": "onderzoekt zieke mensen en schrijft medicijnen voor",
+    "defB": "controleert en herstelt je gebit",
+    "distractors": ["apotheker", "chirurg"],
+    "distractorDefs": ["verstrekt medicijnen op voorschrift", "voert operaties uit in het ziekenhuis"]
+  },
+  {
+    "a": "bruiloft", "b": "verjaardag", "domain": "feesten",
+    "defA": "feest waarop twee mensen elkaar het jawoord geven",
+    "defB": "jaarlijks feest met taart en kaarsjes uitblazen",
+    "distractors": ["doopfeest", "jubileum"],
+    "distractorDefs": ["viering waarop een baby zijn naam krijgt", "viering van een rond aantal jaren"]
+  },
+  {
+    "a": "bier", "b": "wijn", "domain": "drinken",
+    "defA": "gebrouwen drank van mout en hop, met schuimkraag",
+    "defB": "drank van gegiste druiven, rood of wit",
+    "distractors": ["cider", "champagne"],
+    "distractorDefs": ["licht bruisende drank van gegiste appels", "feestelijke bubbels die je met een knal ontkurkt"]
+  },
+  {
+    "a": "vliegtuig", "b": "helikopter", "domain": "vervoer",
+    "defA": "gevleugeld toestel dat van een startbaan opstijgt",
+    "defB": "toestel met draaiende wieken dat stil kan blijven hangen",
+    "distractors": ["zeppelin", "raket"],
+    "distractorDefs": ["langwerpig luchtschip gevuld met gas", "toestel dat loodrecht de ruimte in schiet"]
+  },
+  {
+    "a": "bos", "b": "park", "domain": "natuur",
+    "defA": "groot stuk natuur vol bomen",
+    "defB": "aangelegd groen in de stad met paden en bankjes",
+    "distractors": ["tuin", "jungle"],
+    "distractorDefs": ["privéstukje groen bij een huis", "dicht, tropisch groen vol lianen"]
+  },
+  {
+    "a": "soep", "b": "stoofpot", "domain": "eten",
+    "defA": "warm vloeibaar gerecht dat je uit een kom lepelt",
+    "defB": "gerecht dat urenlang zachtjes pruttelt in één pan",
+    "distractors": ["saus", "puree"],
+    "distractorDefs": ["smeuïge toevoeging die je over een gerecht giet", "fijngestampt gerecht, meestal van aardappelen"]
+  },
+  {
+    "a": "schaken", "b": "dammen", "domain": "spellen",
+    "defA": "bordspel met koningen, paarden en torens",
+    "defB": "bordspel met platte schijven die over elkaar heen springen",
+    "distractors": ["poker", "scrabble"],
+    "distractorDefs": ["kaartspel met bluffen en inzetten", "woordspel met letterstenen op een bord"]
+  },
+  {
+    "a": "leraar", "b": "professor", "domain": "beroepen",
+    "defA": "geeft les aan een klas op school",
+    "defB": "doet onderzoek en doceert aan de universiteit",
+    "distractors": ["coach", "mentor"],
+    "distractorDefs": ["begeleidt je om beter te presteren", "ervaren gids die je persoonlijk op weg helpt"]
+  },
+  {
+    "a": "krant", "b": "tijdschrift", "domain": "media",
+    "defA": "dagelijks nieuws op groot gevouwen papier",
+    "defB": "glossy blad dat wekelijks of maandelijks verschijnt",
+    "distractors": ["folder", "roman"],
+    "distractorDefs": ["reclameblaadje dat in de bus valt", "lang verzonnen verhaal in boekvorm"]
+  },
+  {
+    "a": "schoen", "b": "laars", "domain": "kleding",
+    "defA": "dagelijks schoeisel met veters of klittenband",
+    "defB": "hoog schoeisel dat ook je kuit bedekt",
+    "distractors": ["sandaal", "pantoffel"],
+    "distractorDefs": ["open zomerschoeisel met bandjes", "zacht schoeisel voor binnenshuis"]
+  },
+  {
+    "a": "keuken", "b": "badkamer", "domain": "huis",
+    "defA": "ruimte waar je kookt en afwast",
+    "defB": "ruimte waar je doucht en je tanden poetst",
+    "distractors": ["kelder", "zolder"],
+    "distractorDefs": ["opslagruimte onder het huis", "ruimte helemaal boven in het huis, onder het dak"]
+  },
+  {
+    "a": "haai", "b": "dolfijn", "domain": "dieren",
+    "defA": "gevreesde vis met rijen vlijmscherpe tanden",
+    "defB": "speels, slim zeezoogdier dat uit het water springt",
+    "distractors": ["orka", "walvis"],
+    "distractorDefs": ["zwart-witte jager van de oceaan", "reusachtig zeezoogdier dat door een spuitgat ademt"]
+  },
+  {
+    "a": "honing", "b": "siroop", "domain": "eten",
+    "defA": "gouden zoetigheid gemaakt door bijen",
+    "defB": "dikke zoete vloeistof om te gieten of aan te lengen",
+    "distractors": ["confituur", "suiker"],
+    "distractorDefs": ["zoet broodbeleg van ingekookt fruit", "witte korreltjes die alles zoeter maken"]
+  },
+  {
+    "a": "kasteel", "b": "kerk", "domain": "gebouwen",
+    "defA": "versterkt middeleeuws bouwwerk met een slotgracht",
+    "defB": "gebedshuis met klokken en glasramen",
+    "distractors": ["toren", "paleis"],
+    "distractorDefs": ["hoog, smal bouwwerk dat boven alles uitsteekt", "prachtig gebouw waar vorsten wonen"]
+  },
+  {
+    "a": "camping", "b": "hotel", "domain": "reizen",
+    "defA": "terrein waar je zelf je slaapplek opzet",
+    "defB": "gebouw met kamers, roomservice en een receptie",
+    "distractors": ["hostel", "resort"],
+    "distractorDefs": ["budgetverblijf met gedeelde slaapzalen", "luxueus vakantiecomplex met alles op één plek"]
+  },
+  {
+    "a": "mier", "b": "spin", "domain": "dieren",
+    "defA": "piepklein insect dat in kolonies sjouwt en samenwerkt",
+    "defB": "achtpotig beestje dat webben weeft",
+    "distractors": ["kever", "wesp"],
+    "distractorDefs": ["insect met harde, glanzende schilden", "geel-zwart gestreept insect met een angel"]
+  },
+  {
+    "a": "gordijn", "b": "rolluik", "domain": "huis",
+    "defA": "stof voor het raam die je dichtschuift",
+    "defB": "hard scherm dat voor het raam naar beneden ratelt",
+    "distractors": ["hor", "luifel"],
+    "distractorDefs": ["fijn gaas dat insecten buitenhoudt", "afdak dat schaduw geeft boven deur of terras"]
+  },
+  {
+    "a": "marathon", "b": "wielerwedstrijd", "domain": "sport",
+    "defA": "loopwedstrijd van ruim veertig kilometer",
+    "defB": "koers waarin een peloton om de zege strijdt",
+    "distractors": ["triatlon", "sprint"],
+    "distractorDefs": ["drie sporten na elkaar in één wedstrijd", "korte explosieve race op topsnelheid"]
+  },
+  {
+    "a": "museum", "b": "galerie", "domain": "cultuur",
+    "defA": "gebouw vol historische stukken achter glas",
+    "defB": "ruimte waar kunst hangt die je kunt kopen",
+    "distractors": ["expo", "atelier"],
+    "distractorDefs": ["tijdelijke tentoonstelling rond één thema", "werkplaats waar een kunstenaar creëert"]
+  },
+  {
+    "a": "friet", "b": "chips", "domain": "eten",
+    "defA": "goudgele staafjes uit de frituur, vaak met een sausje",
+    "defB": "flinterdunne, krokante schijfjes uit een knisperend zakje",
+    "distractors": ["popcorn", "kroket"],
+    "distractorDefs": ["gepofte maïs voor bij de film", "krokant gefrituurd rolletje met smeuïge vulling"]
+  },
+  {
+    "a": "regenboog", "b": "zonsondergang", "domain": "natuur",
+    "defA": "kleurrijke boog aan de hemel na een bui",
+    "defB": "moment waarop de hemel avondrood kleurt",
+    "distractors": ["dageraad", "noorderlicht"],
+    "distractorDefs": ["eerste licht waarmee de dag begint", "dansend groen licht aan de poolhemel"]
+  }
 ]

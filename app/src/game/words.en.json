@@ -1,42 +1,282 @@
 [
-  { "a": "coffee", "b": "tea", "domain": "drinks", "distractors": ["espresso", "cocoa"] },
-  { "a": "beach", "b": "desert", "domain": "places", "distractors": ["dune", "oasis"] },
-  { "a": "guitar", "b": "violin", "domain": "music", "distractors": ["cello", "banjo"] },
-  { "a": "bicycle", "b": "scooter", "domain": "transport", "distractors": ["skateboard", "moped"] },
-  { "a": "winter", "b": "autumn", "domain": "seasons", "distractors": ["spring", "frost"] },
-  { "a": "pizza", "b": "pancake", "domain": "food", "distractors": ["quiche", "wrap"] },
-  { "a": "cat", "b": "dog", "domain": "animals", "distractors": ["rabbit", "hamster"] },
-  { "a": "sun", "b": "moon", "domain": "nature", "distractors": ["star", "comet"] },
-  { "a": "library", "b": "bookstore", "domain": "places", "distractors": ["archive", "kiosk"] },
-  { "a": "train", "b": "tram", "domain": "transport", "distractors": ["subway", "bus"] },
-  { "a": "pool", "b": "lake", "domain": "places", "distractors": ["pond", "ocean"] },
-  { "a": "apple", "b": "pear", "domain": "food", "distractors": ["plum", "peach"] },
-  { "a": "tent", "b": "caravan", "domain": "camping", "distractors": ["cabin", "igloo"] },
-  { "a": "soccer", "b": "rugby", "domain": "sports", "distractors": ["handball", "hockey"] },
-  { "a": "painter", "b": "sculptor", "domain": "professions", "distractors": ["photographer", "architect"] },
-  { "a": "breakfast", "b": "brunch", "domain": "food", "distractors": ["lunch", "dessert"] },
-  { "a": "mountain", "b": "hill", "domain": "nature", "distractors": ["cliff", "volcano"] },
-  { "a": "snow", "b": "hail", "domain": "weather", "distractors": ["rain", "sleet"] },
-  { "a": "piano", "b": "organ", "domain": "music", "distractors": ["accordion", "keyboard"] },
-  { "a": "doctor", "b": "dentist", "domain": "professions", "distractors": ["pharmacist", "surgeon"] },
-  { "a": "wedding", "b": "birthday", "domain": "celebrations", "distractors": ["baptism", "anniversary"] },
-  { "a": "beer", "b": "wine", "domain": "drinks", "distractors": ["cider", "champagne"] },
-  { "a": "airplane", "b": "helicopter", "domain": "transport", "distractors": ["blimp", "rocket"] },
-  { "a": "forest", "b": "park", "domain": "nature", "distractors": ["garden", "jungle"] },
-  { "a": "soup", "b": "stew", "domain": "food", "distractors": ["sauce", "porridge"] },
-  { "a": "chess", "b": "checkers", "domain": "games", "distractors": ["poker", "scrabble"] },
-  { "a": "teacher", "b": "professor", "domain": "professions", "distractors": ["coach", "mentor"] },
-  { "a": "newspaper", "b": "magazine", "domain": "media", "distractors": ["brochure", "novel"] },
-  { "a": "shoe", "b": "boot", "domain": "clothing", "distractors": ["sandal", "slipper"] },
-  { "a": "kitchen", "b": "bathroom", "domain": "home", "distractors": ["basement", "attic"] },
-  { "a": "shark", "b": "dolphin", "domain": "animals", "distractors": ["orca", "whale"] },
-  { "a": "honey", "b": "syrup", "domain": "food", "distractors": ["jam", "sugar"] },
-  { "a": "castle", "b": "church", "domain": "buildings", "distractors": ["tower", "palace"] },
-  { "a": "camping", "b": "hotel", "domain": "travel", "distractors": ["hostel", "resort"] },
-  { "a": "ant", "b": "spider", "domain": "animals", "distractors": ["beetle", "wasp"] },
-  { "a": "curtain", "b": "blinds", "domain": "home", "distractors": ["screen", "awning"] },
-  { "a": "marathon", "b": "cycling race", "domain": "sports", "distractors": ["triathlon", "sprint"] },
-  { "a": "museum", "b": "gallery", "domain": "culture", "distractors": ["exhibition", "studio"] },
-  { "a": "fries", "b": "crisps", "domain": "food", "distractors": ["popcorn", "nuggets"] },
-  { "a": "rainbow", "b": "sunset", "domain": "nature", "distractors": ["dawn", "aurora"] }
+  {
+    "a": "coffee", "b": "tea", "domain": "drinks",
+    "defA": "hot drink brewed from roasted, ground beans",
+    "defB": "hot drink made by steeping dried leaves",
+    "distractors": ["espresso", "cocoa"],
+    "distractorDefs": ["small, strong shot brewed under high pressure", "powder from tropical beans, the base of chocolate"]
+  },
+  {
+    "a": "beach", "b": "desert", "domain": "places",
+    "defA": "wide strip of sand or pebbles along the waterline",
+    "defB": "vast bone-dry region where almost nothing grows",
+    "distractors": ["dune", "oasis"],
+    "distractorDefs": ["wind-blown hill of sand, often tufted with grass", "fertile spot with water in the middle of barren land"]
+  },
+  {
+    "a": "guitar", "b": "violin", "domain": "music",
+    "defA": "string instrument you strum or pick",
+    "defB": "small bowed instrument held under the chin",
+    "distractors": ["cello", "banjo"],
+    "distractorDefs": ["large bowed instrument played between the knees", "plucked instrument with a round body and bright twang"]
+  },
+  {
+    "a": "bicycle", "b": "scooter", "domain": "transport",
+    "defA": "two-wheeler with pedals and a chain",
+    "defB": "board with handlebars you push along with one foot",
+    "distractors": ["skateboard", "moped"],
+    "distractorDefs": ["board on four small wheels, no handlebars", "light motorized two-wheeler with a license plate"]
+  },
+  {
+    "a": "winter", "b": "autumn", "domain": "seasons",
+    "defA": "coldest season of the year, with short days",
+    "defB": "season when the leaves turn and fall",
+    "distractors": ["spring", "frost"],
+    "distractorDefs": ["season when everything starts to bloom and grow", "temperatures below zero that freeze everything over"]
+  },
+  {
+    "a": "pizza", "b": "pancake", "domain": "food",
+    "defA": "flat oven-baked base with sauce and toppings",
+    "defB": "thin batter fried in a pan, sweet or savory",
+    "distractors": ["quiche", "wrap"],
+    "distractorDefs": ["savory tart filled with egg and cream", "thin flatbread rolled around a filling"]
+  },
+  {
+    "a": "cat", "b": "dog", "domain": "animals",
+    "defA": "independent pet that purrs and hunts mice",
+    "defB": "loyal pet that barks and loves a walk",
+    "distractors": ["rabbit", "hamster"],
+    "distractorDefs": ["long-eared pet with a twitching nose", "small rodent that stuffs food in its cheeks"]
+  },
+  {
+    "a": "sun", "b": "moon", "domain": "nature",
+    "defA": "celestial body that gives us daylight and warmth",
+    "defB": "celestial body that shines at night and seems to change shape",
+    "distractors": ["star", "comet"],
+    "distractorDefs": ["twinkling point of light in the night sky", "celestial body trailing a long glowing tail"]
+  },
+  {
+    "a": "library", "b": "bookstore", "domain": "places",
+    "defA": "place where you borrow books for free",
+    "defB": "shop where you buy new books",
+    "distractors": ["archive", "kiosk"],
+    "distractorDefs": ["storage for old documents and records", "small stand selling papers and sweets"]
+  },
+  {
+    "a": "train", "b": "tram", "domain": "transport",
+    "defA": "long row of carriages on rails between cities",
+    "defB": "rail vehicle running through city streets",
+    "distractors": ["subway", "bus"],
+    "distractorDefs": ["underground transit with its own stations", "large road vehicle with fixed stops"]
+  },
+  {
+    "a": "pool", "b": "lake", "domain": "places",
+    "defA": "man-made basin of chlorinated water for swimming laps",
+    "defB": "large natural body of water surrounded by land",
+    "distractors": ["pond", "ocean"],
+    "distractorDefs": ["small man-made water in a garden or park", "vast salt water with waves and tides"]
+  },
+  {
+    "a": "apple", "b": "pear", "domain": "food",
+    "defA": "round, crunchy fruit with a core",
+    "defB": "soft fruit, narrow on top and wide below",
+    "distractors": ["plum", "peach"],
+    "distractorDefs": ["small dark stone fruit with a smooth skin", "soft stone fruit with a velvety skin"]
+  },
+  {
+    "a": "tent", "b": "caravan", "domain": "camping",
+    "defA": "foldable canvas on poles to sleep in",
+    "defB": "little home on wheels towed behind a car",
+    "distractors": ["cabin", "igloo"],
+    "distractorDefs": ["simple shelter built of wood", "dome-shaped shelter of snow blocks"]
+  },
+  {
+    "a": "soccer", "b": "rugby", "domain": "sports",
+    "defA": "team sport where you kick the ball into a goal",
+    "defB": "rough team sport with an oval ball you may carry",
+    "distractors": ["handball", "hockey"],
+    "distractorDefs": ["fast indoor sport of throwing at a goal", "team sport where you hit the ball with a stick"]
+  },
+  {
+    "a": "painter", "b": "sculptor", "domain": "professions",
+    "defA": "artist who works with paint on canvas",
+    "defB": "artist who carves figures from stone or wood",
+    "distractors": ["photographer", "architect"],
+    "distractorDefs": ["captures moments with a camera", "designer of buildings and floor plans"]
+  },
+  {
+    "a": "breakfast", "b": "brunch", "domain": "food",
+    "defA": "first meal of the day, right after getting up",
+    "defB": "late-morning meal that merges two meals into one",
+    "distractors": ["lunch", "dessert"],
+    "distractorDefs": ["midday meal, often sandwiches", "sweet finish after the main course"]
+  },
+  {
+    "a": "mountain", "b": "hill", "domain": "nature",
+    "defA": "high rocky rise, sometimes snow-capped",
+    "defB": "gentle rise in the landscape, easy to climb",
+    "distractors": ["cliff", "volcano"],
+    "distractorDefs": ["sheer rock face dropping straight down", "opening in the earth that can spew ash and lava"]
+  },
+  {
+    "a": "snow", "b": "hail", "domain": "weather",
+    "defA": "white flakes drifting softly down",
+    "defB": "hard pellets of ice clattering down",
+    "distractors": ["rain", "sleet"],
+    "distractorDefs": ["drops of water falling from the clouds", "half-frozen drops that coat everything in a slippery glaze"]
+  },
+  {
+    "a": "piano", "b": "organ", "domain": "music",
+    "defA": "large instrument whose keys strike strings with little hammers",
+    "defB": "instrument with pipes and keys, often in churches",
+    "distractors": ["accordion", "keyboard"],
+    "distractorDefs": ["instrument with bellows you squeeze in and out", "electronic keys with hundreds of sounds"]
+  },
+  {
+    "a": "doctor", "b": "dentist", "domain": "professions",
+    "defA": "examines the sick and prescribes medicine",
+    "defB": "checks and repairs your teeth",
+    "distractors": ["pharmacist", "surgeon"],
+    "distractorDefs": ["hands out medicine on prescription", "performs operations in the hospital"]
+  },
+  {
+    "a": "wedding", "b": "birthday", "domain": "celebrations",
+    "defA": "party where two people say their vows",
+    "defB": "yearly party with cake and blowing out candles",
+    "distractors": ["baptism", "anniversary"],
+    "distractorDefs": ["ceremony where a baby is given its name", "celebration of a round number of years"]
+  },
+  {
+    "a": "beer", "b": "wine", "domain": "drinks",
+    "defA": "brewed drink of malt and hops, with a foamy head",
+    "defB": "drink of fermented grapes, red or white",
+    "distractors": ["cider", "champagne"],
+    "distractorDefs": ["lightly sparkling drink of fermented apples", "festive bubbles uncorked with a pop"]
+  },
+  {
+    "a": "airplane", "b": "helicopter", "domain": "transport",
+    "defA": "winged craft that takes off from a runway",
+    "defB": "craft with spinning blades that can hover",
+    "distractors": ["blimp", "rocket"],
+    "distractorDefs": ["long airship filled with gas", "craft that shoots straight up into space"]
+  },
+  {
+    "a": "forest", "b": "park", "domain": "nature",
+    "defA": "large stretch of nature full of trees",
+    "defB": "landscaped city green with paths and benches",
+    "distractors": ["garden", "jungle"],
+    "distractorDefs": ["private patch of green by a house", "dense tropical growth full of vines"]
+  },
+  {
+    "a": "soup", "b": "stew", "domain": "food",
+    "defA": "warm liquid dish you spoon from a bowl",
+    "defB": "dish simmered gently for hours in one pot",
+    "distractors": ["sauce", "porridge"],
+    "distractorDefs": ["smooth addition poured over a dish", "soft grains slowly cooked in milk or water"]
+  },
+  {
+    "a": "chess", "b": "checkers", "domain": "games",
+    "defA": "board game with kings, knights and rooks",
+    "defB": "board game of flat discs jumping over each other",
+    "distractors": ["poker", "scrabble"],
+    "distractorDefs": ["card game of bluffing and betting", "word game with letter tiles on a board"]
+  },
+  {
+    "a": "teacher", "b": "professor", "domain": "professions",
+    "defA": "teaches a class at school",
+    "defB": "researches and lectures at a university",
+    "distractors": ["coach", "mentor"],
+    "distractorDefs": ["guides you to perform better", "experienced guide who shows you the ropes"]
+  },
+  {
+    "a": "newspaper", "b": "magazine", "domain": "media",
+    "defA": "daily news on big folded paper",
+    "defB": "glossy issue published weekly or monthly",
+    "distractors": ["brochure", "novel"],
+    "distractorDefs": ["advertising leaflet dropped in your mailbox", "long invented story in book form"]
+  },
+  {
+    "a": "shoe", "b": "boot", "domain": "clothing",
+    "defA": "everyday footwear with laces or straps",
+    "defB": "tall footwear that also covers your calf",
+    "distractors": ["sandal", "slipper"],
+    "distractorDefs": ["open summer footwear with straps", "soft footwear for indoors"]
+  },
+  {
+    "a": "kitchen", "b": "bathroom", "domain": "home",
+    "defA": "room where you cook and wash up",
+    "defB": "room where you shower and brush your teeth",
+    "distractors": ["basement", "attic"],
+    "distractorDefs": ["storage space beneath the house", "room at the very top, under the roof"]
+  },
+  {
+    "a": "shark", "b": "dolphin", "domain": "animals",
+    "defA": "feared fish with rows of razor-sharp teeth",
+    "defB": "playful, clever sea mammal that leaps from the water",
+    "distractors": ["orca", "whale"],
+    "distractorDefs": ["black-and-white hunter of the ocean", "gigantic sea mammal breathing through a blowhole"]
+  },
+  {
+    "a": "honey", "b": "syrup", "domain": "food",
+    "defA": "golden sweetness made by bees",
+    "defB": "thick sweet liquid for pouring or diluting",
+    "distractors": ["jam", "sugar"],
+    "distractorDefs": ["sweet spread of fruit boiled down", "white grains that sweeten everything"]
+  },
+  {
+    "a": "castle", "b": "church", "domain": "buildings",
+    "defA": "fortified medieval stronghold with a moat",
+    "defB": "house of worship with bells and stained glass",
+    "distractors": ["tower", "palace"],
+    "distractorDefs": ["tall, narrow structure rising above everything", "splendid building where royalty lives"]
+  },
+  {
+    "a": "camping", "b": "hotel", "domain": "travel",
+    "defA": "grounds where you set up your own place to sleep",
+    "defB": "building with rooms, room service and a reception",
+    "distractors": ["hostel", "resort"],
+    "distractorDefs": ["budget stay with shared dorms", "luxury holiday complex with everything on site"]
+  },
+  {
+    "a": "ant", "b": "spider", "domain": "animals",
+    "defA": "tiny insect that hauls and teams up in colonies",
+    "defB": "eight-legged creature that spins webs",
+    "distractors": ["beetle", "wasp"],
+    "distractorDefs": ["insect with hard, shiny wing cases", "yellow-and-black striped insect with a sting"]
+  },
+  {
+    "a": "curtain", "b": "blinds", "domain": "home",
+    "defA": "fabric you draw across the window",
+    "defB": "hard slats that rattle down over the window",
+    "distractors": ["screen", "awning"],
+    "distractorDefs": ["fine mesh that keeps insects out", "overhang giving shade above a door or patio"]
+  },
+  {
+    "a": "marathon", "b": "cycling race", "domain": "sports",
+    "defA": "running race of just over forty kilometers",
+    "defB": "race where a peloton battles for the win",
+    "distractors": ["triathlon", "sprint"],
+    "distractorDefs": ["three sports back to back in one race", "short explosive dash at top speed"]
+  },
+  {
+    "a": "museum", "b": "gallery", "domain": "culture",
+    "defA": "building full of historic pieces behind glass",
+    "defB": "space hung with art you can buy",
+    "distractors": ["exhibition", "studio"],
+    "distractorDefs": ["temporary show built around one theme", "workshop where an artist creates"]
+  },
+  {
+    "a": "fries", "b": "crisps", "domain": "food",
+    "defA": "golden sticks from the fryer, often with a dip",
+    "defB": "paper-thin crunchy slices from a rustling bag",
+    "distractors": ["popcorn", "nuggets"],
+    "distractorDefs": ["popped corn for movie night", "crispy fried bites with a soft filling"]
+  },
+  {
+    "a": "rainbow", "b": "sunset", "domain": "nature",
+    "defA": "colorful arc in the sky after a shower",
+    "defB": "moment the evening sky glows red",
+    "distractors": ["dawn", "aurora"],
+    "distractorDefs": ["first light that starts the day", "dancing green light in the polar sky"]
+  }
 ]

@@ -28,11 +28,24 @@ export type Action =
       orientation: boolean
       charlatanSeats: number[]
       speakerOrder: number[]
-      pair: { a: string; b: string; distractors: [string, string] }
+      pair: {
+        a: string
+        b: string
+        defA: string
+        defB: string
+        distractors: [string, string]
+        distractorDefs: [string, string]
+      }
     }
   | { type: 'HANDOFF_CONTINUE' }
   | { type: 'PEEK' }
-  | { type: 'BURN_WHISPER'; targetSeat: number; fakeWord: string; swapped: boolean }
+  | {
+      type: 'BURN_WHISPER'
+      targetSeat: number
+      fakeWord: string
+      fakeWordDef: string
+      swapped: boolean
+    }
   | { type: 'REVEAL_NEXT' }
   | { type: 'SUBMIT_CLUE'; word: string }
   | { type: 'GO_TO_VOTE' }
@@ -83,6 +96,11 @@ export function tally(votes: Record<string, string>): Record<string, number> {
 /** The word this player must see while holding the cover open. */
 export function wordFor(round: RoundState, seat: number): string {
   return round.players[seat].role === 'charlatan' ? round.pair.decoy : round.pair.real
+}
+
+/** The definition shown under that word — the decoy gets its own, so both roles read the same layout. */
+export function definitionFor(round: RoundState, seat: number): string {
+  return round.players[seat].role === 'charlatan' ? round.pair.decoyDef : round.pair.realDef
 }
 
 /** Whisper eligibility for the seat currently revealing (requirements §3.6). */
@@ -230,7 +248,9 @@ export function reducer(state: GameState, action: Action): GameState {
       if (!session) return state
       const names = session.players.filter((p) => !p.left).map((p) => p.name)
       const real = action.orientation ? action.pair.a : action.pair.b
+      const realDef = action.orientation ? action.pair.defA : action.pair.defB
       const decoy = action.orientation ? action.pair.b : action.pair.a
+      const decoyDef = action.orientation ? action.pair.defB : action.pair.defA
       const players: RoundPlayer[] = names.map((name, seat) => ({
         name,
         role: action.charlatanSeats.includes(seat) ? 'charlatan' : 'civilian',
@@ -239,7 +259,14 @@ export function reducer(state: GameState, action: Action): GameState {
       }))
       const round: RoundState = {
         number: session.roundsPlayed + 1,
-        pair: { real, decoy, distractors: action.pair.distractors },
+        pair: {
+          real,
+          realDef,
+          decoy,
+          decoyDef,
+          distractors: action.pair.distractors,
+          distractorDefs: action.pair.distractorDefs,
+        },
         players,
         speakerOrder: action.speakerOrder,
         cursor: 0,
@@ -296,7 +323,13 @@ export function reducer(state: GameState, action: Action): GameState {
       const session = state.session!
       return {
         ...withRound(state, {
-          whisper: { by, target, fakeWord: action.fakeWord, swapped: action.swapped },
+          whisper: {
+            by,
+            target,
+            fakeWord: action.fakeWord,
+            fakeWordDef: action.fakeWordDef,
+            swapped: action.swapped,
+          },
         }),
         session: {
           ...session,

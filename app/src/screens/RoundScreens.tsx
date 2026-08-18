@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { Dispatch } from 'react'
 import type { Action } from '../game/reducer'
-import { canWhisper, speakingOrder, tally, wordFor } from '../game/reducer'
+import { canWhisper, definitionFor, speakingOrder, tally, wordFor } from '../game/reducer'
 import { burnWhisperAction } from '../game/actions'
 import type { GameState, RoundState } from '../game/types'
 import { useT } from '../i18n'
@@ -96,8 +96,22 @@ export function RevealScreen({ state, dispatch }: { state: GameState; dispatch: 
   const cards =
     state.session?.players.find((p) => p.name === player.name)?.whisperCards ?? 0
 
-  const wordBlock = (w: string) => (
-    <div className="text-5xl font-bold tracking-tight break-all">{w.toUpperCase()}</div>
+  // Word + its one-line definition, styled identically for real and fake words
+  // so neither the decoy nor a whispered distractor stands out.
+  const wordBlock = (w: string, def?: string) => (
+    <div className="flex flex-col items-center gap-1.5">
+      <div className="text-[40px] leading-none font-bold tracking-tight break-all">
+        {w.toUpperCase()}
+      </div>
+      {def && (
+        <div
+          className={`max-w-[30ch] leading-relaxed ${whispered ? 'text-xs' : 'text-[13px]'}`}
+          style={{ color: 'var(--color-g5)' }}
+        >
+          {def}
+        </div>
+      )}
+    </div>
   )
 
   return (
@@ -112,38 +126,32 @@ export function RevealScreen({ state, dispatch }: { state: GameState; dispatch: 
         coverLabel={t('reveal.holdWord')}
         coverSub={t('reveal.holdWordSub')}
       >
-        {/* Thumb economics (§3.3): the word sits LOW, right above the role button. */}
-        <div className="flex flex-1 flex-col items-center justify-end gap-3 pb-5 text-center">
+        {/* Thumb economics (§3.3): the words sit LOW, right above the role button,
+            away from the finger holding the cover open near the top. */}
+        <div className="flex flex-1 flex-col items-center justify-end gap-4 pb-5 text-center">
           {whispered ? (
             <>
+              {round.whisper!.swapped ? (
+                <>
+                  {wordBlock(round.whisper!.fakeWord, round.whisper!.fakeWordDef)}
+                  {wordBlock(word, definitionFor(round, seat))}
+                </>
+              ) : (
+                <>
+                  {wordBlock(word, definitionFor(round, seat))}
+                  {wordBlock(round.whisper!.fakeWord, round.whisper!.fakeWordDef)}
+                </>
+              )}
               <div
                 className="rounded-xl border px-3 py-2 text-sm"
                 style={{ borderColor: 'var(--color-g3)' }}
               >
                 <b>{t('reveal.psst')}</b> {t('reveal.psstText')}
               </div>
-              {round.whisper!.swapped ? (
-                <>
-                  {wordBlock(round.whisper!.fakeWord)}
-                  {wordBlock(word)}
-                </>
-              ) : (
-                <>
-                  {wordBlock(word)}
-                  {wordBlock(round.whisper!.fakeWord)}
-                </>
-              )}
-              <div className="max-w-[26ch] text-xs" style={{ color: 'var(--color-g4)' }}>
-                {t('reveal.psstNote')}
-              </div>
             </>
           ) : (
-            <>
-              <div className="eb2">{t('reveal.yourWord')}</div>
-              {wordBlock(word)}
-            </>
+            wordBlock(word, definitionFor(round, seat))
           )}
-          <div className="eb">{t('reveal.release')}</div>
         </div>
       </HoldCover>
 

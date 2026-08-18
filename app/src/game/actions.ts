@@ -46,7 +46,14 @@ export function startRoundAction(state: GameState): Action | null {
     orientation: Math.random() < 0.5,
     charlatanSeats: sampleSeats(charlatanCount(n, state.settings.charlatanOverride), n),
     speakerOrder: shuffledSeats(n),
-    pair: { a: pair.a, b: pair.b, distractors: pair.distractors },
+    pair: {
+      a: pair.a,
+      b: pair.b,
+      defA: pair.defA,
+      defB: pair.defB,
+      distractors: pair.distractors,
+      distractorDefs: pair.distractorDefs,
+    },
   }
 }
 
@@ -61,10 +68,12 @@ export function burnWhisperAction(state: GameState): Action | null {
     (_, pos) => pos > round.cursor && !(round.cursor === 0 && pos === 1),
   )
   if (laterSeats.length === 0) return null
+  const distractor = randInt(round.pair.distractors.length)
   return {
     type: 'BURN_WHISPER',
     targetSeat: laterSeats[randInt(laterSeats.length)],
-    fakeWord: round.pair.distractors[randInt(round.pair.distractors.length)],
+    fakeWord: round.pair.distractors[distractor],
+    fakeWordDef: round.pair.distractorDefs[distractor],
     swapped: Math.random() < 0.5,
   }
 }

@@ -15,8 +15,12 @@ export type Role = 'civilian' | 'charlatan'
 export interface WordPair {
   a: string
   b: string
+  /** One-line definitions of a/b — shown under the word so nobody has to ask. */
+  defA: string
+  defB: string
   domain: string
   distractors: [string, string]
+  distractorDefs: [string, string]
 }
 
 export interface Settings {
@@ -89,7 +93,14 @@ export type VerdictInfo =
 
 export interface RoundState {
   number: number
-  pair: { real: string; decoy: string; distractors: [string, string] }
+  pair: {
+    real: string
+    realDef: string
+    decoy: string
+    decoyDef: string
+    distractors: [string, string]
+    distractorDefs: [string, string]
+  }
   players: RoundPlayer[]
   /** Fresh uniform-random permutation of all seats, drawn at round start; stable within the round. */
   speakerOrder: number[]
@@ -108,7 +119,13 @@ export interface RoundState {
   ballots: BallotRecord[]
   consecutiveTies: number
   verdict: VerdictInfo | null
-  whisper: { by: string; target: string; fakeWord: string; swapped: boolean } | null
+  whisper: {
+    by: string
+    target: string
+    fakeWord: string
+    fakeWordDef: string
+    swapped: boolean
+  } | null
   pendingGuesser: string | null
   guess: { by: string; text: string; correct: boolean } | null
   outcome: RoundOutcome | null
