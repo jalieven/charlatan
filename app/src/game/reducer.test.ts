@@ -3,6 +3,7 @@ import type { Action } from './reducer'
 import {
   activeSeats,
   canWhisper,
+  clueTooClose,
   guessMatches,
   reducer,
   revealSeat,
@@ -213,6 +214,39 @@ describe('whisper (§3.6)', () => {
     s = reducer(s, { type: 'HANDOFF_CONTINUE' })
     s = reducer(s, { type: 'PEEK' }) // Jan, civilian
     expect(canWhisper(s)).toBe(false)
+  })
+})
+
+describe('clue proximity block', () => {
+  it('flags clues that lean on the secret word', () => {
+    expect(clueTooClose('kapstok', 'kapstok')).toBe(true)
+    expect(clueTooClose('KAPSTOK', 'kapstok')).toBe(true)
+    expect(clueTooClose('kapstick', 'kapstok')).toBe(true) // shares "kap"
+    expect(clueTooClose('lekstok', 'kapstok')).toBe(true) // shares "stok"
+    expect(clueTooClose('kap', 'kapstok')).toBe(true)
+    expect(clueTooClose('cafeetje', 'café')).toBe(true) // diacritics-insensitive
+    expect(clueTooClose('jas', 'kapstok')).toBe(false)
+    expect(clueTooClose('haak', 'kapstok')).toBe(false)
+    expect(clueTooClose('', 'kapstok')).toBe(false)
+  })
+
+  it('rejects a clue too close to the speaker\'s own word in the reducer', () => {
+    const s = revealAll(startRound(freshSession())) // Jan speaks first, real = 'koffie'
+    for (const word of ['koffie', 'koffiekan', 'Kof']) {
+      expect(reducer(s, { type: 'SUBMIT_CLUE', word })).toBe(s)
+    }
+    const ok = reducer(s, { type: 'SUBMIT_CLUE', word: 'warm' })
+    expect(ok.round!.ledger).toHaveLength(1)
+  })
+
+  it('checks the charlatan against the decoy only — never the real word', () => {
+    let s = revealAll(startRound(freshSession())) // Tom (seat 2) is the Charlatan, decoy = 'thee'
+    s = reducer(s, { type: 'SUBMIT_CLUE', word: 'clue0' })
+    s = reducer(s, { type: 'SUBMIT_CLUE', word: 'clue1' })
+    // Blocking on the real word would leak it to the Charlatan.
+    const leaky = reducer(s, { type: 'SUBMIT_CLUE', word: 'koffiekan' })
+    expect(leaky.round!.ledger).toHaveLength(3)
+    expect(reducer(s, { type: 'SUBMIT_CLUE', word: 'theepot' })).toBe(s)
   })
 })
 
