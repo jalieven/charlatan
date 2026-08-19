@@ -88,6 +88,8 @@
   .pad { display: grid; grid-template-columns: repeat(3, 56px); gap: 12px; justify-content: center; }
   .key { width: 56px; height: 56px; border-radius: 999px; border: 1px solid #3D3D3D; display: flex; align-items: center; justify-content: center; font-size: 19px; font-weight: 700; }
   .key.mute { border-color: transparent; color: #737373; font-size: 16px; }
+  .key.ok { border-color: #FAFAFA; }
+  .key.ok.off { border-color: #262626; color: #3D3D3D; }
   .minifield { border: 1px solid #262626; border-radius: 8px; padding: 8px 10px; font-size: 13px; display: flex; align-items: center; }
   .minifield .caret { display: inline-block; width: 2px; height: 1em; background: #FAFAFA; vertical-align: -2px; }
   .stepper { display: flex; align-items: center; gap: 10px; }
@@ -207,7 +209,7 @@
   <header class="top">
     <p class="kicker">Charlatan · Design review</p>
     <h1>Charlatan Mockups</h1>
-    <p class="lede">Twenty-nine frames covering all nine screens, S1–S9, in flow order — including the
+    <p class="lede">Thirty frames covering all nine screens, S1–S9, in flow order — including the
     reveal's four states, the second-tie warning, the three-act result, the round menu that
     hangs off the clue screen, and the forgot-your-word re-check with its optional per-player PIN. In-app copy is Dutch —
     the default locale per §6.4. One running scenario throughout: six players, koffie/thee, Tom is
@@ -321,28 +323,69 @@
           <div class="scrim"></div>
           <div class="sheet" style="height:62%">
             <div class="handle"></div>
-            <div class="eb">Pincode · EVA</div>
+            <div class="eb">Pincode · EVA · stap 1 van 2</div>
             <div style="font-size:17px;font-weight:900;margin-top:2px">Kies een pincode</div>
             <div style="height:8px"></div>
-            <div class="pindots"><i class="on"></i><i class="on"></i><i></i><i></i></div>
+            <div class="pindots"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
             <div style="height:14px"></div>
             <div class="pad">
               <span class="key">1</span><span class="key">2</span><span class="key">3</span>
               <span class="key">4</span><span class="key">5</span><span class="key">6</span>
               <span class="key">7</span><span class="key">8</span><span class="key">9</span>
-              <span class="key mute"></span><span class="key">0</span><span class="key mute">⌫</span>
+              <span class="key mute">⌫</span><span class="key">0</span><span class="key ok">✓</span>
             </div>
             <div class="grow"></div>
             <div class="cta quiet">ANNULEER</div>
           </div>
         </div>
         <div class="cap">
-          <h4>Setting a PIN — the keypad sheet, step 1</h4>
+          <h4>Setting a PIN — step 1, choose</h4>
           <p>Round 56 px keys on a bottom sheet: the OS keyboard never opens and the code is only
-          ever four anonymous dots — never text in a field. The fourth digit advances automatically
-          to step 2, <em>Bevestig je pincode</em>: the same keypad, same dots, entered again. A
-          mismatch says <em>De codes verschillen</em> and restarts at step 1. Cancel (or tapping
-          the scrim) closes the sheet without saving.</p>
+          ever anonymous dots — never text in a field. The code is at least four digits but has no
+          fixed length: four hollow placeholders fill first, every extra digit appends a dot (five
+          here). ✓ stays disabled until four digits are in; tapping it moves to step 2. Cancel (or
+          tapping the scrim) closes the sheet without saving.</p>
+        </div>
+      </div>
+
+      <div class="mock">
+        <div class="phone">
+          <div class="dim" style="display:flex;flex-direction:column;flex:1;min-height:0">
+            <div class="logo">CHARLATAN</div>
+            <div class="hairline"></div>
+            <div class="eb">Spelers · 5 van 12</div>
+            <div style="height:8px"></div>
+            <div class="rows">
+              <div class="row"><span><span class="h">≡</span>&nbsp; <b>Jan</b></span><span class="pinbadge set">PIN ✓</span></div>
+              <div class="row"><span><span class="h">≡</span>&nbsp; <b>Sanne</b></span><span class="pinbadge">PIN</span></div>
+              <div class="row"><span><span class="h">≡</span>&nbsp; <b>Eva</b></span><span class="pinbadge">PIN</span></div>
+            </div>
+            <div class="grow"></div>
+          </div>
+          <div class="scrim"></div>
+          <div class="sheet" style="height:62%">
+            <div class="handle"></div>
+            <div class="eb">Pincode · EVA · stap 2 van 2</div>
+            <div style="font-size:17px;font-weight:900;margin-top:2px">Bevestig je pincode</div>
+            <div style="height:8px"></div>
+            <div class="pindots"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>
+            <div style="height:14px"></div>
+            <div class="pad">
+              <span class="key">1</span><span class="key">2</span><span class="key">3</span>
+              <span class="key">4</span><span class="key">5</span><span class="key">6</span>
+              <span class="key">7</span><span class="key">8</span><span class="key">9</span>
+              <span class="key mute">⌫</span><span class="key">0</span><span class="key ok off">✓</span>
+            </div>
+            <div class="grow"></div>
+            <div class="cta quiet">ANNULEER</div>
+          </div>
+        </div>
+        <div class="cap">
+          <h4>Setting a PIN — step 2, confirm</h4>
+          <p>Nothing is saved after step 1: the code must be entered a second time, on the same
+          keypad, before it exists (three of at least four digits re-typed here — ✓ still
+          disabled). Only a matching ✓ sets the PIN and fills the player's pill to <em>PIN ✓</em>.
+          A mismatch clears the dots, says <em>De codes verschillen</em>, and restarts at step 1.</p>
         </div>
       </div>
 
@@ -372,18 +415,18 @@
               <span class="key">1</span><span class="key">2</span><span class="key">3</span>
               <span class="key">4</span><span class="key">5</span><span class="key">6</span>
               <span class="key">7</span><span class="key">8</span><span class="key">9</span>
-              <span class="key mute"></span><span class="key">0</span><span class="key mute">⌫</span>
+              <span class="key mute">⌫</span><span class="key">0</span><span class="key ok off">✓</span>
             </div>
             <div class="grow"></div>
             <div class="cta quiet">ANNULEER</div>
           </div>
         </div>
         <div class="cap">
-          <h4>Changing a PIN — verify, then choose</h4>
+          <h4>Changing a PIN — verify, then choose + confirm</h4>
           <p>A filled pill opens the same sheet with one extra step in front: the current code,
-          verified on the spot — nobody rewrites another player's PIN by grabbing the phone. A
-          wrong code clears the dots and says <em>Verkeerde pincode</em>. After verification the
-          flow continues as steps 1 + 2 of the previous frame: choose, then confirm the new code.</p>
+          checked with ✓ — nobody rewrites another player's PIN by grabbing the phone. A wrong
+          code clears the dots and says <em>Verkeerde pincode</em>. After verification the flow
+          continues as the two frames above: choose the new code, then confirm it again.</p>
         </div>
       </div>
 
@@ -835,7 +878,7 @@
               <span class="key">1</span><span class="key">2</span><span class="key">3</span>
               <span class="key">4</span><span class="key">5</span><span class="key">6</span>
               <span class="key">7</span><span class="key">8</span><span class="key">9</span>
-              <span class="key mute"></span><span class="key">0</span><span class="key mute">⌫</span>
+              <span class="key mute">⌫</span><span class="key">0</span><span class="key ok off">✓</span>
             </div>
           </div>
           <div class="cta quiet">TERUG NAAR DE HINTS</div>
@@ -843,10 +886,11 @@
         <div class="cap">
           <h4>2a · Gate — Lotte set a PIN</h4>
           <p>The phone is public on the clue screen, so the gate is the point: the same round
-          keypad as the setup sheet, dots only — no field, no OS keyboard. The fourth digit checks
-          the code by itself: right unlocks the cover, wrong clears the dots and says
-          <em>Verkeerde pincode</em> — nothing more; there is no recovery flow, a forgotten PIN
-          simply means no re-check. Back returns to the exact clue turn.</p>
+          keypad as the setup sheet, dots only — no field, no OS keyboard, and since a code has no
+          fixed length the dot row grows past four as needed. ✓ checks the code: right unlocks the
+          cover, wrong clears the dots and says <em>Verkeerde pincode</em> — nothing more; there
+          is no recovery flow, a forgotten PIN simply means no re-check. Back returns to the exact
+          clue turn.</p>
         </div>
       </div>
 
