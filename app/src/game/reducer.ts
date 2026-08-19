@@ -54,8 +54,6 @@ export type Action =
   | { type: 'SUBMIT_GUESS'; text: string }
   | { type: 'RESULT_ADVANCE' }
   | { type: 'RESULT_BACK' }
-  | { type: 'OPEN_DRILL_IN' }
-  | { type: 'CLOSE_DRILL_IN' }
   | { type: 'FINISH_ROUND' }
   | { type: 'ROSTER_ADD'; name: string }
   | { type: 'ROSTER_REMOVE'; name: string }
@@ -182,7 +180,7 @@ function resolveBallot(round: RoundState): { verdict: VerdictInfo; ballot: Ballo
 
 /** Enter the result phase: compute and stash the round summary via scoring. */
 function toResult(state: GameState, round: RoundState, outcome: RoundOutcome): GameState {
-  const finished: RoundState = { ...round, outcome, resultAct: 1, drillIn: false }
+  const finished: RoundState = { ...round, outcome, resultAct: 1 }
   return { ...state, phase: 'result', round: finished }
 }
 
@@ -300,7 +298,6 @@ export function reducer(state: GameState, action: Action): GameState {
         guess: null,
         outcome: null,
         resultAct: 1,
-        drillIn: false,
       }
       return {
         ...state,
@@ -470,28 +467,18 @@ export function reducer(state: GameState, action: Action): GameState {
       return { ...withRound({ ...state, round: updated }, backToClues(updated)), phase: 'clues' }
     }
 
-    // ---------- result (three acts + drill-in) ----------
+    // ---------- result (three acts) ----------
     case 'RESULT_ADVANCE': {
       const round = state.round
-      if (!round || state.phase !== 'result' || round.drillIn) return state
+      if (!round || state.phase !== 'result') return state
       if (round.resultAct >= 3) return state
       return withRound(state, { resultAct: (round.resultAct + 1) as 2 | 3 })
     }
     case 'RESULT_BACK': {
       const round = state.round
-      if (!round || state.phase !== 'result' || round.drillIn) return state
+      if (!round || state.phase !== 'result') return state
       if (round.resultAct <= 1) return state
       return withRound(state, { resultAct: (round.resultAct - 1) as 1 | 2 })
-    }
-    case 'OPEN_DRILL_IN': {
-      const round = state.round
-      if (!round || state.phase !== 'result' || round.resultAct !== 1) return state
-      return withRound(state, { drillIn: true })
-    }
-    case 'CLOSE_DRILL_IN': {
-      const round = state.round
-      if (!round || state.phase !== 'result') return state
-      return withRound(state, { drillIn: false })
     }
     case 'FINISH_ROUND': {
       const round = state.round

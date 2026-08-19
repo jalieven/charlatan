@@ -84,11 +84,6 @@ test('full round happy path: setup → reveal → clues → votes → result →
       await tryClick('result.finish')
       if (await page.getByTestId('score.next-round').isVisible().catch(() => false)) break
     } else if (await page.getByTestId('result.screen').isVisible().catch(() => false)) {
-      // Peek into the drill-in once, close it, then advance the acts.
-      if (await page.getByTestId('result.drill-in').isVisible().catch(() => false)) {
-        await tryClick('result.drill-in')
-        await tryClick('result.drill-back')
-      }
       await tryClick('result.screen')
     } else if (await page.getByTestId('score.next-round').isVisible().catch(() => false)) {
       break

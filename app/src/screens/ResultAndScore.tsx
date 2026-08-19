@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import type { Dispatch } from 'react'
 import type { Action } from '../game/reducer'
-import { tally } from '../game/reducer'
 import { scoreRound } from '../game/scoring'
 import { startRoundAction } from '../game/actions'
 import type { GameState, RoundSummary, ScoreDelta } from '../game/types'
@@ -10,7 +9,7 @@ import { useT } from '../i18n'
 import { FitWord } from '../ui/FitWord'
 import { fitBasisPx, groupWidthEm } from '../ui/fitText'
 
-/** Cap for the drill-in pair, and the size a card insists on before it gives up the row. */
+/** Cap for the result pair, and the size a card insists on before it gives up the row. */
 const PAIR_CAP_PX = 26
 const PAIR_PREFERRED_PX = 20
 /** Each card's own horizontal chrome: 2×8 px padding + 2×1 px border. */
@@ -60,15 +59,6 @@ function Dots({ act }: { act: 1 | 2 | 3 }) {
   )
 }
 
-/** ◆ markers exist ONLY here, in the replay — never in the live Ledger (§3.5). */
-function suspicionMarks(summary: RoundSummary, base: number, author: string, cycle: number): string {
-  const ballotIndex = cycle <= base ? 0 : cycle - base
-  const ballot = summary.ballots[ballotIndex]
-  if (!ballot) return ''
-  const votes = tally(ballot.votes)[author] ?? 0
-  return '◆'.repeat(Math.min(2, votes))
-}
-
 function outcomeTitle(summary: RoundSummary, t: (k: string, p?: Record<string, string | number>) => string) {
   switch (summary.outcome.kind) {
     case 'civilians':
@@ -84,58 +74,6 @@ export function ResultScreen({ state, dispatch }: { state: GameState; dispatch: 
   const t = useT()
   const round = state.round!
   const summary = scoreRound(round)
-  const base = state.settings.cluesPerPlayer
-
-  if (round.drillIn) {
-    const lastBallot = summary.ballots[summary.ballots.length - 1]
-    return (
-      <div className="flex h-full flex-col gap-3">
-        <button
-          type="button"
-          className="eb2 min-h-11 text-left"
-          data-testid="result.drill-back"
-          onClick={() => dispatch({ type: 'CLOSE_DRILL_IN' })}
-        >
-          {t('result.back')}
-        </button>
-        <WordPair real={summary.pair.real} decoy={summary.pair.decoy} />
-        <div className="hairline" />
-        <div className="flex-1 overflow-y-auto">
-          {[...new Set(summary.ledger.map((c) => c.cycle))].map((cycle) => (
-            <div key={cycle}>
-              <div className="eb2 mt-3 mb-1">{t('result.replayCycle', { i: cycle })}</div>
-              {summary.ledger
-                .filter((c) => c.cycle === cycle)
-                .map((c, i) => (
-                  <div
-                    key={i}
-                    className="flex justify-between border-b py-2 text-sm"
-                    style={{ borderColor: 'var(--color-g1)' }}
-                  >
-                    <span className="font-bold">{c.author}</span>
-                    <span>
-                      "{c.word}"{' '}
-                      <span style={{ color: 'var(--color-g5)' }}>
-                        {suspicionMarks(summary, base, c.author, c.cycle)}
-                      </span>
-                    </span>
-                  </div>
-                ))}
-            </div>
-          ))}
-          {lastBallot && (
-            <div className="eb mt-4">
-              {t('result.finalBallot')} —{' '}
-              {Object.entries(tally(lastBallot.votes))
-                .sort((a, b) => b[1] - a[1])
-                .map(([name, n]) => `${n}× ${name}`)
-                .join(' · ')}
-            </div>
-          )}
-        </div>
-      </div>
-    )
-  }
 
   const charlatanNames = summary.charlatans.join(', ')
 
@@ -189,17 +127,7 @@ export function ResultScreen({ state, dispatch }: { state: GameState; dispatch: 
                     ],
               )}
           </div>
-          <button
-            type="button"
-            className="cta cta-quiet"
-            data-testid="result.drill-in"
-            onClick={(e) => {
-              e.stopPropagation()
-              dispatch({ type: 'OPEN_DRILL_IN' })
-            }}
-          >
-            {t('result.drillIn')}
-          </button>
+          <WordPair real={summary.pair.real} decoy={summary.pair.decoy} />
         </div>
       )}
 

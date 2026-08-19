@@ -131,9 +131,8 @@ export interface RoundState {
   pendingGuesser: string | null
   guess: { by: string; text: string; correct: boolean } | null
   outcome: RoundOutcome | null
-  /** Result staging: acts 1-3 plus the words+replay drill-in. */
+  /** Result staging: acts 1-3. */
   resultAct: 1 | 2 | 3
-  drillIn: boolean
 }
 
 export interface GameState {

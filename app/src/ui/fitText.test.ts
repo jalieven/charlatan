@@ -12,7 +12,7 @@ import {
   wordWidthEm,
 } from './fitText'
 
-// Mirrors the screens: reveal hero (RoundScreens) and drill-in pair (ResultAndScore).
+// Mirrors the screens: reveal hero (RoundScreens) and result pair (ResultAndScore).
 const REVEAL_CAP_PX = 40
 const WORD_TRACKING = -0.025
 const PAIR_CAP_PX = 26
@@ -95,14 +95,14 @@ function sharesRow(a: string, b: string): boolean {
   return 2 * basis + PAIR_GAP_PX <= NARROWEST_CONTENT_PX
 }
 
-describe('drill-in · the pair row', () => {
+describe('result · the pair row', () => {
   it('seats a short pair side by side and stacks one that cannot share the row', () => {
     expect(sharesRow('koffie', 'thee')).toBe(true)
     expect(sharesRow('bibliotheek', 'boekenwinkel')).toBe(false)
   })
 })
 
-describe.each(catalogs)('drill-in · every %s pair fits one readable line', (_locale, list) => {
+describe.each(catalogs)('result · every %s pair fits one readable line', (_locale, list) => {
   it('keeps both words readable, side by side or stacked', () => {
     for (const entry of list) {
       const em = groupWidthEm([entry.a, entry.b])
