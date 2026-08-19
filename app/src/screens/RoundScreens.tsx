@@ -1,7 +1,14 @@
 import { useState } from 'react'
 import type { Dispatch } from 'react'
 import type { Action } from '../game/reducer'
-import { canWhisper, definitionFor, speakingOrder, tally, wordFor } from '../game/reducer'
+import {
+  canWhisper,
+  definitionFor,
+  isDuplicateClue,
+  speakingOrder,
+  tally,
+  wordFor,
+} from '../game/reducer'
 import { burnWhisperAction } from '../game/actions'
 import type { GameState, RoundState } from '../game/types'
 import { useT } from '../i18n'
@@ -240,6 +247,8 @@ export function CluesScreen({ state, dispatch }: { state: GameState; dispatch: D
   const t = useT()
   const round = state.round!
   const [draft, setDraft] = useState('')
+  // The clue the round just refused, kept so the reason survives clearing the field.
+  const [rejected, setRejected] = useState<string | null>(null)
   const order = speakingOrder(round)
   const speakerSeat = round.turn < order.length ? order[round.turn] : null
   const speaker = speakerSeat !== null ? round.players[speakerSeat] : null
@@ -254,8 +263,22 @@ export function CluesScreen({ state, dispatch }: { state: GameState; dispatch: D
     clean.toLowerCase() === wordFor(round, speakerSeat!).toLowerCase()
   )
     warnings.push(t('clues.warnOwnWord'))
-  if (clean && round.ledger.some((c) => c.word.toLowerCase() === clean.toLowerCase()))
-    warnings.push(t('clues.warnDuplicate'))
+  const duplicate = clean !== '' && isDuplicateClue(round, clean)
+  if (duplicate) warnings.push(t('clues.warnDuplicate'))
+
+  // A repeat is refused outright: the ledger keeps one clue per word per round,
+  // so the draft is dropped and the player is told why.
+  const submit = () => {
+    if (!clean) return
+    if (duplicate) {
+      setRejected(clean)
+      setDraft('')
+      return
+    }
+    setRejected(null)
+    dispatch({ type: 'SUBMIT_CLUE', word: clean })
+    setDraft('')
+  }
 
   // The round's full shuffled order, eliminated players struck through (§3.4).
   const seatOrder = round.speakerOrder
@@ -327,14 +350,23 @@ export function CluesScreen({ state, dispatch }: { state: GameState; dispatch: D
             placeholder={t('clues.placeholder')}
             value={draft}
             maxLength={24}
-            onChange={(e) => setDraft(e.target.value)}
+            onChange={(e) => {
+              setDraft(e.target.value)
+              setRejected(null)
+            }}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' && clean) {
-                dispatch({ type: 'SUBMIT_CLUE', word: clean })
-                setDraft('')
-              }
+              if (e.key === 'Enter') submit()
             }}
           />
+          {rejected && (
+            <div
+              className="text-xs"
+              data-testid="clues.duplicate-rejected"
+              style={{ color: 'var(--color-ink)' }}
+            >
+              {t('clues.duplicateRejected', { word: rejected.toUpperCase() })}
+            </div>
+          )}
           {warnings.length > 0 && (
             <div className="text-xs" style={{ color: 'var(--color-g4)' }}>
               {warnings.join(' · ')}
@@ -345,10 +377,7 @@ export function CluesScreen({ state, dispatch }: { state: GameState; dispatch: D
             className="cta"
             data-testid="clues.confirm"
             disabled={!clean}
-            onClick={() => {
-              dispatch({ type: 'SUBMIT_CLUE', word: clean })
-              setDraft('')
-            }}
+            onClick={submit}
           >
             {t('clues.confirm')}
           </button>

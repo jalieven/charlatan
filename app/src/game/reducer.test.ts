@@ -239,6 +239,31 @@ describe('clues (§3.4, §3.5)', () => {
     expect(s.round!.ledger[0]).toEqual({ author: 'Lotte', word: 'warm', cycle: 1 })
   })
 
+  it('refuses a clue already given this round, whoever gave it', () => {
+    let s = revealAll(startRound(freshSession()))
+    s = reducer(s, { type: 'SUBMIT_CLUE', word: 'warm' })
+    const afterFirst = s
+    // Same word from the next speaker: rejected, and the turn does not advance.
+    s = reducer(s, { type: 'SUBMIT_CLUE', word: 'warm' })
+    expect(s).toBe(afterFirst)
+    // Case and diacritics are not a way around it; surrounding space neither.
+    for (const repeat of ['WARM', ' warm ', 'wärm']) {
+      expect(reducer(afterFirst, { type: 'SUBMIT_CLUE', word: repeat })).toBe(afterFirst)
+    }
+    // A genuinely new clue still lands.
+    s = reducer(afterFirst, { type: 'SUBMIT_CLUE', word: 'bruin' })
+    expect(s.round!.ledger).toHaveLength(2)
+    expect(s.round!.turn).toBe(2)
+  })
+
+  it('keeps the no-repeat rule across cycles', () => {
+    let s = revealAll(startRound(freshSession()))
+    for (let i = 0; i < 6; i++) s = reducer(s, { type: 'SUBMIT_CLUE', word: `c${i}` })
+    expect(s.round!.cycle).toBe(2) // second cycle, same ledger
+    const before = s
+    expect(reducer(s, { type: 'SUBMIT_CLUE', word: 'c0' })).toBe(before)
+  })
+
   it('offers the vote only after the required cycles', () => {
     let s = revealAll(startRound(freshSession()))
     for (let i = 0; i < 11; i++) s = reducer(s, { type: 'SUBMIT_CLUE', word: `c${i}` })

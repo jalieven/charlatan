@@ -120,6 +120,21 @@ export function canWhisper(state: GameState): boolean {
   )
 }
 
+/** Clue identity for the no-repeat rule: trimmed, case- and diacritics-insensitive. */
+export function normalizeClue(word: string): string {
+  return word
+    .toLowerCase()
+    .trim()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+}
+
+/** A clue already spoken this round — by anyone, in any cycle — can never be repeated (§3.5). */
+export function isDuplicateClue(round: RoundState, word: string): boolean {
+  const w = normalizeClue(word)
+  return w !== '' && round.ledger.some((c) => normalizeClue(c.word) === w)
+}
+
 // Steal matching: case-insensitive, trimmed, diacritics-insensitive, with
 // basic singular/plural tolerance (nl: -en/-s/-'s, en: -s/-es).
 export function guessMatches(guess: string, real: string): boolean {
@@ -354,6 +369,7 @@ export function reducer(state: GameState, action: Action): GameState {
       if (!round || state.phase !== 'clues' || round.awaitingVote) return state
       const word = action.word.trim()
       if (!word) return state
+      if (isDuplicateClue(round, word)) return state
       const order = speakingOrder(round)
       const author = round.players[order[round.turn]].name
       const ledger = [...round.ledger, { author, word, cycle: round.cycle }]
