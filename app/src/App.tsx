@@ -11,6 +11,7 @@ import {
   CluesScreen,
   GuessScreen,
   HandoffScreen,
+  RecheckScreen,
   RevealScreen,
   VerdictScreen,
 } from './screens/RoundScreens'
@@ -36,7 +37,8 @@ export default function App() {
   const phaseKey =
     state.phase +
     (state.round?.handoff ? '.h' : '') +
-    (passing && state.round ? `.${state.round.cursor}` : '')
+    (passing && state.round ? `.${state.round.cursor}` : '') +
+    (state.phase === 'clues' && state.round?.recheck != null ? `.r${state.round.recheck}` : '')
 
   let screen
   if (!booted && saved) {
@@ -66,7 +68,11 @@ export default function App() {
         )
         break
       case 'clues':
-        screen = <CluesScreen state={state} dispatch={dispatch} />
+        screen = state.round!.recheck != null ? (
+          <RecheckScreen state={state} dispatch={dispatch} />
+        ) : (
+          <CluesScreen state={state} dispatch={dispatch} />
+        )
         break
       case 'vote':
         screen = state.round!.handoff ? (

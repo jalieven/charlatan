@@ -101,16 +101,13 @@ export function HandoffScreen({ state, dispatch }: { state: GameState; dispatch:
 }
 
 // ---------- S3 · Reveal ----------
-export function RevealScreen({ state, dispatch }: { state: GameState; dispatch: Dispatch<Action> }) {
+
+/** The secret word(s) exactly as the reveal shows them — shared by RevealScreen and
+    RecheckScreen so the whisper indistinguishability rules (§3.6) live in one place. */
+function SecretWordPanel({ round, seat }: { round: RoundState; seat: number }) {
   const t = useT()
-  const round = state.round!
-  const seat = round.speakerOrder[round.cursor]
-  const player = round.players[seat]
   const word = wordFor(round, seat)
-  const whispered = round.whisper && round.whisper.target === player.name
-  const whisperAvailable = canWhisper(state)
-  const cards =
-    state.session?.players.find((p) => p.name === player.name)?.whisperCards ?? 0
+  const whispered = round.whisper && round.whisper.target === round.players[seat].name
 
   // Word + its one-line definition, styled identically for real and fake words
   // so neither the decoy nor a whispered distractor stands out. A whispered player
@@ -143,6 +140,46 @@ export function RevealScreen({ state, dispatch }: { state: GameState; dispatch: 
   )
 
   return (
+    /* Thumb economics (§3.3): the words sit LOW, right above the role button,
+       away from the finger holding the cover open near the top. */
+    <div className="flex flex-1 flex-col items-center justify-end gap-4 pb-5 text-center">
+      {whispered ? (
+        <>
+          {round.whisper!.swapped ? (
+            <>
+              {wordBlock(round.whisper!.fakeWord, round.whisper!.fakeWordDef)}
+              {wordBlock(word, definitionFor(round, seat))}
+            </>
+          ) : (
+            <>
+              {wordBlock(word, definitionFor(round, seat))}
+              {wordBlock(round.whisper!.fakeWord, round.whisper!.fakeWordDef)}
+            </>
+          )}
+          <div
+            className="rounded-xl border px-3 py-2 text-sm"
+            style={{ borderColor: 'var(--color-g3)' }}
+          >
+            <b>{t('reveal.psst')}</b> {t('reveal.psstText')}
+          </div>
+        </>
+      ) : (
+        wordBlock(word, definitionFor(round, seat))
+      )}
+    </div>
+  )
+}
+
+export function RevealScreen({ state, dispatch }: { state: GameState; dispatch: Dispatch<Action> }) {
+  const t = useT()
+  const round = state.round!
+  const seat = round.speakerOrder[round.cursor]
+  const player = round.players[seat]
+  const whisperAvailable = canWhisper(state)
+  const cards =
+    state.session?.players.find((p) => p.name === player.name)?.whisperCards ?? 0
+
+  return (
     <div className="flex h-full flex-col gap-3">
       <div>
         <div className="eb">{t('handoff.progress', { i: round.cursor + 1, n: round.players.length })}</div>
@@ -154,33 +191,7 @@ export function RevealScreen({ state, dispatch }: { state: GameState; dispatch: 
         coverLabel={t('reveal.holdWord')}
         coverSub={t('reveal.holdWordSub')}
       >
-        {/* Thumb economics (§3.3): the words sit LOW, right above the role button,
-            away from the finger holding the cover open near the top. */}
-        <div className="flex flex-1 flex-col items-center justify-end gap-4 pb-5 text-center">
-          {whispered ? (
-            <>
-              {round.whisper!.swapped ? (
-                <>
-                  {wordBlock(round.whisper!.fakeWord, round.whisper!.fakeWordDef)}
-                  {wordBlock(word, definitionFor(round, seat))}
-                </>
-              ) : (
-                <>
-                  {wordBlock(word, definitionFor(round, seat))}
-                  {wordBlock(round.whisper!.fakeWord, round.whisper!.fakeWordDef)}
-                </>
-              )}
-              <div
-                className="rounded-xl border px-3 py-2 text-sm"
-                style={{ borderColor: 'var(--color-g3)' }}
-              >
-                <b>{t('reveal.psst')}</b> {t('reveal.psstText')}
-              </div>
-            </>
-          ) : (
-            wordBlock(word, definitionFor(round, seat))
-          )}
-        </div>
+        <SecretWordPanel round={round} seat={seat} />
       </HoldCover>
 
       <RoleHold
@@ -315,30 +326,42 @@ export function CluesScreen({ state, dispatch }: { state: GameState; dispatch: D
               : orderIdx === round.turn && !round.awaitingVote
                 ? 'now'
                 : 'up'
-          return (
-            <span
-              key={p.name}
-              className="rounded-full border px-3 py-1.5 text-xs"
-              style={{
-                borderColor: status === 'now' ? 'var(--color-ink)' : 'var(--color-g2)',
-                background: status === 'now' ? 'var(--color-ink)' : 'transparent',
-                color:
-                  status === 'now'
-                    ? 'var(--color-paper)'
-                    : status === 'out'
-                      ? 'var(--color-g3)'
-                      : status === 'done'
-                        ? 'var(--color-g4)'
-                        : 'var(--color-g5)',
-                textDecoration: status === 'out' ? 'line-through' : 'none',
-                fontWeight: status === 'now' ? 700 : 400,
-              }}
-            >
-              {p.name}
-              {status === 'done' ? ' ✓' : ''}
+          const pillStyle = {
+            borderColor: status === 'now' ? 'var(--color-ink)' : 'var(--color-g2)',
+            background: status === 'now' ? 'var(--color-ink)' : 'transparent',
+            color:
+              status === 'now'
+                ? 'var(--color-paper)'
+                : status === 'out'
+                  ? 'var(--color-g3)'
+                  : status === 'done'
+                    ? 'var(--color-g4)'
+                    : 'var(--color-g5)',
+            textDecoration: status === 'out' ? 'line-through' : 'none',
+            fontWeight: status === 'now' ? 700 : 400,
+          } as const
+          const label = `${p.name}${status === 'done' ? ' ✓' : ''}`
+          // Active players' pills open their word re-check; eliminated ones stay inert.
+          return status === 'out' ? (
+            <span key={p.name} className="rounded-full border px-3 py-1.5 text-xs" style={pillStyle}>
+              {label}
             </span>
+          ) : (
+            <button
+              key={p.name}
+              type="button"
+              data-testid={`clues.pill.${p.name}`}
+              className="rounded-full border px-3 py-1.5 text-xs"
+              style={pillStyle}
+              onClick={() => dispatch({ type: 'OPEN_RECHECK', seat: seatIdx })}
+            >
+              {label}
+            </button>
           )
         })}
+      </div>
+      <div className="text-[10px]" style={{ color: 'var(--color-g4)' }}>
+        {t('clues.pillHint')}
       </div>
 
       {round.awaitingVote ? (
@@ -397,6 +420,96 @@ export function CluesScreen({ state, dispatch }: { state: GameState; dispatch: D
       )}
       <div className="hairline" />
       <Ledger round={round} />
+    </div>
+  )
+}
+
+// ---------- S4c · Word re-check (forgot-your-word) ----------
+export function RecheckScreen({ state, dispatch }: { state: GameState; dispatch: Dispatch<Action> }) {
+  const t = useT()
+  const round = state.round!
+  const seat = round.recheck!
+  const player = round.players[seat]
+  const pin = state.session?.players.find((p) => p.name === player.name)?.pin ?? null
+  // The gate lives in component state on purpose: it can never be persisted,
+  // so a reload always lands back behind it (RESUME clears recheck anyway).
+  const [unlocked, setUnlocked] = useState(false)
+  const [draft, setDraft] = useState('')
+  const [wrong, setWrong] = useState(false)
+
+  return (
+    <div className="flex h-full flex-col gap-3">
+      <div>
+        <div className="eb">{t('recheck.title')}</div>
+        <div className="text-xl font-bold">{player.name.toUpperCase()}</div>
+      </div>
+
+      {unlocked ? (
+        <HoldCover
+          testId="recheck.cover"
+          coverLabel={t('reveal.holdWord')}
+          coverSub={t('reveal.holdWordSub')}
+        >
+          {/* Same privacy physics as the reveal — and the same panel, so a whispered
+              player sees the identical two-word display here too. No role button:
+              peek economics stay whatever the reveal made them. */}
+          <SecretWordPanel round={round} seat={seat} />
+        </HoldCover>
+      ) : pin !== null ? (
+        <form
+          className="flex flex-1 flex-col justify-center gap-3"
+          onSubmit={(e) => {
+            e.preventDefault()
+            if (draft === pin) {
+              setUnlocked(true)
+            } else {
+              setWrong(true)
+              setDraft('')
+            }
+          }}
+        >
+          <div className="eb2 text-center">{t('recheck.enterPin')}</div>
+          <input
+            className="field text-center tracking-[.35em]"
+            data-testid="recheck.pin-input"
+            type="password"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            maxLength={4}
+            autoComplete="off"
+            value={draft}
+            onChange={(e) => {
+              setDraft(e.target.value.replace(/\D/g, ''))
+              setWrong(false)
+            }}
+          />
+          {wrong && (
+            <div className="text-center text-xs" data-testid="recheck.pin-wrong" style={{ color: 'var(--color-ink)' }}>
+              {t('recheck.wrongPin')}
+            </div>
+          )}
+          <button type="submit" className="cta" data-testid="recheck.pin-submit" disabled={draft.length !== 4}>
+            {t('recheck.pinSubmit')}
+          </button>
+        </form>
+      ) : (
+        <div className="flex flex-1 flex-col justify-end gap-3">
+          <SlideToContinue
+            label={t('recheck.slide', { name: player.name })}
+            testId="recheck.slide"
+            onConfirm={() => setUnlocked(true)}
+          />
+        </div>
+      )}
+
+      <button
+        type="button"
+        className="cta cta-quiet"
+        data-testid="recheck.back"
+        onClick={() => dispatch({ type: 'CLOSE_RECHECK' })}
+      >
+        {t('recheck.back')}
+      </button>
     </div>
   )
 }

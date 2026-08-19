@@ -38,6 +38,8 @@ export interface SessionPlayer {
   whisperCards: number
   /** Grayed leaver; restored (score + cards) on same-name rejoin. */
   left: boolean
+  /** Optional 4-digit code that unlocks this player's word re-check; null = slider gate. */
+  pin: string | null
 }
 
 export interface RoundPlayer {
@@ -135,6 +137,8 @@ export interface RoundState {
   outcome: RoundOutcome | null
   /** Result staging: acts 1-3. */
   resultAct: 1 | 2 | 3
+  /** Seat whose word is being re-checked from the clue screen; null = none (clues phase only). */
+  recheck: number | null
 }
 
 export interface GameState {
@@ -142,6 +146,8 @@ export interface GameState {
   locale: Locale
   settings: Settings
   setupNames: string[]
+  /** name -> optional 4-digit re-check pin; only names that set one appear here. */
+  setupPins: Record<string, string>
   session: {
     players: SessionPlayer[]
     roundsPlayed: number
@@ -154,6 +160,7 @@ export interface GameState {
 export const MIN_PLAYERS = 3
 export const MAX_PLAYERS = 12
 export const TIE_LIMIT = 3
+export const PIN_RE = /^\d{4}$/
 
 export function autoCharlatans(playerCount: number): number {
   return playerCount >= 8 ? 2 : 1
@@ -173,6 +180,7 @@ export const initialState: GameState = {
   locale: 'nl',
   settings: { charlatanOverride: null, cluesPerPlayer: 2, whisperCardsPerPlayer: 1 },
   setupNames: [],
+  setupPins: {},
   session: null,
   round: null,
 }

@@ -78,6 +78,10 @@
   .row .h { color: #737373; font-size: 12px; }
   .row .x { color: #737373; }
   .row.ghost { border-style: dashed; color: #737373; }
+  .pinbadge { font-size: 9px; letter-spacing: .12em; text-transform: uppercase; border: 1px solid #3D3D3D; border-radius: 5px; padding: 2px 6px; color: #A3A3A3; }
+  .addline { display: flex; gap: 6px; }
+  .minifield { border: 1px solid #262626; border-radius: 8px; padding: 8px 10px; font-size: 13px; display: flex; align-items: center; }
+  .minifield .caret { display: inline-block; width: 2px; height: 1em; background: #FAFAFA; vertical-align: -2px; }
   .stepper { display: flex; align-items: center; gap: 10px; }
   .stepper .btn { width: 22px; height: 22px; border: 1px solid #3D3D3D; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #A3A3A3; font-size: 13px; }
   .stepper .val { font-weight: 800; font-size: 14px; min-width: 42px; text-align: center; }
@@ -195,9 +199,9 @@
   <header class="top">
     <p class="kicker">Charlatan · Design review</p>
     <h1>Charlatan Mockups</h1>
-    <p class="lede">Twenty-two frames covering all nine screens, S1–S9, in flow order — including the
-    reveal's four states, the second-tie warning, the three-act result, and the round menu that
-    hangs off the clue screen. In-app copy is Dutch —
+    <p class="lede">Twenty-seven frames covering all nine screens, S1–S9, in flow order — including the
+    reveal's four states, the second-tie warning, the three-act result, the round menu that
+    hangs off the clue screen, and the forgot-your-word re-check with its optional per-player PIN. In-app copy is Dutch —
     the default locale per §6.4. One running scenario throughout: six players, koffie/thee, Tom is
     the Charlatan. Annotations under each frame say what to validate.</p>
     <div class="chips">
@@ -252,6 +256,43 @@
           <p>Drag handles reorder seating; the Charlatan stepper shows <em>AUTO·1</em> until the host
           overrides (clamped 1…⌊n/3⌋, §2.1). Four options only — no accent toggle, no timers. Rows
           here are compressed — built targets are ≥ 56 px.</p>
+        </div>
+      </div>
+
+      <div class="mock">
+        <div class="phone">
+          <div class="logo">CHARLATAN</div>
+          <div class="hairline"></div>
+          <div class="eb">Spelers · 4 van 12</div>
+          <div style="height:8px"></div>
+          <div class="rows">
+            <div class="row"><span><span class="h">≡</span>&nbsp; <b>Jan</b></span><span style="display:flex;align-items:center;gap:10px"><span class="pinbadge">PIN</span><span class="x">✕</span></span></div>
+            <div class="row"><span><span class="h">≡</span>&nbsp; <b>Sanne</b></span><span class="x">✕</span></div>
+            <div class="row"><span><span class="h">≡</span>&nbsp; <b>Tom</b></span><span class="x">✕</span></div>
+            <div class="row"><span><span class="h">≡</span>&nbsp; <b>Lotte</b></span><span style="display:flex;align-items:center;gap:10px"><span class="pinbadge">PIN</span><span class="x">✕</span></span></div>
+            <div class="addline">
+              <span class="minifield" style="flex:1"><b>Eva</b><span class="caret"></span></span>
+              <span class="minifield" style="width:86px;color:#737373">PIN&nbsp;····</span>
+              <span class="minifield" style="width:44px;justify-content:center;color:#A3A3A3">+</span>
+            </div>
+          </div>
+          <div class="hairline"></div>
+          <div class="rows">
+            <div class="row"><span class="eb2">Charlatans</span>
+              <span class="stepper"><span class="btn">−</span><span class="val">AUTO·1</span><span class="btn">+</span></span></div>
+            <div class="row"><span class="eb2">Hints per speler</span>
+              <span class="stepper"><span class="btn">−</span><span class="val">2</span><span class="btn">+</span></span></div>
+          </div>
+          <div class="grow"></div>
+          <div class="cta">START HET SPEL</div>
+        </div>
+        <div class="cap">
+          <h4>Setup — optional PIN per player</h4>
+          <p>A narrow, optional PIN field (4 digits, numeric keyboard) sits between the name and the
+          add button; leaving it empty adds the player exactly as before. A quiet <em>PIN</em> badge
+          marks who set one. The PIN exists for one purpose: unlocking that player's word re-check
+          during the round (S4c). Same optional field when someone joins mid-session from the
+          scoreboard. Options rows are elided here for room.</p>
         </div>
       </div>
 
@@ -649,6 +690,117 @@
     </div>
   </section>
 
+  <!-- ============ S4c RECHECK — WOORD VERGETEN ============ -->
+  <section class="block">
+    <p class="sec-eyebrow">S4c · Woord vergeten</p>
+    <h2>The word, retrievable — never exposed</h2>
+    <p class="sec-note">Forgetting your word mid-round used to be unrecoverable. Now every player
+    pill on the clue screen is a button: tap your own name and a re-check opens, gated the way the
+    reveal is — by your PIN if you set one at setup, by the handoff slider if you didn't — and the
+    word itself sits behind the same swipe-up-and-hold cover. Nothing else moves: the turn, the
+    speaking order and the peek economics are untouched, there is no role card here, and a
+    Whispered player sees the same two-word display as in the reveal — a re-check can never betray
+    the plant.</p>
+
+    <div class="frames">
+      <div class="mock">
+        <div class="phone">
+          <div class="hdr"><div class="eb">Hintronde 1 van 2</div><span class="gear"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span></div>
+          <div style="font-size:22px;font-weight:900;margin-top:4px">SANNE, JOUW HINT</div>
+          <div style="height:10px"></div>
+          <div class="strip">
+            <span class="done">Jan ✓</span><span class="now">Sanne</span><span>Tom</span><span style="border-color:#3D3D3D">Lotte</span><span>Eva</span><span class="out">Bram</span>
+          </div>
+          <div style="font-size:10px;color:#737373;margin-top:6px;letter-spacing:.04em">Woord vergeten? Tik op je naam.</div>
+          <div style="height:8px"></div>
+          <div class="input">warm<span class="caret"></span></div>
+          <div style="height:8px"></div>
+          <div class="cta" style="padding:12px;font-size:11px">BEVESTIG &amp; ZEG HET LUIDOP</div>
+          <div class="hairline"></div>
+          <div class="eb2">Logboek · hintronde 1</div>
+          <div class="list">
+            <div><span class="who">Jan</span><span>"zwart"</span></div>
+          </div>
+          <div class="grow"></div>
+        </div>
+        <div class="cap">
+          <h4>1 · The pills become buttons</h4>
+          <p>Same clue screen, one new affordance: every active player's pill is tappable (here
+          Lotte's is pressed) and one quiet line under the strip says so. Eliminated players' pills
+          stay inert. The clue draft underneath is untouched by a re-check — it's the same
+          non-modal manner as the round menu.</p>
+        </div>
+      </div>
+
+      <div class="mock">
+        <div class="phone">
+          <div class="eb">Woord opnieuw bekijken</div>
+          <div style="font-size:20px;font-weight:900;margin-top:2px">LOTTE</div>
+          <div class="grow" style="display:flex;flex-direction:column;justify-content:center;gap:12px">
+            <div class="eb2">Voer je pincode in</div>
+            <div class="input" style="text-align:center;letter-spacing:.35em">•••<span class="caret"></span></div>
+            <div style="font-size:11px;color:#737373;text-align:center">4 cijfers · gekozen bij de setup</div>
+          </div>
+          <div class="cta">ONTGRENDEL</div>
+          <div style="height:8px"></div>
+          <div class="cta quiet">TERUG NAAR DE HINTS</div>
+        </div>
+        <div class="cap">
+          <h4>2a · Gate — Lotte set a PIN</h4>
+          <p>The phone is public on the clue screen, so the gate is the point: a masked numeric
+          field, digits only. A wrong code clears the field and says <em>Verkeerde pincode</em> —
+          nothing more; there is no recovery flow, a forgotten PIN simply means no re-check. Back
+          returns to the exact clue turn.</p>
+        </div>
+      </div>
+
+      <div class="mock">
+        <div class="phone">
+          <div class="eb">Woord opnieuw bekijken</div>
+          <div style="font-size:20px;font-weight:900;margin-top:2px">EVA</div>
+          <div class="grow" style="display:flex;flex-direction:column;justify-content:center;gap:12px;text-align:center">
+            <div class="eb2">Geen pincode ingesteld</div>
+            <div style="font-size:12px;color:#737373;max-width:24ch;margin:0 auto;line-height:1.5">geef de telefoon aan Eva — schuiven is haar gebaar, zoals bij de handoff</div>
+          </div>
+          <div class="slide"><span class="knob">→</span> Schuif als jij Eva bent</div>
+          <div style="height:8px"></div>
+          <div class="cta quiet">TERUG NAAR DE HINTS</div>
+        </div>
+        <div class="cap">
+          <h4>2b · Gate — no PIN</h4>
+          <p>Without a PIN the gate falls back to the reveal's own grammar: the deliberate slide
+          from the handoff interstitial. It keeps honest people honest — same social contract as
+          passing the phone during the reveal — while the PIN variant above is for tables that want
+          it enforced.</p>
+        </div>
+      </div>
+
+      <div class="mock">
+        <div class="phone">
+          <div class="eb dim">Woord opnieuw bekijken</div>
+          <div style="font-size:20px;font-weight:900;margin-top:2px" class="dim">LOTTE</div>
+          <div style="height:12px"></div>
+          <div class="cover folded"><div class="grab"></div></div>
+          <div class="wordstage">
+            <div class="eb2">Jouw woord</div>
+            <div class="fitbox"><div class="theword" style="--em:3.13">KOFFIE</div></div>
+            <div style="font-size:11px;color:#A3A3A3;max-width:30ch;line-height:1.5">gebrande bonen, gemalen en gezet tot een zwarte oppepper</div>
+            <div class="holdnote">laat los om te verbergen</div>
+          </div>
+          <div class="cta quiet dim">TERUG NAAR DE HINTS</div>
+        </div>
+        <div class="cap">
+          <h4>3 · The word — same cover, same physics</h4>
+          <p>Past the gate, the word sits behind the identical swipe-up-and-hold cover: visible only
+          while held, instant snap shut on release. No role button — peeking economics stay what
+          they were in the reveal — and no slide-to-continue: the only way out is back to the
+          hints. A Whispered player gets the two-word display here too, so re-checking reveals
+          nothing new.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ============ S5–S7 VOTE, VERDICT, STEAL ============ -->
   <section class="block">
     <p class="sec-eyebrow">S5 · S6 · S7 — Vote, verdict &amp; the steal</p>
@@ -927,7 +1079,8 @@
     <p><strong>Type note:</strong> these frames render in the system font; the built app ships Space
     Grotesk (or Inter Tight) per §6.5 — expect the words and verdicts to gain more character at the
     same weights.</p>
-    <p><strong>Coverage:</strong> all nine screens are mocked, plus the round menu (S4b). Not shown as separate frames: the
+    <p><strong>Coverage:</strong> all nine screens are mocked, plus the round menu (S4b) and the
+    forgot-your-word re-check with its optional PIN (S4c). Not shown as separate frames: the
     civilian role card (identical geometry to the Charlatan's, targets close-only) and the
     vote-phase handoff (identical to the reveal-phase one).</p>
   </footer>

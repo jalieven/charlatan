@@ -6,7 +6,7 @@ import type {
   RoundState,
   VerdictInfo,
 } from './types'
-import { initialState, MAX_PLAYERS, MIN_PLAYERS, TIE_LIMIT } from './types'
+import { initialState, MAX_PLAYERS, MIN_PLAYERS, PIN_RE, TIE_LIMIT } from './types'
 import { scoreRound } from './scoring'
 
 // Every source of randomness lives in the ACTION PAYLOAD (produced by the
@@ -14,7 +14,7 @@ import { scoreRound } from './scoring'
 // whole game is unit-testable and resumable.
 export type Action =
   | { type: 'SET_LOCALE'; locale: 'nl' | 'en' }
-  | { type: 'ADD_NAME'; name: string }
+  | { type: 'ADD_NAME'; name: string; pin?: string }
   | { type: 'REMOVE_NAME'; name: string }
   | { type: 'MOVE_NAME'; name: string; dir: -1 | 1 }
   | { type: 'SET_CHARLATAN_OVERRIDE'; value: number | null }
@@ -48,6 +48,8 @@ export type Action =
     }
   | { type: 'REVEAL_NEXT' }
   | { type: 'SUBMIT_CLUE'; word: string }
+  | { type: 'OPEN_RECHECK'; seat: number }
+  | { type: 'CLOSE_RECHECK' }
   | { type: 'GO_TO_VOTE' }
   | { type: 'SKIP_ROUND' }
   | { type: 'CAST_VOTE'; target: string }
@@ -56,7 +58,7 @@ export type Action =
   | { type: 'RESULT_ADVANCE' }
   | { type: 'RESULT_BACK' }
   | { type: 'FINISH_ROUND' }
-  | { type: 'ROSTER_ADD'; name: string }
+  | { type: 'ROSTER_ADD'; name: string; pin?: string }
   | { type: 'ROSTER_REMOVE'; name: string }
   | { type: 'END_SESSION' }
   | { type: 'RESUME'; state: GameState }
@@ -208,11 +210,18 @@ export function reducer(state: GameState, action: Action): GameState {
       const name = action.name.trim()
       if (!name || state.setupNames.length >= MAX_PLAYERS) return state
       if (state.setupNames.some((n) => n.toLowerCase() === name.toLowerCase())) return state
-      return { ...state, setupNames: [...state.setupNames, name] }
+      const pin = action.pin && PIN_RE.test(action.pin.trim()) ? action.pin.trim() : null
+      return {
+        ...state,
+        setupNames: [...state.setupNames, name],
+        setupPins: pin ? { ...state.setupPins, [name]: pin } : state.setupPins,
+      }
     }
-    case 'REMOVE_NAME':
+    case 'REMOVE_NAME': {
       if (state.phase !== 'setup') return state
-      return { ...state, setupNames: state.setupNames.filter((n) => n !== action.name) }
+      const { [action.name]: _dropped, ...setupPins } = state.setupPins
+      return { ...state, setupNames: state.setupNames.filter((n) => n !== action.name), setupPins }
+    }
     case 'MOVE_NAME': {
       if (state.phase !== 'setup') return state
       const i = state.setupNames.indexOf(action.name)
@@ -247,6 +256,7 @@ export function reducer(state: GameState, action: Action): GameState {
             score: 0,
             whisperCards: state.settings.whisperCardsPerPlayer,
             left: false,
+            pin: state.setupPins[name] ?? null,
           })),
           roundsPlayed: 0,
           usedPairIndexes: [],
@@ -299,6 +309,7 @@ export function reducer(state: GameState, action: Action): GameState {
         guess: null,
         outcome: null,
         resultAct: 1,
+        recheck: null,
       }
       return {
         ...state,
@@ -402,11 +413,25 @@ export function reducer(state: GameState, action: Action): GameState {
         },
       }
     }
+    // ---------- word re-check (forgot-your-word, §S4c) ----------
+    case 'OPEN_RECHECK': {
+      const round = state.round
+      if (!round || state.phase !== 'clues') return state
+      const p = round.players[action.seat]
+      if (!p || p.eliminated) return state
+      return withRound(state, { recheck: action.seat })
+    }
+    case 'CLOSE_RECHECK': {
+      const round = state.round
+      if (!round || state.phase !== 'clues' || round.recheck === null) return state
+      return withRound(state, { recheck: null })
+    }
+
     case 'GO_TO_VOTE': {
       const round = state.round
       if (!round || state.phase !== 'clues' || !round.awaitingVote) return state
       return {
-        ...withRound(state, { cursor: 0, handoff: true, votes: {} }),
+        ...withRound(state, { cursor: 0, handoff: true, votes: {}, recheck: null }),
         phase: 'vote',
       }
     }
@@ -545,13 +570,16 @@ export function reducer(state: GameState, action: Action): GameState {
           },
         }
       }
+      // A joiner may set a re-check pin too; a rejoin above keeps the stored one —
+      // nobody can reset another player's pin from the public roster editor.
+      const pin = action.pin && PIN_RE.test(action.pin.trim()) ? action.pin.trim() : null
       return {
         ...state,
         session: {
           ...session,
           players: [
             ...session.players,
-            { name, score: 0, whisperCards: state.settings.whisperCardsPerPlayer, left: false },
+            { name, score: 0, whisperCards: state.settings.whisperCardsPerPlayer, left: false, pin },
           ],
         },
       }
@@ -573,11 +601,32 @@ export function reducer(state: GameState, action: Action): GameState {
         locale: state.locale,
         settings: state.settings,
         setupNames: state.session ? state.session.players.filter((p) => !p.left).map((p) => p.name) : state.setupNames,
+        setupPins: state.session
+          ? Object.fromEntries(
+              state.session.players.filter((p) => !p.left && p.pin).map((p) => [p.name, p.pin!]),
+            )
+          : state.setupPins,
       }
 
     case 'RESUME': {
       // Rehydration always re-enters via the handoff interstitial (§6.3 inv. 6).
       let s = action.state
+      // Pre-pin saves lack the pin fields; default them so the shape is whole.
+      s = { ...s, setupPins: s.setupPins ?? {} }
+      if (s.session) {
+        s = {
+          ...s,
+          session: {
+            ...s.session,
+            players: s.session.players.map((p) => ({ ...p, pin: p.pin ?? null })),
+          },
+        }
+      }
+      if (s.round) {
+        // An open re-check never survives a reload — same privacy invariant as
+        // the handoff gate (and the default for pre-recheck saves).
+        s = { ...s, round: { ...s.round, recheck: null } }
+      }
       if (s.round && !s.round.speakerOrder) {
         // Pre-shuffle saves carried a firstSpeaker rotation instead of a permutation.
         const first = (s.round as RoundState & { firstSpeaker?: number }).firstSpeaker ?? 0

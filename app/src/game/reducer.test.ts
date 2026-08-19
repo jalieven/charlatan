@@ -550,3 +550,128 @@ describe('word definitions (reveal aid)', () => {
   })
 
 })
+
+describe('re-check pins (setup + roster)', () => {
+  it('stores a valid 4-digit pin on ADD_NAME and drops invalid ones', () => {
+    let s = reducer(initialState, { type: 'ADD_NAME', name: 'Jan', pin: '1234' })
+    s = reducer(s, { type: 'ADD_NAME', name: 'Sanne', pin: '12' })
+    s = reducer(s, { type: 'ADD_NAME', name: 'Tom', pin: '12ab' })
+    s = reducer(s, { type: 'ADD_NAME', name: 'Lotte' })
+    expect(s.setupPins).toEqual({ Jan: '1234' })
+  })
+
+  it('REMOVE_NAME deletes the pin entry', () => {
+    let s = reducer(initialState, { type: 'ADD_NAME', name: 'Jan', pin: '1234' })
+    s = reducer(s, { type: 'REMOVE_NAME', name: 'Jan' })
+    expect(s.setupPins).toEqual({})
+  })
+
+  it('START_SESSION maps setup pins onto session players', () => {
+    let s = run(initialState, [
+      { type: 'ADD_NAME', name: 'Jan', pin: '1234' },
+      { type: 'ADD_NAME', name: 'Sanne' },
+      { type: 'ADD_NAME', name: 'Tom' },
+      { type: 'START_SESSION' },
+    ])
+    const byName = Object.fromEntries(s.session!.players.map((p) => [p.name, p.pin]))
+    expect(byName).toEqual({ Jan: '1234', Sanne: null, Tom: null })
+  })
+
+  it('ROSTER_ADD accepts a pin for a joiner; a rejoin keeps the original pin', () => {
+    let s = run(initialState, [
+      { type: 'ADD_NAME', name: 'Jan', pin: '1234' },
+      { type: 'ADD_NAME', name: 'Sanne' },
+      { type: 'ADD_NAME', name: 'Tom' },
+      { type: 'START_SESSION' },
+      { type: 'ROSTER_ADD', name: 'Lotte', pin: '9999' },
+    ])
+    expect(s.session!.players.find((p) => p.name === 'Lotte')!.pin).toBe('9999')
+    s = run(s, [
+      { type: 'ROSTER_REMOVE', name: 'Jan' },
+      { type: 'ROSTER_ADD', name: 'Jan', pin: '0000' },
+    ])
+    const jan = s.session!.players.find((p) => p.name === 'Jan')!
+    expect(jan.left).toBe(false)
+    expect(jan.pin).toBe('1234')
+  })
+
+  it('END_SESSION carries pins of staying players back to setup', () => {
+    let s = run(initialState, [
+      { type: 'ADD_NAME', name: 'Jan', pin: '1234' },
+      { type: 'ADD_NAME', name: 'Sanne', pin: '5678' },
+      { type: 'ADD_NAME', name: 'Tom' },
+      { type: 'START_SESSION' },
+      { type: 'ROSTER_REMOVE', name: 'Sanne' },
+      { type: 'END_SESSION' },
+    ])
+    expect(s.setupNames).toEqual(['Jan', 'Tom'])
+    expect(s.setupPins).toEqual({ Jan: '1234' })
+  })
+})
+
+describe('word re-check from the clue screen (S4c)', () => {
+  it('opens for a valid seat during clues and closes again', () => {
+    let s = revealAll(startRound(freshSession()))
+    expect(s.phase).toBe('clues')
+    expect(s.round!.recheck).toBeNull()
+    s = reducer(s, { type: 'OPEN_RECHECK', seat: 3 })
+    expect(s.round!.recheck).toBe(3)
+    s = reducer(s, { type: 'CLOSE_RECHECK' })
+    expect(s.round!.recheck).toBeNull()
+    // closing again is a no-op
+    expect(reducer(s, { type: 'CLOSE_RECHECK' })).toBe(s)
+  })
+
+  it('refuses outside the clues phase and for invalid or eliminated seats', () => {
+    const revealing = startRound(freshSession())
+    expect(reducer(revealing, { type: 'OPEN_RECHECK', seat: 1 })).toBe(revealing)
+
+    let s = revealAll(startRound(freshSession()))
+    expect(reducer(s, { type: 'OPEN_RECHECK', seat: 99 })).toBe(s)
+    const withOut = {
+      ...s,
+      round: {
+        ...s.round!,
+        players: s.round!.players.map((p, i) => (i === 1 ? { ...p, eliminated: true } : p)),
+      },
+    }
+    expect(reducer(withOut, { type: 'OPEN_RECHECK', seat: 1 })).toBe(withOut)
+  })
+
+  it('does not disturb the clue turn, cursor, or peek state', () => {
+    let s = revealAll(startRound(freshSession()))
+    s = reducer(s, { type: 'SUBMIT_CLUE', word: 'warm' })
+    const before = s.round!
+    s = reducer(s, { type: 'OPEN_RECHECK', seat: 2 })
+    s = reducer(s, { type: 'CLOSE_RECHECK' })
+    expect(s.round!.turn).toBe(before.turn)
+    expect(s.round!.cursor).toBe(before.cursor)
+    expect(s.round!.players).toEqual(before.players)
+    expect(s.round!.ledger).toEqual(before.ledger)
+  })
+
+  it('stays available while awaiting the vote, and GO_TO_VOTE clears it', () => {
+    let s = revealAll(startRound(freshSession()))
+    let i = 0
+    while (!s.round!.awaitingVote) s = reducer(s, { type: 'SUBMIT_CLUE', word: `clue${i++}` })
+    s = reducer(s, { type: 'OPEN_RECHECK', seat: 0 })
+    expect(s.round!.recheck).toBe(0)
+    s = reducer(s, { type: 'GO_TO_VOTE' })
+    expect(s.phase).toBe('vote')
+    expect(s.round!.recheck).toBeNull()
+  })
+
+  it('RESUME clears an open re-check and defaults missing pin fields of old saves', () => {
+    let s = revealAll(startRound(freshSession()))
+    s = reducer(s, { type: 'OPEN_RECHECK', seat: 2 })
+    // Simulate a pre-pin save: strip the new fields entirely.
+    const raw = JSON.parse(JSON.stringify(s))
+    delete raw.setupPins
+    for (const p of raw.session.players) delete p.pin
+    raw.round.recheck = 2
+    const resumed = reducer(initialState, { type: 'RESUME', state: raw as GameState })
+    expect(resumed.setupPins).toEqual({})
+    expect(resumed.session!.players.every((p) => p.pin === null)).toBe(true)
+    expect(resumed.round!.recheck).toBeNull()
+  })
+})

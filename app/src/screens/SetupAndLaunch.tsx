@@ -44,13 +44,15 @@ function Stepper({
 export function SetupScreen({ state, dispatch }: { state: GameState; dispatch: Dispatch<Action> }) {
   const t = useT()
   const [draft, setDraft] = useState('')
+  const [pinDraft, setPinDraft] = useState('')
   const n = state.setupNames.length
   const effective = charlatanCount(Math.max(n, MIN_PLAYERS), state.settings.charlatanOverride)
 
   const add = () => {
     if (!draft.trim()) return
-    dispatch({ type: 'ADD_NAME', name: draft })
+    dispatch({ type: 'ADD_NAME', name: draft, pin: pinDraft.length === 4 ? pinDraft : undefined })
     setDraft('')
+    setPinDraft('')
   }
 
   return (
@@ -63,6 +65,15 @@ export function SetupScreen({ state, dispatch }: { state: GameState; dispatch: D
           <div className="row" key={name}>
             <span className="font-bold">{name}</span>
             <span className="flex items-center gap-1">
+              {state.setupPins[name] && (
+                <span
+                  className="eb rounded border px-1.5 py-0.5"
+                  data-testid={`setup.player.${name}.pin`}
+                  style={{ borderColor: 'var(--color-g3)', color: 'var(--color-g4)' }}
+                >
+                  {t('setup.pinBadge')}
+                </span>
+              )}
               <button
                 type="button"
                 data-testid={`setup.player.${name}.up`}
@@ -92,6 +103,19 @@ export function SetupScreen({ state, dispatch }: { state: GameState; dispatch: D
             value={draft}
             maxLength={16}
             onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && add()}
+          />
+          <input
+            className="field quietfield"
+            data-testid="setup.pin-input"
+            placeholder={t('setup.pinPlaceholder')}
+            value={pinDraft}
+            inputMode="numeric"
+            pattern="[0-9]*"
+            maxLength={4}
+            autoComplete="off"
+            style={{ width: 96 }}
+            onChange={(e) => setPinDraft(e.target.value.replace(/\D/g, ''))}
             onKeyDown={(e) => e.key === 'Enter' && add()}
           />
           <button
