@@ -15,10 +15,13 @@ export function scoreRound(round: RoundState): RoundSummary {
 
   const charlatans = round.players.filter((p) => p.role === 'charlatan')
   const civilians = round.players.filter((p) => p.role === 'civilian')
+  // A skipped round is void: every delta stays zero, including bonuses already
+  // earned on an ejecting ballot before the round was abandoned (§3.10).
+  const scored = outcome.kind !== 'skipped'
 
   // Correct-vote bonuses accrue on every ejecting ballot that hit a Charlatan,
   // regardless of the round's final outcome direction — but only civilians earn them.
-  for (const ballot of round.ballots) {
+  for (const ballot of scored ? round.ballots : []) {
     if (ballot.outcome !== 'ejection' || !ballot.ejected) continue
     const ejectedRole = round.players.find((p) => p.name === ballot.ejected)?.role
     if (ejectedRole !== 'charlatan') continue
@@ -29,7 +32,9 @@ export function scoreRound(round: RoundState): RoundSummary {
     }
   }
 
-  if (outcome.kind === 'civilians') {
+  if (!scored) {
+    // nothing to award
+  } else if (outcome.kind === 'civilians') {
     for (const p of civilians) {
       deltas[p.name].win = 2
       if (!p.peeked) deltas[p.name].blind = 1

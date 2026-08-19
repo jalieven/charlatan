@@ -65,6 +65,8 @@ export type RoundOutcome =
   | { kind: 'charlatans-parity' }
   | { kind: 'charlatans-ties' }
   | { kind: 'steal'; by: string }
+  /** Abandoned from the round menu: it is recorded, but nobody scores (§3.10). */
+  | { kind: 'skipped' }
 
 export interface ScoreDelta {
   win: number

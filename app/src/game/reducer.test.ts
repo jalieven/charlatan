@@ -230,6 +230,66 @@ describe('whisper (§3.6)', () => {
   })
 })
 
+describe('round menu · skipping a round (§3.10)', () => {
+  /** A round mid-clues, with one full cycle of clues already on the ledger. */
+  function midRound(): GameState {
+    let s = revealAll(startRound(freshSession()))
+    for (let i = 0; i < 6; i++) s = reducer(s, { type: 'SUBMIT_CLUE', word: `c${i}` })
+    return s
+  }
+
+  it('abandons the round to the scoreboard and pays nobody', () => {
+    const before = midRound()
+    const s = reducer(before, { type: 'SKIP_ROUND' })
+    expect(s.phase).toBe('scoreboard')
+    expect(s.round).toBeNull()
+    for (const p of s.session!.players) expect(p.score).toBe(0)
+  })
+
+  it('records the round as skipped so the numbering stays honest', () => {
+    const s = reducer(midRound(), { type: 'SKIP_ROUND' })
+    expect(s.session!.roundsPlayed).toBe(1)
+    expect(s.session!.history).toHaveLength(1)
+    const summary = s.session!.history[0]
+    expect(summary.outcome).toEqual({ kind: 'skipped' })
+    expect(summary.number).toBe(1)
+    for (const d of Object.values(summary.deltas)) expect(d.total).toBe(0)
+  })
+
+  it('voids bonuses already earned before the round was abandoned', () => {
+    // Two Charlatans: Tom is voted out and every civilian who named him earned
+    // +1, then the round is skipped in the extra cycle his miss opened up.
+    let s = clueThrough(revealAll(startRound(freshSession(), [2, 4])))
+    s = voteAll(s, { Jan: 'Tom', Sanne: 'Tom', Lotte: 'Tom', Eva: 'Tom', Bram: 'Tom', Tom: 'Jan' })
+    expect(s.round!.verdict).toMatchObject({ kind: 'ejection', ejected: 'Tom' })
+    s = reducer(s, { type: 'VERDICT_CONTINUE' })
+    s = reducer(s, { type: 'SUBMIT_GUESS', text: 'mis' })
+    expect(s.phase).toBe('clues') // Eva is still hidden: play continues
+    expect(scoreRound({ ...s.round!, outcome: { kind: 'civilians' } }).deltas.Jan.vote).toBe(1)
+    const skipped = reducer(s, { type: 'SKIP_ROUND' })
+    for (const d of Object.values(skipped.session!.history[0].deltas)) {
+      expect(d).toEqual({ win: 0, blind: 0, vote: 0, survive: 0, steal: 0, total: 0 })
+    }
+    for (const p of skipped.session!.players) expect(p.score).toBe(0)
+  })
+
+  it('is reachable only from the clue screen', () => {
+    const fresh = startRound(freshSession()) // reveal
+    expect(reducer(fresh, { type: 'SKIP_ROUND' })).toBe(fresh)
+    const voting = clueThrough(revealAll(startRound(freshSession())))
+    expect(reducer(voting, { type: 'SKIP_ROUND' })).toBe(voting)
+    const lobby = freshSession()
+    expect(reducer(lobby, { type: 'SKIP_ROUND' })).toBe(lobby)
+  })
+
+  it('leaves the next round free to start normally', () => {
+    let s = reducer(midRound(), { type: 'SKIP_ROUND' })
+    s = startRound(s)
+    expect(s.phase).toBe('reveal')
+    expect(s.round!.number).toBe(2)
+  })
+})
+
 describe('clues (§3.4, §3.5)', () => {
   it('runs the exact shuffled speaking order from the action payload', () => {
     let s = revealAll(startRound(freshSession(), [2], [3, 0, 5, 2, 4, 1]))

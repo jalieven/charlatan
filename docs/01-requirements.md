@@ -304,6 +304,31 @@ scoreboard. Scoring rules:
 Charlatan not ejected; steal-ended rounds are scored by the steal row instead. Point values
 are a starting balance, to be tuned in playtesting.
 
+### 3.10 The round menu: standings and the escape hatch
+
+The **clue screen is the only screen where the phone is public**, so it is the only screen
+that may carry a settings affordance. A gear sits top-right of it and opens a two-entry
+popover; nothing about it is modal — the screen behind is not dimmed, the clue in progress is
+untouched, and a half-typed draft survives. A tap anywhere else closes it.
+
+**Score.** Raises a **read-only** sheet over the round: cumulative session scores and the
+round history, so the table can settle an argument mid-round. It is *not* the S9 scoreboard —
+no roster editing, no next-round button, no way out of the round. Closing returns to the exact
+clue turn underneath.
+
+**Skip the round.** The escape hatch for a round that has gone wrong: a misread word, a player
+who saw the wrong screen, someone who has to leave. Skipping is irreversible and sits two taps
+from a player mid-clue, so the **first tap only arms it** — the row inverts and asks again, and
+tapping anywhere else disarms. There is no modal and no extra screen: the confirmation lives in
+the row itself.
+
+A skipped round is **void: nobody scores**. Bonuses already accrued in it — a correct-vote
+bonus from a ballot that ejected a Charlatan before the round was abandoned — are voided with
+it. The round is still **recorded in the session history as "skipped"** so the numbering stays
+honest, and it counts toward the rounds played. The word pair stays spent for the session (it
+was already drawn), and play returns straight to the scoreboard: a skipped round shows no
+result screen, so nothing about the abandoned round is revealed.
+
 ---
 
 ## 4. Flows (lingual description)
@@ -311,6 +336,9 @@ are a starting balance, to be tuned in playtesting.
 The app is **one phase state machine**; the full phase set is:
 
 `setup → assign → reveal → clues → vote → verdict → guess → result → scoreboard → (next round | roster edit | end)`
+
+From **clues**, the round menu (§3.10) can also exit straight to `scoreboard`, recording the
+round as skipped without scoring it.
 
 1. **Setup flow.** The host enters player names in seating order, adjusts Charlatan count,
    clues-per-player, Whisper cards per player, and language, and taps **Start**. Validation:
@@ -383,10 +411,11 @@ accepted, deliberate trade-off — it matches the app's trust model.
 | S2 | Handoff interstitial | reveal, vote | Privacy gate: "Pass to *name*", slide to continue |
 | S3 | Reveal | reveal | One-thumb grammar: held word, long-press peek, Whisper release-on-target |
 | S4 | Clue entry & Ledger | clues | Turn indicator, clue input, full Ledger |
+| S4b | Round menu | clues | Gear popover: read-only score sheet, and the armed skip (§3.10) |
 | S5 | Vote ballot | vote | Private single-choice ballot |
 | S6 | Verdict | verdict | Tie counter & warning, or ejection + open role announcement |
 | S7 | Charlatan's guess | guess | The steal attempt |
-| S8 | Round result & replay | result | Three-act progressive reveal; words & replay behind buttons on the verdict |
+| S8 | Round result | result | Three-act progressive reveal; the word pair sits on the first act |
 | S9 | Scoreboard | scoreboard | Cumulative scores between rounds; roster editing |
 
 Component-level detail for every screen is in [02-flows.md §5](./02-flows.md).

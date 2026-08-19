@@ -15,6 +15,7 @@ import { useT } from '../i18n'
 import { FitWord } from '../ui/FitWord'
 import { groupWidthEm } from '../ui/fitText'
 import { HoldCover, RoleHold, SlideToContinue } from '../ui/gestures'
+import { RoundMenu } from '../ui/RoundMenu'
 
 /** The word cap on the reveal: the hero size, and the smaller shared size of a Whisper pair. */
 const REVEAL_CAP_PX = 40
@@ -288,12 +289,15 @@ export function CluesScreen({ state, dispatch }: { state: GameState; dispatch: D
   const seatOrder = round.speakerOrder
 
   return (
-    <div className="flex h-full flex-col gap-3">
+    <div className="relative flex h-full flex-col gap-3">
       <TieStakes round={round} />
-      <div className="eb">
-        {round.cycle <= base
-          ? t('clues.cycle', { i: round.cycle, n: round.requiredCycles })
-          : t('clues.cycleExtra', { i: round.cycle })}
+      <div className="flex items-start justify-between gap-2">
+        <div className="eb">
+          {round.cycle <= base
+            ? t('clues.cycle', { i: round.cycle, n: round.requiredCycles })
+            : t('clues.cycleExtra', { i: round.cycle })}
+        </div>
+        <RoundMenu state={state} onSkip={() => dispatch({ type: 'SKIP_ROUND' })} />
       </div>
       {!round.awaitingVote && speaker && (
         <div className="text-2xl font-bold">

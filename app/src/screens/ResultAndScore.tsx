@@ -65,6 +65,8 @@ function outcomeTitle(summary: RoundSummary, t: (k: string, p?: Record<string, s
       return t('result.civiliansWin')
     case 'steal':
       return t('result.steal')
+    case 'skipped':
+      return t('score.roundSkipped')
     default:
       return t('result.charlatansWin')
   }
@@ -279,7 +281,9 @@ export function ScoreboardScreen({
       ? t('score.roundCivilians')
       : s.outcome.kind === 'steal'
         ? t('score.roundSteal')
-        : t('score.roundCharlatans')
+        : s.outcome.kind === 'skipped'
+          ? t('score.roundSkipped')
+          : t('score.roundCharlatans')
 
   return (
     <div className="flex h-full flex-col gap-3">

@@ -49,6 +49,7 @@ export type Action =
   | { type: 'REVEAL_NEXT' }
   | { type: 'SUBMIT_CLUE'; word: string }
   | { type: 'GO_TO_VOTE' }
+  | { type: 'SKIP_ROUND' }
   | { type: 'CAST_VOTE'; target: string }
   | { type: 'VERDICT_CONTINUE' }
   | { type: 'SUBMIT_GUESS'; text: string }
@@ -378,6 +379,28 @@ export function reducer(state: GameState, action: Action): GameState {
         return withRound(state, { ledger, awaitingVote: true })
       }
       return withRound(state, { ledger, cycle: round.cycle + 1, turn: 0 })
+    }
+    /**
+     * The round menu's escape hatch (§3.10): a round that went wrong — a misread
+     * word, a player who saw the wrong screen — is abandoned from the clue screen,
+     * the only screen where the phone is public. It is recorded in the history so
+     * the numbering stays honest, but nobody scores.
+     */
+    case 'SKIP_ROUND': {
+      const round = state.round
+      const session = state.session
+      if (!round || !session || state.phase !== 'clues') return state
+      const skipped: RoundState = { ...round, outcome: { kind: 'skipped' } }
+      return {
+        ...state,
+        phase: 'scoreboard',
+        round: null,
+        session: {
+          ...session,
+          roundsPlayed: session.roundsPlayed + 1,
+          history: [...session.history, scoreRound(skipped)],
+        },
+      }
     }
     case 'GO_TO_VOTE': {
       const round = state.round
