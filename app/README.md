@@ -26,6 +26,8 @@ randomness is rolled in `src/game/actions.ts` and travels inside action payloads
 - `src/i18n/` — `en-i18n.properties` (source of truth) + `dutch-i18n.properties`; the Vite
   plugin in `plugins/i18nProperties.ts` fails the build when the Dutch catalog is incomplete
 - `src/ui/gestures.tsx` — the four privacy gestures: HoldCover, RoleHold (+release-on-target), SlideToContinue
+- `src/ui/fitText.ts` + `FitWord.tsx` — the one-line fit for secret words: static Space Grotesk
+  metrics scale the type down to the container instead of ever wrapping or breaking a word
 - `src/screens/` — S1–S9
 - `src/recorder/` — the `?recorder=1` interaction recorder (always on in artifact builds)
 

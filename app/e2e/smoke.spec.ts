@@ -41,9 +41,13 @@ test('full round happy path: setup → reveal → clues → votes → result →
   await page.mouse.move(cx, cbox.y + cbox.height - 60)
   await page.mouse.down()
   await page.mouse.move(cx, cbox.y + cbox.height - 220, { steps: 8 })
-  await expect(page.getByText(/jouw woord/i)).toBeVisible() // word visible while held
+  const word = page.getByTestId('reveal.word').first()
+  await expect(word).toBeVisible() // word visible while held
+  // The secret word always occupies exactly one line (§6.5): it scales to fit.
+  expect(await word.evaluate((el) => el.scrollWidth - el.parentElement!.clientWidth)).toBeLessThanOrEqual(0)
+  expect(await word.evaluate((el) => el.getClientRects().length)).toBe(1)
   await page.mouse.up()
-  await expect(page.getByText(/jouw woord/i)).not.toBeVisible() // snaps shut on release
+  await expect(word).not.toBeVisible() // snaps shut on release
 
   // Drive the round to its end, whatever the random roles decided. Every
   // action is short-timeout and non-fatal: the loop re-reads the screen each

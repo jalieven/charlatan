@@ -7,6 +7,44 @@ import { startRoundAction } from '../game/actions'
 import type { GameState, RoundSummary, ScoreDelta } from '../game/types'
 import { MAX_PLAYERS, MIN_PLAYERS } from '../game/types'
 import { useT } from '../i18n'
+import { FitWord } from '../ui/FitWord'
+import { fitBasisPx, groupWidthEm } from '../ui/fitText'
+
+/** Cap for the drill-in pair, and the size a card insists on before it gives up the row. */
+const PAIR_CAP_PX = 26
+const PAIR_PREFERRED_PX = 20
+/** Each card's own horizontal chrome: 2×8 px padding + 2×1 px border. */
+const PAIR_CHROME_PX = 18
+
+/**
+ * The round's word pair, revealed side by side. Both words share one size (measured on
+ * the longer) so the typography never singles one out, and each card claims the width
+ * its word needs at PAIR_PREFERRED_PX — when the two claims no longer fit one row, the
+ * row wraps and the pair stacks full-width instead of grinding both words down. Even the
+ * deck's longest pair then stays above the hard floor (see ui/fitText.test.ts).
+ */
+function WordPair({ real, decoy }: { real: string; decoy: string }) {
+  const t = useT()
+  const em = groupWidthEm([real, decoy])
+  const basis = fitBasisPx(em, PAIR_PREFERRED_PX, PAIR_CHROME_PX)
+  const card = (label: string, word: string, testId: string) => (
+    <div
+      className="rounded-xl border px-2 py-4 text-center"
+      style={{ flex: `1 1 ${basis}px`, borderColor: 'var(--color-g2)' }}
+    >
+      <div className="eb2">{label}</div>
+      <div className="mt-1">
+        <FitWord text={word} capPx={PAIR_CAP_PX} widthEm={em} testId={testId} />
+      </div>
+    </div>
+  )
+  return (
+    <div className="flex flex-wrap gap-2">
+      {card(t('result.real'), real, 'result.word-real')}
+      {card(t('result.decoy'), decoy, 'result.word-decoy')}
+    </div>
+  )
+}
 
 function Dots({ act }: { act: 1 | 2 | 3 }) {
   return (
@@ -60,22 +98,7 @@ export function ResultScreen({ state, dispatch }: { state: GameState; dispatch: 
         >
           {t('result.back')}
         </button>
-        <div className="flex gap-2">
-          <div
-            className="flex-1 rounded-xl border px-2 py-4 text-center"
-            style={{ borderColor: 'var(--color-g2)' }}
-          >
-            <div className="eb2">{t('result.real')}</div>
-            <div className="mt-1 text-2xl font-bold break-all">{summary.pair.real.toUpperCase()}</div>
-          </div>
-          <div
-            className="flex-1 rounded-xl border px-2 py-4 text-center"
-            style={{ borderColor: 'var(--color-g2)' }}
-          >
-            <div className="eb2">{t('result.decoy')}</div>
-            <div className="mt-1 text-2xl font-bold break-all">{summary.pair.decoy.toUpperCase()}</div>
-          </div>
-        </div>
+        <WordPair real={summary.pair.real} decoy={summary.pair.decoy} />
         <div className="hairline" />
         <div className="flex-1 overflow-y-auto">
           {[...new Set(summary.ledger.map((c) => c.cycle))].map((cycle) => (

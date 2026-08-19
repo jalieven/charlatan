@@ -5,7 +5,15 @@ import { canWhisper, definitionFor, speakingOrder, tally, wordFor } from '../gam
 import { burnWhisperAction } from '../game/actions'
 import type { GameState, RoundState } from '../game/types'
 import { useT } from '../i18n'
+import { FitWord } from '../ui/FitWord'
+import { groupWidthEm } from '../ui/fitText'
 import { HoldCover, RoleHold, SlideToContinue } from '../ui/gestures'
+
+/** The word cap on the reveal: the hero size, and the smaller shared size of a Whisper pair. */
+const REVEAL_CAP_PX = 40
+const WHISPER_CAP_PX = 30
+/** Matches Tailwind's `tracking-tight`; the fit measures with it, so the two never disagree. */
+const WORD_TRACKING = -0.025
 
 function TieStakes({ round }: { round: RoundState }) {
   const t = useT()
@@ -97,12 +105,24 @@ export function RevealScreen({ state, dispatch }: { state: GameState; dispatch: 
     state.session?.players.find((p) => p.name === player.name)?.whisperCards ?? 0
 
   // Word + its one-line definition, styled identically for real and fake words
-  // so neither the decoy nor a whispered distractor stands out.
+  // so neither the decoy nor a whispered distractor stands out. A whispered player
+  // sees both words at ONE shared size — measured on the longer of the two — so the
+  // length of a word can never betray which of them was planted (§3.6).
+  const cap = whispered ? WHISPER_CAP_PX : REVEAL_CAP_PX
+  const sharedEm = whispered
+    ? groupWidthEm([word, round.whisper!.fakeWord], WORD_TRACKING)
+    : undefined
   const wordBlock = (w: string, def?: string) => (
-    <div className="flex flex-col items-center gap-1.5">
-      <div className="text-[40px] leading-none font-bold tracking-tight break-all">
-        {w.toUpperCase()}
-      </div>
+    <div className="flex w-full flex-col items-center gap-1.5">
+      <FitWord
+        text={w}
+        capPx={cap}
+        widthEm={sharedEm}
+        tracking={WORD_TRACKING}
+        // Both whispered words carry the identical testid on purpose: a
+        // distinguishing attribute in the DOM would be a tell.
+        testId="reveal.word"
+      />
       {def && (
         <div
           className={`max-w-[30ch] leading-relaxed ${whispered ? 'text-xs' : 'text-[13px]'}`}

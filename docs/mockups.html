@@ -95,6 +95,16 @@
   .cover.folded { flex: 0 0 54px; justify-content: flex-start; padding: 8px; }
   .wordstage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 14px; gap: 10px; text-align: center; }
   .theword { font-size: 54px; font-weight: 900; letter-spacing: -.02em; }
+
+  /* ---- One-line fit: a secret word never wraps and never breaks (§6.5). ----
+     --em is the word's width in em at the display weight, known statically from
+     the font metrics. The type scales down from its cap until the word fits the
+     line; the container query unit does the arithmetic at render time. */
+  .fitbox { container-type: inline-size; width: 100%; }
+  /* --mock-wide: these frames render in a system sans that runs ~12 % wider than
+     the app's Space Grotesk; the app itself uses the raw --em. */
+  .phone { --mock-wide: 1.12; }
+  .fitbox .theword { font-size: min(54px, calc(100cqi / (var(--em) * var(--mock-wide)))); white-space: nowrap; }
   .holdnote { font-size: 10px; color: #737373; letter-spacing: .08em; text-transform: uppercase; }
   .rolebtn { border: 1px solid #3D3D3D; border-radius: 10px; padding: 14px 12px; text-align: center; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: #A3A3A3; position: relative; overflow: hidden; }
   .rolebtn .fill { position: absolute; inset: 0 auto 0 0; width: 0; background: #1C1C1C; }
@@ -116,9 +126,13 @@
   .verdict { font-size: 40px; font-weight: 900; letter-spacing: -.02em; line-height: 1.04; }
   .accent { color: #FF3D8A; }
   .tapnote { font-size: 10px; color: #737373; letter-spacing: .1em; text-transform: uppercase; text-align: center; }
-  .pair { display: flex; gap: 8px; }
-  .pair > div { flex: 1; border: 1px solid #262626; border-radius: 12px; padding: 16px 8px; text-align: center; }
-  .pair .w { font-size: 24px; font-weight: 900; margin-top: 6px; }
+  .pair { display: flex; flex-wrap: wrap; gap: 8px; }
+  /* The basis is the width the word needs at the size a card insists on (20px),
+     so two long words can no longer squeeze each other: the row wraps and each
+     card takes the full width instead. */
+  .pair > div { flex: 1 1 calc(var(--em, 4) * 20px + 18px); container-type: inline-size;
+    border: 1px solid #262626; border-radius: 12px; padding: 16px 8px; text-align: center; }
+  .pair .w { font-size: min(24px, calc(100cqi / (var(--em) * var(--mock-wide)))); white-space: nowrap; font-weight: 900; margin-top: 6px; }
   .list { display: flex; flex-direction: column; gap: 0; font-size: 13px; }
   .list > div { display: flex; justify-content: space-between; gap: 10px; padding: 8px 2px; border-bottom: 1px solid #1C1C1C; }
   .list .who { font-weight: 700; }
@@ -308,7 +322,7 @@
           <div class="cover folded"><div class="grab"></div></div>
           <div class="wordstage">
             <div class="eb2">Jouw woord</div>
-            <div class="theword">KOFFIE</div>
+            <div class="fitbox"><div class="theword" style="--em:3.13">KOFFIE</div></div>
             <div class="holdnote">laat los om te verbergen</div>
           </div>
           <div class="rolebtn dim"><span>Hou ingedrukt voor je rol</span></div>
@@ -333,8 +347,10 @@
           <div class="wordstage">
             <div class="whisper"><b>PSST —</b> <span>één van deze werd je toegefluisterd</span></div>
             <div style="height:2px"></div>
-            <div class="theword" style="font-size:38px">ESPRESSO</div>
-            <div class="theword" style="font-size:38px">KOFFIE</div>
+            <div class="fitbox" style="--em:4.77">
+              <div class="theword" style="font-size:min(38px, calc(100cqi / (var(--em) * var(--mock-wide))))">ESPRESSO</div>
+              <div class="theword" style="font-size:min(38px, calc(100cqi / (var(--em) * var(--mock-wide))))">KOFFIE</div>
+            </div>
             <div style="font-size:11px;color:#737373;max-width:24ch;line-height:1.5">identieke stijl, willekeurige volgorde — de positie verraadt niets</div>
             <div class="holdnote">laat los om te verbergen</div>
           </div>
@@ -348,6 +364,33 @@
           their assigned word and the distractor. Position and treatment never betray which one was
           Whispered (§3.6). Eva now mistrusts both. Monochrome on purpose — the accent is reserved
           for the verdict.</p>
+        </div>
+      </div>
+
+      <div class="mock">
+        <div class="phone">
+          <div class="eb dim">Speler 4 van 6</div>
+          <div style="font-size:20px;font-weight:900;margin-top:2px" class="dim">LOTTE</div>
+          <div style="height:12px"></div>
+          <div class="cover folded"><div class="grab"></div></div>
+          <div class="wordstage">
+            <div class="eb2">Jouw woord</div>
+            <div class="fitbox"><div class="theword" style="--em:15.13">VOORHOOFDSHOLTEONTSTEKING</div></div>
+            <div style="font-size:11px;color:#A3A3A3;max-width:30ch;line-height:1.5">ontstoken holte boven je ogen die drukkende hoofdpijn geeft</div>
+            <div class="holdnote">laat los om te verbergen</div>
+          </div>
+          <div class="rolebtn dim"><span>Hou ingedrukt voor je rol</span></div>
+          <div style="height:10px"></div>
+          <div class="slide dim"><span class="knob">→</span> Schuif door</div>
+        </div>
+        <div class="cap">
+          <h4>2b · Word — the long tail</h4>
+          <p>The deck's longest entries run to 25–28 characters. They keep the hero's single line:
+          the type scales down from the 54 px cap until the word fits — never wrapping, never
+          breaking mid-word (a break would hand the reader a false compound). The word stays the
+          largest thing on screen, and the deck's worst case still lands above the readability
+          floor. The one-line definition underneath keeps its own size, so a long word never reads
+          as a less important one.</p>
         </div>
       </div>
 
@@ -596,8 +639,8 @@
           <div class="backlink">← Terug naar de uitslag</div>
           <div style="height:12px"></div>
           <div class="pair">
-            <div><div class="eb2">Echt</div><div class="w">KOFFIE</div></div>
-            <div><div class="eb2">Lokaas</div><div class="w">THEE</div></div>
+            <div style="--em:3.25"><div class="eb2">Echt</div><div class="w">KOFFIE</div></div>
+            <div style="--em:3.25"><div class="eb2">Lokaas</div><div class="w">THEE</div></div>
           </div>
           <div class="hairline"></div>
           <div class="eb2">Hintronde 1</div>
@@ -627,6 +670,37 @@
           ◆-marks on clues whose author drew votes in the following ballot (derived from tallies,
           shown <em>only</em> here — the live Ledger stays neutral). The screenshot-friendly,
           shareable moment. No progress dots — this is a drill-in, not an act.</p>
+        </div>
+      </div>
+
+      <div class="mock">
+        <div class="phone">
+          <div class="backlink">← Terug naar de uitslag</div>
+          <div style="height:12px"></div>
+          <div class="pair">
+            <div style="--em:7.44"><div class="eb2">Echt</div><div class="w">BIBLIOTHEEK</div></div>
+            <div style="--em:7.44"><div class="eb2">Lokaas</div><div class="w">BOEKENWINKEL</div></div>
+          </div>
+          <div class="hairline"></div>
+          <div class="eb2">Hintronde 1</div>
+          <div class="list">
+            <div><span class="who">Jan</span><span>"stil"</span></div>
+            <div><span class="who">Sanne</span><span>"rekken"</span></div>
+            <div><span class="who">Tom</span><span>"kassa" <span class="flag">◆</span></span></div>
+            <div><span class="who">Lotte</span><span>"lenen"</span></div>
+            <div><span class="who">Eva</span><span>"pasje"</span></div>
+          </div>
+          <div class="fadeout"></div>
+          <div style="height:8px"></div>
+          <div class="eb2" style="color:#737373">Laatste stemming — 3× Tom · 2× Eva</div>
+        </div>
+        <div class="cap">
+          <h4>Drill-in · Long pair — the row breaks, the words don't</h4>
+          <p>Side by side each card owns barely half the width, so a long pair broke mid-word into
+          nonsense. Each card now asks for the width its word needs at the readability floor; when
+          both can't have it the row wraps and the pair stacks full-width. Same two cards, same
+          order (real first) — only the room changes. Both words share one size, so neither
+          typography nor position hints at which is which.</p>
         </div>
       </div>
 
