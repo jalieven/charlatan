@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import type { Dispatch } from 'react'
 import type { Action } from '../game/reducer'
 import {
@@ -249,6 +249,7 @@ export function CluesScreen({ state, dispatch }: { state: GameState; dispatch: D
   const [draft, setDraft] = useState('')
   // The clue the round just refused, kept so the reason survives clearing the field.
   const [rejected, setRejected] = useState<string | null>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
   const order = speakingOrder(round)
   const speakerSeat = round.turn < order.length ? order[round.turn] : null
   const speaker = speakerSeat !== null ? round.players[speakerSeat] : null
@@ -273,11 +274,14 @@ export function CluesScreen({ state, dispatch }: { state: GameState; dispatch: D
     if (duplicate) {
       setRejected(clean)
       setDraft('')
-      return
+    } else {
+      setRejected(null)
+      dispatch({ type: 'SUBMIT_CLUE', word: clean })
+      setDraft('')
     }
-    setRejected(null)
-    dispatch({ type: 'SUBMIT_CLUE', word: clean })
-    setDraft('')
+    // The next player types straight away: keep the caret — and the phone's
+    // keyboard — on the field instead of making them tap it open again.
+    inputRef.current?.focus()
   }
 
   // The round's full shuffled order, eliminated players struck through (§3.4).
@@ -343,19 +347,29 @@ export function CluesScreen({ state, dispatch }: { state: GameState; dispatch: D
           {t('clues.goVote')}
         </button>
       ) : (
-        <>
+        <form
+          className="flex flex-col gap-3"
+          // A single-field form: the phone keyboard shows its Go key and
+          // submits with it, so nothing has to be dismissed to confirm.
+          onSubmit={(e) => {
+            e.preventDefault()
+            submit()
+          }}
+        >
           <input
+            ref={inputRef}
             className="field"
             data-testid="clues.input"
             placeholder={t('clues.placeholder')}
             value={draft}
             maxLength={24}
+            enterKeyHint="send"
+            autoComplete="off"
+            autoCapitalize="none"
+            autoCorrect="off"
             onChange={(e) => {
               setDraft(e.target.value)
               setRejected(null)
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') submit()
             }}
           />
           {rejected && (
@@ -372,16 +386,10 @@ export function CluesScreen({ state, dispatch }: { state: GameState; dispatch: D
               {warnings.join(' · ')}
             </div>
           )}
-          <button
-            type="button"
-            className="cta"
-            data-testid="clues.confirm"
-            disabled={!clean}
-            onClick={submit}
-          >
+          <button type="submit" className="cta" data-testid="clues.confirm" disabled={!clean}>
             {t('clues.confirm')}
           </button>
-        </>
+        </form>
       )}
       <div className="hairline" />
       <Ledger round={round} />
@@ -525,8 +533,17 @@ export function GuessScreen({ state, dispatch }: { state: GameState; dispatch: D
   const t = useT()
   const round = state.round!
   const [draft, setDraft] = useState('')
+  const clean = draft.trim()
   return (
-    <div className="flex h-full flex-col gap-3">
+    <form
+      className="flex h-full flex-col gap-3"
+      // The guess is one field: submitting the form is what the phone
+      // keyboard's Go key does, so the steal never needs the keyboard closed.
+      onSubmit={(e) => {
+        e.preventDefault()
+        if (clean) dispatch({ type: 'SUBMIT_GUESS', text: draft })
+      }}
+    >
       <div className="eb">{t('result.guessLabel')}</div>
       <div className="flex flex-1 flex-col justify-center gap-4">
         <div className="text-3xl leading-tight font-bold">
@@ -541,20 +558,18 @@ export function GuessScreen({ state, dispatch }: { state: GameState; dispatch: D
           placeholder={t('guess.placeholder')}
           value={draft}
           maxLength={32}
+          enterKeyHint="go"
+          autoComplete="off"
+          autoCapitalize="none"
+          autoCorrect="off"
           onChange={(e) => setDraft(e.target.value)}
         />
       </div>
-      <button
-        type="button"
-        className="cta"
-        data-testid="guess.submit"
-        disabled={!draft.trim()}
-        onClick={() => dispatch({ type: 'SUBMIT_GUESS', text: draft })}
-      >
+      <button type="submit" className="cta" data-testid="guess.submit" disabled={!clean}>
         {t('guess.submit')}
       </button>
       <div className="eb text-center">{t('guess.note')}</div>
-    </div>
+    </form>
   )
 }
 

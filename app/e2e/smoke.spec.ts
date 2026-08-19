@@ -63,8 +63,10 @@ test('full round happy path: setup → reveal → clues → votes → result →
     } else if (await page.getByTestId('clues.go-vote').isVisible().catch(() => false)) {
       await tryClick('clues.go-vote')
     } else if (await page.getByTestId('clues.input').isVisible().catch(() => false)) {
+      // Submitted with the keyboard on purpose: on a phone the Go key is how
+      // a clue is confirmed, so the smoke run breaks if that path regresses.
       await page.getByTestId('clues.input').fill(`hint${clue++}`, { timeout: 2000 }).catch(() => {})
-      await tryClick('clues.confirm')
+      await page.getByTestId('clues.input').press('Enter', { timeout: 2000 }).catch(() => {})
     } else if (await page.getByTestId('vote.confirm').isVisible().catch(() => false)) {
       // Everyone gangs up on the first-listed candidate: guaranteed ejection.
       await page
@@ -77,7 +79,7 @@ test('full round happy path: setup → reveal → clues → votes → result →
       await tryClick('verdict.continue')
     } else if (await page.getByTestId('guess.input').isVisible().catch(() => false)) {
       await page.getByTestId('guess.input').fill('zzz', { timeout: 2000 }).catch(() => {})
-      await tryClick('guess.submit')
+      await page.getByTestId('guess.input').press('Enter', { timeout: 2000 }).catch(() => {})
     } else if (await page.getByTestId('result.finish').isVisible().catch(() => false)) {
       await tryClick('result.finish')
       if (await page.getByTestId('score.next-round').isVisible().catch(() => false)) break
