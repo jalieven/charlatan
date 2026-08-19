@@ -552,43 +552,70 @@ describe('word definitions (reveal aid)', () => {
 })
 
 describe('re-check pins (setup + roster)', () => {
-  it('stores a valid 4-digit pin on ADD_NAME and drops invalid ones', () => {
-    let s = reducer(initialState, { type: 'ADD_NAME', name: 'Jan', pin: '1234' })
-    s = reducer(s, { type: 'ADD_NAME', name: 'Sanne', pin: '12' })
-    s = reducer(s, { type: 'ADD_NAME', name: 'Tom', pin: '12ab' })
-    s = reducer(s, { type: 'ADD_NAME', name: 'Lotte' })
-    expect(s.setupPins).toEqual({ Jan: '1234' })
+  it('SET_PIN stores a valid code (4+ digits) for an existing setup name', () => {
+    let s = run(initialState, [
+      { type: 'ADD_NAME', name: 'Jan' },
+      { type: 'ADD_NAME', name: 'Sanne' },
+      { type: 'SET_PIN', name: 'Jan', pin: '1234' },
+      { type: 'SET_PIN', name: 'Sanne', pin: '987654' },
+    ])
+    expect(s.setupPins).toEqual({ Jan: '1234', Sanne: '987654' })
+  })
+
+  it('SET_PIN refuses short or non-numeric codes and unknown names', () => {
+    const base = reducer(initialState, { type: 'ADD_NAME', name: 'Jan' })
+    expect(reducer(base, { type: 'SET_PIN', name: 'Jan', pin: '123' })).toBe(base)
+    expect(reducer(base, { type: 'SET_PIN', name: 'Jan', pin: '12ab' })).toBe(base)
+    expect(reducer(base, { type: 'SET_PIN', name: 'Ghost', pin: '1234' })).toBe(base)
+  })
+
+  it('SET_PIN replaces an existing code', () => {
+    let s = run(initialState, [
+      { type: 'ADD_NAME', name: 'Jan' },
+      { type: 'SET_PIN', name: 'Jan', pin: '1234' },
+      { type: 'SET_PIN', name: 'Jan', pin: '55555' },
+    ])
+    expect(s.setupPins).toEqual({ Jan: '55555' })
   })
 
   it('REMOVE_NAME deletes the pin entry', () => {
-    let s = reducer(initialState, { type: 'ADD_NAME', name: 'Jan', pin: '1234' })
-    s = reducer(s, { type: 'REMOVE_NAME', name: 'Jan' })
+    let s = run(initialState, [
+      { type: 'ADD_NAME', name: 'Jan' },
+      { type: 'SET_PIN', name: 'Jan', pin: '1234' },
+      { type: 'REMOVE_NAME', name: 'Jan' },
+    ])
     expect(s.setupPins).toEqual({})
   })
 
   it('START_SESSION maps setup pins onto session players', () => {
-    let s = run(initialState, [
-      { type: 'ADD_NAME', name: 'Jan', pin: '1234' },
+    const s = run(initialState, [
+      { type: 'ADD_NAME', name: 'Jan' },
       { type: 'ADD_NAME', name: 'Sanne' },
       { type: 'ADD_NAME', name: 'Tom' },
+      { type: 'SET_PIN', name: 'Jan', pin: '1234' },
       { type: 'START_SESSION' },
     ])
     const byName = Object.fromEntries(s.session!.players.map((p) => [p.name, p.pin]))
     expect(byName).toEqual({ Jan: '1234', Sanne: null, Tom: null })
   })
 
-  it('ROSTER_ADD accepts a pin for a joiner; a rejoin keeps the original pin', () => {
-    let s = run(initialState, [
-      { type: 'ADD_NAME', name: 'Jan', pin: '1234' },
-      { type: 'ADD_NAME', name: 'Sanne' },
-      { type: 'ADD_NAME', name: 'Tom' },
-      { type: 'START_SESSION' },
-      { type: 'ROSTER_ADD', name: 'Lotte', pin: '9999' },
-    ])
-    expect(s.session!.players.find((p) => p.name === 'Lotte')!.pin).toBe('9999')
-    s = run(s, [
+  it('SET_PIN works on the scoreboard for active players, not mid-round or for leavers', () => {
+    let s = freshSession(['Jan', 'Sanne', 'Tom'])
+    s = reducer(s, { type: 'SET_PIN', name: 'Sanne', pin: '4321' })
+    expect(s.session!.players.find((p) => p.name === 'Sanne')!.pin).toBe('4321')
+
+    const left = reducer(s, { type: 'ROSTER_REMOVE', name: 'Tom' })
+    expect(reducer(left, { type: 'SET_PIN', name: 'Tom', pin: '1234' })).toBe(left)
+
+    const playing = startRound(s)
+    expect(reducer(playing, { type: 'SET_PIN', name: 'Jan', pin: '1234' })).toBe(playing)
+  })
+
+  it('a rejoin keeps the original pin', () => {
+    let s = run(freshSession(['Jan', 'Sanne', 'Tom']), [
+      { type: 'SET_PIN', name: 'Jan', pin: '1234' },
       { type: 'ROSTER_REMOVE', name: 'Jan' },
-      { type: 'ROSTER_ADD', name: 'Jan', pin: '0000' },
+      { type: 'ROSTER_ADD', name: 'Jan' },
     ])
     const jan = s.session!.players.find((p) => p.name === 'Jan')!
     expect(jan.left).toBe(false)
@@ -596,11 +623,9 @@ describe('re-check pins (setup + roster)', () => {
   })
 
   it('END_SESSION carries pins of staying players back to setup', () => {
-    let s = run(initialState, [
-      { type: 'ADD_NAME', name: 'Jan', pin: '1234' },
-      { type: 'ADD_NAME', name: 'Sanne', pin: '5678' },
-      { type: 'ADD_NAME', name: 'Tom' },
-      { type: 'START_SESSION' },
+    const s = run(freshSession(['Jan', 'Sanne', 'Tom']), [
+      { type: 'SET_PIN', name: 'Jan', pin: '1234' },
+      { type: 'SET_PIN', name: 'Sanne', pin: '5678' },
       { type: 'ROSTER_REMOVE', name: 'Sanne' },
       { type: 'END_SESSION' },
     ])

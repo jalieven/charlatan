@@ -14,7 +14,8 @@ import { scoreRound } from './scoring'
 // whole game is unit-testable and resumable.
 export type Action =
   | { type: 'SET_LOCALE'; locale: 'nl' | 'en' }
-  | { type: 'ADD_NAME'; name: string; pin?: string }
+  | { type: 'ADD_NAME'; name: string }
+  | { type: 'SET_PIN'; name: string; pin: string }
   | { type: 'REMOVE_NAME'; name: string }
   | { type: 'MOVE_NAME'; name: string; dir: -1 | 1 }
   | { type: 'SET_CHARLATAN_OVERRIDE'; value: number | null }
@@ -58,7 +59,7 @@ export type Action =
   | { type: 'RESULT_ADVANCE' }
   | { type: 'RESULT_BACK' }
   | { type: 'FINISH_ROUND' }
-  | { type: 'ROSTER_ADD'; name: string; pin?: string }
+  | { type: 'ROSTER_ADD'; name: string }
   | { type: 'ROSTER_REMOVE'; name: string }
   | { type: 'END_SESSION' }
   | { type: 'RESUME'; state: GameState }
@@ -210,12 +211,30 @@ export function reducer(state: GameState, action: Action): GameState {
       const name = action.name.trim()
       if (!name || state.setupNames.length >= MAX_PLAYERS) return state
       if (state.setupNames.some((n) => n.toLowerCase() === name.toLowerCase())) return state
-      const pin = action.pin && PIN_RE.test(action.pin.trim()) ? action.pin.trim() : null
-      return {
-        ...state,
-        setupNames: [...state.setupNames, name],
-        setupPins: pin ? { ...state.setupPins, [name]: pin } : state.setupPins,
+      return { ...state, setupNames: [...state.setupNames, name] }
+    }
+    case 'SET_PIN': {
+      // Sets or replaces a player's re-check pin (4+ digits). The UI verifies the
+      // current pin before allowing a change; the reducer only validates shape.
+      const pin = action.pin.trim()
+      if (!PIN_RE.test(pin)) return state
+      if (state.phase === 'setup') {
+        if (!state.setupNames.includes(action.name)) return state
+        return { ...state, setupPins: { ...state.setupPins, [action.name]: pin } }
       }
+      if (state.phase === 'scoreboard' && state.session) {
+        if (!state.session.players.some((p) => p.name === action.name && !p.left)) return state
+        return {
+          ...state,
+          session: {
+            ...state.session,
+            players: state.session.players.map((p) =>
+              p.name === action.name ? { ...p, pin } : p,
+            ),
+          },
+        }
+      }
+      return state
     }
     case 'REMOVE_NAME': {
       if (state.phase !== 'setup') return state
@@ -570,16 +589,13 @@ export function reducer(state: GameState, action: Action): GameState {
           },
         }
       }
-      // A joiner may set a re-check pin too; a rejoin above keeps the stored one —
-      // nobody can reset another player's pin from the public roster editor.
-      const pin = action.pin && PIN_RE.test(action.pin.trim()) ? action.pin.trim() : null
       return {
         ...state,
         session: {
           ...session,
           players: [
             ...session.players,
-            { name, score: 0, whisperCards: state.settings.whisperCardsPerPlayer, left: false, pin },
+            { name, score: 0, whisperCards: state.settings.whisperCardsPerPlayer, left: false, pin: null },
           ],
         },
       }

@@ -25,18 +25,45 @@ async function holdCoverOpen(page: Page, testId: string) {
   return () => page.mouse.up()
 }
 
+/** Tap a code into a PinPad by its testid prefix. */
+async function typePin(page: Page, code: string, pad = 'pin') {
+  for (const d of code) await page.getByTestId(`${pad}.key-${d}`).click()
+}
+
 test('forgot-your-word re-check: PIN gate and slider gate from the clue screen', async ({ page }) => {
   await page.goto('/')
 
   // S1 · Setup: Anna protects her re-check with a PIN, Bea and Carl do not.
-  await page.getByTestId('setup.name-input').fill('Anna')
-  await page.getByTestId('setup.pin-input').fill('1234')
-  await page.getByTestId('setup.name-add').click()
-  await expect(page.getByTestId('setup.player.Anna.pin')).toBeVisible()
-  for (const name of ['Bea', 'Carl']) {
+  for (const name of ['Anna', 'Bea', 'Carl']) {
     await page.getByTestId('setup.name-input').fill(name)
     await page.getByTestId('setup.name-add').click()
   }
+
+  // The pin pill opens the keypad sheet: choose, then confirm — nothing is
+  // saved until the code is entered twice and ✓ matches.
+  await page.getByTestId('setup.player.Anna.pin').click()
+  await typePin(page, '1234')
+  await expect(page.getByTestId('pin.title')).toHaveText('Kies een pincode')
+  await page.getByTestId('pin.key-ok').click()
+  await expect(page.getByTestId('pin.title')).toHaveText('Bevestig je pincode')
+  // A mismatching confirmation restarts the choice…
+  await typePin(page, '9999')
+  await page.getByTestId('pin.key-ok').click()
+  await expect(page.getByTestId('pin.error')).toBeVisible()
+  await expect(page.getByTestId('pin.title')).toHaveText('Kies een pincode')
+  // …so choose and confirm again, matching this time.
+  await typePin(page, '1234')
+  await page.getByTestId('pin.key-ok').click()
+  await typePin(page, '1234')
+  await page.getByTestId('pin.key-ok').click()
+  await expect(page.getByTestId('pin.sheet')).not.toBeVisible()
+  await expect(page.getByTestId('setup.player.Anna.pin')).toHaveText('PIN ✓')
+
+  // Changing it asks for the current code first; cancel leaves it untouched.
+  await page.getByTestId('setup.player.Anna.pin').click()
+  await expect(page.getByTestId('pin.title')).toHaveText('Huidige pincode eerst')
+  await page.getByTestId('pin.cancel').click()
+
   await page.getByTestId('setup.start').click()
   await page.getByTestId('score.next-round').click()
 
@@ -47,14 +74,14 @@ test('forgot-your-word re-check: PIN gate and slider gate from the clue screen',
   }
   await expect(page.getByTestId('clues.input')).toBeVisible()
 
-  // Anna's pill → PIN gate. A wrong code is refused, the right one unlocks.
+  // Anna's pill → PIN gate on the same keypad. Wrong code refused, right one unlocks.
   await page.getByTestId('clues.pill.Anna').click()
-  await expect(page.getByTestId('recheck.pin-input')).toBeVisible()
-  await page.getByTestId('recheck.pin-input').fill('9999')
-  await page.getByTestId('recheck.pin-submit').click()
+  await expect(page.getByTestId('recheck.pin.key-ok')).toBeVisible()
+  await typePin(page, '9999', 'recheck.pin')
+  await page.getByTestId('recheck.pin.key-ok').click()
   await expect(page.getByTestId('recheck.pin-wrong')).toBeVisible()
-  await page.getByTestId('recheck.pin-input').fill('1234')
-  await page.getByTestId('recheck.pin-submit').click()
+  await typePin(page, '1234', 'recheck.pin')
+  await page.getByTestId('recheck.pin.key-ok').click()
 
   // The word sits behind the same hold-to-see cover as the reveal.
   const release = await holdCoverOpen(page, 'recheck.cover')

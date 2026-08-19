@@ -4,6 +4,7 @@ import type { Action } from '../game/reducer'
 import type { GameState } from '../game/types'
 import { autoCharlatans, charlatanCount, maxCharlatans, MAX_PLAYERS, MIN_PLAYERS } from '../game/types'
 import { useT } from '../i18n'
+import { PinSheet } from '../ui/PinSheet'
 
 function Stepper({
   value,
@@ -44,19 +45,18 @@ function Stepper({
 export function SetupScreen({ state, dispatch }: { state: GameState; dispatch: Dispatch<Action> }) {
   const t = useT()
   const [draft, setDraft] = useState('')
-  const [pinDraft, setPinDraft] = useState('')
+  const [pinFor, setPinFor] = useState<string | null>(null)
   const n = state.setupNames.length
   const effective = charlatanCount(Math.max(n, MIN_PLAYERS), state.settings.charlatanOverride)
 
   const add = () => {
     if (!draft.trim()) return
-    dispatch({ type: 'ADD_NAME', name: draft, pin: pinDraft.length === 4 ? pinDraft : undefined })
+    dispatch({ type: 'ADD_NAME', name: draft })
     setDraft('')
-    setPinDraft('')
   }
 
   return (
-    <div className="flex h-full flex-col gap-3 overflow-y-auto">
+    <div className="relative flex h-full flex-col gap-3 overflow-y-auto">
       <div className="text-3xl font-bold tracking-tight">CHARLATAN</div>
       <div className="hairline" />
       <div className="eb">{t('setup.players', { count: n, max: MAX_PLAYERS })}</div>
@@ -65,15 +65,21 @@ export function SetupScreen({ state, dispatch }: { state: GameState; dispatch: D
           <div className="row" key={name}>
             <span className="font-bold">{name}</span>
             <span className="flex items-center gap-1">
-              {state.setupPins[name] && (
-                <span
-                  className="eb rounded border px-1.5 py-0.5"
-                  data-testid={`setup.player.${name}.pin`}
-                  style={{ borderColor: 'var(--color-g3)', color: 'var(--color-g4)' }}
-                >
-                  {t('setup.pinBadge')}
-                </span>
-              )}
+              {/* Every row carries the pin pill: set one on the keypad sheet, or —
+                  filled — change it (current code first, verified in the sheet). */}
+              <button
+                type="button"
+                className="eb rounded-full border px-2.5 py-1.5"
+                data-testid={`setup.player.${name}.pin`}
+                style={
+                  state.setupPins[name]
+                    ? { borderColor: 'var(--color-ink)', color: 'var(--color-ink)', fontWeight: 700 }
+                    : { borderColor: 'var(--color-g3)', color: 'var(--color-g4)' }
+                }
+                onClick={() => setPinFor(name)}
+              >
+                {state.setupPins[name] ? t('setup.pinBadgeSet') : t('setup.pinBadge')}
+              </button>
               <button
                 type="button"
                 data-testid={`setup.player.${name}.up`}
@@ -103,19 +109,6 @@ export function SetupScreen({ state, dispatch }: { state: GameState; dispatch: D
             value={draft}
             maxLength={16}
             onChange={(e) => setDraft(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && add()}
-          />
-          <input
-            className="field quietfield"
-            data-testid="setup.pin-input"
-            placeholder={t('setup.pinPlaceholder')}
-            value={pinDraft}
-            inputMode="numeric"
-            pattern="[0-9]*"
-            maxLength={4}
-            autoComplete="off"
-            style={{ width: 96 }}
-            onChange={(e) => setPinDraft(e.target.value.replace(/\D/g, ''))}
             onKeyDown={(e) => e.key === 'Enter' && add()}
           />
           <button
@@ -212,6 +205,18 @@ export function SetupScreen({ state, dispatch }: { state: GameState; dispatch: D
       >
         {t('setup.start')}
       </button>
+
+      {pinFor && (
+        <PinSheet
+          name={pinFor}
+          currentPin={state.setupPins[pinFor] ?? null}
+          onSave={(pin) => {
+            dispatch({ type: 'SET_PIN', name: pinFor, pin })
+            setPinFor(null)
+          }}
+          onClose={() => setPinFor(null)}
+        />
+      )}
     </div>
   )
 }

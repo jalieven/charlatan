@@ -8,6 +8,7 @@ import { MAX_PLAYERS, MIN_PLAYERS } from '../game/types'
 import { useT } from '../i18n'
 import { FitWord } from '../ui/FitWord'
 import { fitBasisPx, groupWidthEm } from '../ui/fitText'
+import { PinSheet } from '../ui/PinSheet'
 
 /** Cap for the result pair, and the size a card insists on before it gives up the row. */
 const PAIR_CAP_PX = 26
@@ -290,7 +291,7 @@ export function ScoreboardScreen({
   const session = state.session!
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState('')
-  const [pinDraft, setPinDraft] = useState('')
+  const [pinFor, setPinFor] = useState<string | null>(null)
   const activeCount = session.players.filter((p) => !p.left).length
   const sorted = [...session.players].sort((a, b) => Number(a.left) - Number(b.left) || b.score - a.score)
 
@@ -304,7 +305,7 @@ export function ScoreboardScreen({
           : t('score.roundCharlatans')
 
   return (
-    <div className="flex h-full flex-col gap-3">
+    <div className="relative flex h-full flex-col gap-3">
       <div className="eb">
         {t('score.title')}
         {session.roundsPlayed > 0 && ` · ${t('score.afterRound', { n: session.roundsPlayed })}`}
@@ -322,6 +323,21 @@ export function ScoreboardScreen({
             <span className="font-bold">{p.name}</span>
             <span className="flex items-center gap-3">
               {p.left && <span className="eb" style={{ color: 'var(--color-g3)' }}>{t('score.left')}</span>}
+              {editing && !p.left && (
+                <button
+                  type="button"
+                  className="eb rounded-full border px-2.5 py-1.5"
+                  data-testid={`score.pin.${p.name}`}
+                  style={
+                    p.pin
+                      ? { borderColor: 'var(--color-ink)', color: 'var(--color-ink)', fontWeight: 700 }
+                      : { borderColor: 'var(--color-g3)', color: 'var(--color-g4)' }
+                  }
+                  onClick={() => setPinFor(p.name)}
+                >
+                  {p.pin ? t('setup.pinBadgeSet') : t('setup.pinBadge')}
+                </button>
+              )}
               {editing && !p.left && (
                 <button
                   type="button"
@@ -360,32 +376,14 @@ export function ScoreboardScreen({
             maxLength={16}
             onChange={(e) => setDraft(e.target.value)}
           />
-          <input
-            className="field quietfield"
-            data-testid="score.pin-input"
-            placeholder={t('setup.pinPlaceholder')}
-            value={pinDraft}
-            inputMode="numeric"
-            pattern="[0-9]*"
-            maxLength={4}
-            autoComplete="off"
-            style={{ width: 96 }}
-            onChange={(e) => setPinDraft(e.target.value.replace(/\D/g, ''))}
-          />
           <button
             type="button"
             data-testid="score.name-add"
             className="cta cta-quiet"
             style={{ width: 72 }}
             onClick={() => {
-              if (draft.trim())
-                dispatch({
-                  type: 'ROSTER_ADD',
-                  name: draft,
-                  pin: pinDraft.length === 4 ? pinDraft : undefined,
-                })
+              if (draft.trim()) dispatch({ type: 'ROSTER_ADD', name: draft })
               setDraft('')
-              setPinDraft('')
             }}
           >
             +
@@ -441,6 +439,18 @@ export function ScoreboardScreen({
           {t('score.endSession')}
         </button>
       </div>
+
+      {pinFor && (
+        <PinSheet
+          name={pinFor}
+          currentPin={session.players.find((p) => p.name === pinFor)?.pin ?? null}
+          onSave={(pin) => {
+            dispatch({ type: 'SET_PIN', name: pinFor, pin })
+            setPinFor(null)
+          }}
+          onClose={() => setPinFor(null)}
+        />
+      )}
     </div>
   )
 }

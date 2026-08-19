@@ -38,7 +38,7 @@ export interface SessionPlayer {
   whisperCards: number
   /** Grayed leaver; restored (score + cards) on same-name rejoin. */
   left: boolean
-  /** Optional 4-digit code that unlocks this player's word re-check; null = slider gate. */
+  /** Optional code (4+ digits) that unlocks this player's word re-check; null = slider gate. */
   pin: string | null
 }
 
@@ -146,7 +146,7 @@ export interface GameState {
   locale: Locale
   settings: Settings
   setupNames: string[]
-  /** name -> optional 4-digit re-check pin; only names that set one appear here. */
+  /** name -> optional re-check pin (4+ digits); only names that set one appear here. */
   setupPins: Record<string, string>
   session: {
     players: SessionPlayer[]
@@ -160,7 +160,7 @@ export interface GameState {
 export const MIN_PLAYERS = 3
 export const MAX_PLAYERS = 12
 export const TIE_LIMIT = 3
-export const PIN_RE = /^\d{4}$/
+export const PIN_RE = /^\d{4,}$/
 
 export function autoCharlatans(playerCount: number): number {
   return playerCount >= 8 ? 2 : 1

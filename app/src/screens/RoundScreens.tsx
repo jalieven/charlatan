@@ -15,6 +15,7 @@ import { useT } from '../i18n'
 import { FitWord } from '../ui/FitWord'
 import { groupWidthEm } from '../ui/fitText'
 import { HoldCover, RoleHold, SlideToContinue } from '../ui/gestures'
+import { PinDots, PinPad } from '../ui/PinPad'
 import { RoundMenu } from '../ui/RoundMenu'
 
 /** The word cap on the reveal: the hero size, and the smaller shared size of a Whisper pair. */
@@ -456,42 +457,31 @@ export function RecheckScreen({ state, dispatch }: { state: GameState; dispatch:
           <SecretWordPanel round={round} seat={seat} />
         </HoldCover>
       ) : pin !== null ? (
-        <form
-          className="flex flex-1 flex-col justify-center gap-3"
-          onSubmit={(e) => {
-            e.preventDefault()
-            if (draft === pin) {
-              setUnlocked(true)
-            } else {
-              setWrong(true)
-              setDraft('')
-            }
-          }}
-        >
+        <div className="flex flex-1 flex-col justify-center gap-4">
           <div className="eb2 text-center">{t('recheck.enterPin')}</div>
-          <input
-            className="field text-center tracking-[.35em]"
-            data-testid="recheck.pin-input"
-            type="password"
-            inputMode="numeric"
-            pattern="[0-9]*"
-            maxLength={4}
-            autoComplete="off"
-            value={draft}
-            onChange={(e) => {
-              setDraft(e.target.value.replace(/\D/g, ''))
-              setWrong(false)
-            }}
-          />
+          <PinDots count={draft.length} />
           {wrong && (
             <div className="text-center text-xs" data-testid="recheck.pin-wrong" style={{ color: 'var(--color-ink)' }}>
               {t('recheck.wrongPin')}
             </div>
           )}
-          <button type="submit" className="cta" data-testid="recheck.pin-submit" disabled={draft.length !== 4}>
-            {t('recheck.pinSubmit')}
-          </button>
-        </form>
+          <PinPad
+            value={draft}
+            onChange={(v) => {
+              setDraft(v)
+              setWrong(false)
+            }}
+            onSubmit={() => {
+              if (draft === pin) {
+                setUnlocked(true)
+              } else {
+                setWrong(true)
+                setDraft('')
+              }
+            }}
+            testId="recheck.pin"
+          />
+        </div>
       ) : (
         <div className="flex flex-1 flex-col justify-end gap-3">
           <SlideToContinue
