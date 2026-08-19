@@ -6,7 +6,7 @@ const zero = (): ScoreDelta => ({ win: 0, blind: 0, vote: 0, survive: 0, steal: 
 // - civilians win: +2 each (eliminated included); +1 correct-vote bonus per
 //   ejecting ballot whose target was a Charlatan; +1 no-peek reward ONLY on wins
 // - charlatan survives (parity / tie limit): +4 peeked, +8 blind
-// - steal: +3 to guesser and peeked hidden Charlatans; a blind hidden
+// - steal: +2 to guesser and peeked hidden Charlatans; a blind hidden
 //   Charlatan keeps +8; the guesser never doubles (they were caught)
 export function scoreRound(round: RoundState): RoundSummary {
   const outcome = round.outcome!
@@ -46,10 +46,10 @@ export function scoreRound(round: RoundState): RoundSummary {
   } else if (outcome.kind === 'steal') {
     for (const p of charlatans) {
       if (p.name === outcome.by) {
-        deltas[p.name].steal = 3
+        deltas[p.name].steal = 2
       } else if (!p.eliminated) {
-        // Hidden partner: +3 if peeked; the blind double survives a teammate's steal.
-        if (p.peeked) deltas[p.name].steal = 3
+        // Hidden partner: +2 if peeked; the blind double survives a teammate's steal.
+        if (p.peeked) deltas[p.name].steal = 2
         else deltas[p.name].survive = 8
       }
     }

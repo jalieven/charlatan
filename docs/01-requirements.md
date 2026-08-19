@@ -298,7 +298,7 @@ scoreboard. Scoring rules:
 | Civilian never peeked this round **and the civilian team wins** | +1 reward, on top of the team win (eliminated civilians included) — a non-peeking, sharp-voting civilian can reach +4 in one round |
 | Charlatan survives the round (threshold or tie limit), having peeked | +4 |
 | Charlatan survives the round **blind** (never peeked — "hard mode") | +8 (double) |
-| Steal (ejected Charlatan guesses the real word) | +3 to the guesser and to any **peeked** hidden Charlatan; a still-hidden Charlatan who **never peeked** scores **+8** instead — the blind double survives a teammate's steal. The guesser never gets the double (they were caught). |
+| Steal (ejected Charlatan guesses the real word) | +2 to the guesser and to any **peeked** hidden Charlatan; a still-hidden Charlatan who **never peeked** scores **+8** instead — the blind double survives a teammate's steal. The guesser never gets the double (they were caught). |
 
 "Survives" means the round ends by threshold or by the third consecutive tie with the
 Charlatan not ejected; steal-ended rounds are scored by the steal row instead. Point values
@@ -596,6 +596,6 @@ Not spec gaps — behaviors to observe once the game is in hands:
   Charlatans at 12 players while the auto default never exceeds 2; a 4-Charlatan round ends
   at 4v4 parity. Legal but barely tested — consider labeling counts above the auto default
   as "experimental" in the setup UI.
-- **Blind-double asymmetry on steals:** a blind hidden partner banks +8 off a teammate's +3
+- **Blind-double asymmetry on steals:** a blind hidden partner banks +8 off a teammate's +2
   steal — the highest payout in the game for a player who did nothing knowingly. Explicitly
   wanted; keep an eye on it when tuning point values.

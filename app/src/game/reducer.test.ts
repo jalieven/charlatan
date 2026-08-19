@@ -436,7 +436,7 @@ describe('the steal and scoring (§3.8, §3.9)', () => {
     expect(s.session!.players.find((p) => p.name === 'Jan')!.score).toBe(4)
   })
 
-  it('steal: +3 to guesser and peeked partner; a blind hidden partner keeps +8', () => {
+  it('steal: +2 to guesser and peeked partner; a blind hidden partner keeps +8', () => {
     const names8 = [...NAMES6, 'Fien', 'Wout']
     let s = startRound(freshSession(names8), [2, 6]) // Tom + Fien are Charlatans
     // Tom peeks during his reveal; Fien stays blind.
@@ -456,7 +456,7 @@ describe('the steal and scoring (§3.8, §3.9)', () => {
     s = reducer(s, { type: 'SUBMIT_GUESS', text: 'koffie' })
     expect(s.round!.outcome).toEqual({ kind: 'steal', by: 'Tom' })
     const deltas = scoreRound(s.round!).deltas
-    expect(deltas['Tom']).toMatchObject({ steal: 3, survive: 0, total: 3 })
+    expect(deltas['Tom']).toMatchObject({ steal: 2, survive: 0, total: 2 })
     expect(deltas['Fien']).toMatchObject({ steal: 0, survive: 8, total: 8 }) // blind double survives the steal
     // The correct-vote bonus is unconditional on the outcome (§3.9): Jan did
     // catch a Charlatan on an ejecting ballot, steal or not.

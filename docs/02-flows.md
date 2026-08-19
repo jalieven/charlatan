@@ -56,7 +56,7 @@ flowchart TD
     S6 -->|"plurality — ejected player's role<br/>openly announced"| Role{"Ejected role?"}
 
     Role -->|Charlatan| Guess["S7 · Charlatan's guess<br/>immediate, typed"]
-    Guess -->|guess correct| ResultSteal["S8 · Result<br/>STEAL — all Charlatans win<br/>(+3 each; a blind hidden partner keeps +8)"]
+    Guess -->|guess correct| ResultSteal["S8 · Result<br/>STEAL — all Charlatans win<br/>(+2 each; a blind hidden partner keeps +8)"]
     Guess -->|"guess wrong,<br/>hidden Charlatans remain"| Eliminate1["Eliminated: no more clues/votes"] --> ExtraClue
     Guess -->|"guess wrong,<br/>was the last Charlatan"| ResultCiv["S8 · Result<br/>CIVILIANS WIN"]
 
@@ -116,7 +116,7 @@ flowchart TD
     E -->|Yes| F["Round ends · Charlatans win"]
     E -->|No| G["Eliminated · +1 clue cycle · revote"]
     D -->|Charlatan| I["Immediate steal guess"]
-    I -->|Correct| J["Round ends · all Charlatans win<br/>(+3 each; blind hidden partner keeps +8)"]
+    I -->|Correct| J["Round ends · all Charlatans win<br/>(+2 each; blind hidden partner keeps +8)"]
     I -->|"Wrong, hidden Charlatans remain"| K["Eliminated · +1 clue cycle · revote"]
     I -->|"Wrong, last Charlatan"| L["Round ends · Civilians win"]
 ```
@@ -203,7 +203,7 @@ accent per act. The phone-holder narrates like a game-show host, act by act.
 |---|---|---|
 | 1 · The verdict | Winner banner + Charlatan identities; **one drill-in button: "The words & the replay"** | The **one accent-color moment** of the app; Charlatan names in the accent, huge type. The drill-in is a single screen: back-to-verdict link pinned at the very top, the word pair (real vs decoy, side by side) fixed beneath it, the replay scrolling below (clues grouped by cycle, vote outcomes, ◆ suspicion markers derived from vote tallies — replay-only, never in the live Ledger) — the shareable, screenshot-friendly moment. No progress dots on the drill-in; closing returns to the verdict |
 | 2 · The secrets | Steal guess (judge near-misses), who peeked, blind doubles, Whisper: who → whom + fake word | The "you did THAT on no information?!" beats live here |
-| 3 · The damage | Score matrix: players left, subscore columns top (win / blind / correct vote — adapting to the outcome), totals right | Tabular numerals, heaviest weight on totals, em-dash for nothing earned, one footnote line for context (eliminated, peeked, caught). Steal rounds: +3, blind hidden partner +8. Continue → scoreboard |
+| 3 · The damage | Score matrix: players left, subscore columns top (win / blind / correct vote — adapting to the outcome), totals right | Tabular numerals, heaviest weight on totals, em-dash for nothing earned, one footnote line for context (eliminated, peeked, caught). Steal rounds: +2, blind hidden partner +8. Continue → scoreboard |
 
 ### S9 · Scoreboard
 | Component | Notes |
