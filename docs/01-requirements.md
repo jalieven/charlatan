@@ -368,14 +368,11 @@ round as skipped without scoring it.
 8. **Result flow.** The payoff, staged as **three acts of progressive disclosure** — one act
    on screen at a time, advanced by tap, so the phone-holder narrates it to the table like a
    game-show host instead of everyone squinting at a wall of data:
-   - **Act 1 — The verdict:** who won, huge type, and the Charlatan identities — the app's
-     single accent-color moment. The loudest beat first; everything after is explanation.
-     One drill-in sits **behind a button on this page**: **the words & the replay**, a single
-     screen with a back-to-verdict link pinned at the very top, the word pair (real vs decoy,
-     side by side — the "OHHH *that's* why you said 'beans'" beat) fixed beneath it, and the
-     replay (every clue in order, grouped by cycle, annotated with vote outcomes — the
-     shareable, screenshot-friendly moment) scrolling below. The drill-in shows **no progress
-     dots** — it is not an act; closing returns to the verdict.
+   - **Act 1 — The verdict:** who won, huge type, the Charlatan identities, and the word pair
+     (real vs decoy, side by side — the "OHHH *that's* why you said 'beans'" beat) right
+     beneath them: "wait, what was it?" is the question every table asks next, so the answer
+     is on the page rather than behind a button. This act carries the accent color. The
+     loudest beat first; everything after is explanation.
    - **Act 2 — The secrets:** the steal guess (judge the near-miss), who peeked, blind
      doubles earned, and the Whisper — who burned it, on whom, and the fake word. The "you
      did THAT on no information?!" beats.
@@ -513,9 +510,12 @@ Monochrome with default styling just reads as unstyled. What carries it:
 - **Let one thing move.** With no color to direct attention, motion is the emphasis tool — a
   subtle scale on the revealed word, the cover-panel physics, the long-press fill, animated
   phase transitions. (There is no timer in the app, so no timer visualization exists.)
-- **One accent color, used once.** A single hot color reserved exclusively for the Charlatan
-  reveal at the round result — it makes the payoff moment land. Always on: part of the
-  design, not a setting.
+- **One accent color, one page.** A single hot color reserved exclusively for the round
+  result's first act — the Charlatan names, and the word **STEAL** set above the headline
+  when a caught Charlatan guessed the word: the rarest, loudest way a round can end, so it is
+  the one outcome that gets its own line, larger than the sentence under it. The accent
+  appears nowhere else in the app, so the payoff moment lands. Always on: part of the design,
+  not a setting.
 - **Ergonomics:** tap targets ≥ **56 px**; text readable at arm's length — the phone is
   passed around a room, not held six inches from one face. (Beyond these ergonomics,
   dedicated accessibility work is explicitly out of scope for v1.)

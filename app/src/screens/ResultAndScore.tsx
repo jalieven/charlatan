@@ -59,16 +59,35 @@ function Dots({ act }: { act: 1 | 2 | 3 }) {
   )
 }
 
-function outcomeTitle(summary: RoundSummary, t: (k: string, p?: Record<string, string | number>) => string) {
+/**
+ * The round's headline. A steal is the rarest and loudest way a round can end, so
+ * the word itself is set above the sentence, larger and in the accent (§6.5).
+ */
+function OutcomeTitle({ summary }: { summary: RoundSummary }) {
+  const t = useT()
+  const line = (text: string) => (
+    <div className="text-4xl leading-tight font-bold tracking-tight">{text}</div>
+  )
   switch (summary.outcome.kind) {
     case 'civilians':
-      return t('result.civiliansWin')
-    case 'steal':
-      return t('result.steal')
+      return line(t('result.civiliansWin'))
     case 'skipped':
-      return t('score.roundSkipped')
+      return line(t('score.roundSkipped'))
+    case 'steal':
+      return (
+        <div>
+          <div
+            className="text-6xl leading-none font-bold tracking-tight"
+            style={{ color: 'var(--color-accent)' }}
+            data-testid="result.steal-word"
+          >
+            {t('result.stealWord')}
+          </div>
+          <div className="mt-2">{line(t('result.charlatansWin'))}</div>
+        </div>
+      )
     default:
-      return t('result.charlatansWin')
+      return line(t('result.charlatansWin'))
   }
 }
 
@@ -104,9 +123,7 @@ export function ResultScreen({ state, dispatch }: { state: GameState; dispatch: 
 
       {round.resultAct === 1 && (
         <div className="flex flex-1 flex-col justify-center gap-5">
-          <div className="text-4xl leading-tight font-bold tracking-tight">
-            {outcomeTitle(summary, t)}
-          </div>
+          <OutcomeTitle summary={summary} />
           {/* The app's single accent-color moment (§6.5). */}
           <div className="text-base" style={{ color: 'var(--color-g5)' }}>
             {(summary.charlatans.length > 1
