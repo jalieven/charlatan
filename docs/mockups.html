@@ -209,7 +209,7 @@
   <header class="top">
     <p class="kicker">Charlatan · Design review</p>
     <h1>Charlatan Mockups</h1>
-    <p class="lede">Thirty frames covering all nine screens, S1–S9, in flow order — including the
+    <p class="lede">Thirty-three frames covering all ten screens, S1–S10, in flow order — including the
     reveal's four states, the second-tie warning, the three-act result, the round menu that
     hangs off the clue screen, and the forgot-your-word re-check with its optional per-player PIN. In-app copy is Dutch —
     the default locale per §6.4. One running scenario throughout: six players, koffie/thee, Tom is
@@ -1215,11 +1215,127 @@
     </div>
   </section>
 
+  <!-- ============ S10 SESSION SUMMARY ============ -->
+  <section class="block">
+    <p class="sec-eyebrow">S10 · Sessie-overzicht</p>
+    <h2>The session's parting shot</h2>
+    <p class="sec-note">"Einde sessie" no longer drops straight back to setup: it lands here first —
+    final standings, one fun fact per player mined from the round history, and a set of session
+    awards. Everything is computable from what <code>RoundSummary</code> already records (peeks,
+    ballots, deltas, whispers, steals); skipped rounds are excluded from every ratio. Only
+    "SLUIT AF" actually resets to setup. Scenario continues: six players, seven rounds, one
+    skipped. One scrolling screen, shown here as three frames.</p>
+
+    <div class="frames">
+      <div class="mock">
+        <div class="phone">
+          <div class="eb">Sessie-overzicht · 7 rondes</div>
+          <div style="height:12px"></div>
+          <div class="invert" style="padding:18px 12px">
+            <div style="font-size:9px;letter-spacing:.16em;opacity:.55">Winnaar</div>
+            <div style="font-size:26px;letter-spacing:-.01em;margin-top:2px">JAN</div>
+            <div style="font-size:11px;margin-top:2px">19 punten</div>
+          </div>
+          <div style="height:12px"></div>
+          <div class="list">
+            <div><span class="who"><span class="m" style="margin-right:8px">2</span>Eva</span><span class="delta">16</span></div>
+            <div><span class="who"><span class="m" style="margin-right:8px">3</span>Bram</span><span class="delta">12</span></div>
+            <div><span class="who"><span class="m" style="margin-right:8px">4</span>Sanne</span><span class="delta">11</span></div>
+            <div><span class="who"><span class="m" style="margin-right:8px">5</span>Tom</span><span class="delta">9</span></div>
+            <div style="color:#3D3D3D"><span class="who" style="color:#3D3D3D"><span style="margin-right:8px;font-weight:400">6</span>Lotte</span><span class="delta" style="color:#3D3D3D">4</span></div>
+          </div>
+          <div style="height:12px"></div>
+          <div class="eb2">De sessie</div>
+          <div class="strip" style="margin-top:6px">
+            <span>3× burgers</span><span>2× charlatans</span><span>1× steal</span><span>1× geskipt</span><span>4× gelijkspel</span>
+          </div>
+          <div class="grow"></div>
+          <div class="fadeout"></div>
+        </div>
+        <div class="cap">
+          <h4>Top of the scroll · Final standings</h4>
+          <p>The winner gets the inverted block — the loudest monochrome statement, same voice as
+          the vote verdict. Below it the full ranking, leavers grayed at the bottom, then the
+          session's headline counts as pills. No accent color: that stays reserved for the
+          Charlatan reveal.</p>
+        </div>
+      </div>
+
+      <div class="mock">
+        <div class="phone">
+          <div class="eb">Sessie-overzicht · leuke feiten</div>
+          <div style="height:6px"></div>
+          <div style="display:flex;flex-direction:column">
+            <div style="padding:12px 0;border-bottom:1px solid #1C1C1C">
+              <div class="bigline" style="font-size:19px">Jan gaat voor <span style="white-space:nowrap">83% blind</span></div>
+              <div class="m" style="margin-top:3px">keek maar één keer in zes gespeelde rondes</div>
+            </div>
+            <div style="padding:12px 0;border-bottom:1px solid #1C1C1C">
+              <div class="bigline" style="font-size:19px">Eva's score is voor 44% charlatan</div>
+              <div class="m" style="margin-top:3px">7 van de 16 punten uit overleven en steals</div>
+            </div>
+            <div style="padding:12px 0;border-bottom:1px solid #1C1C1C">
+              <div class="bigline" style="font-size:19px">Bram is de zondebok</div>
+              <div class="m" style="margin-top:3px">kreeg 9 stemmen tegen en werd 2× weggestemd</div>
+            </div>
+            <div style="padding:12px 0;border-bottom:1px solid #1C1C1C">
+              <div class="bigline" style="font-size:19px">Sanne stemt raak</div>
+              <div class="m" style="margin-top:3px">5 van de 6 stemmen troffen een echte charlatan</div>
+            </div>
+            <div style="padding:12px 0;border-bottom:1px solid #1C1C1C">
+              <div class="bigline" style="font-size:19px">Tom overleefde 2× blind</div>
+              <div class="m" style="margin-top:3px">als charlatan, zonder ooit het woord te kennen</div>
+            </div>
+            <div style="padding:12px 0;border-bottom:1px solid #1C1C1C">
+              <div class="bigline" style="font-size:19px">Lotte piekte in ronde 3</div>
+              <div class="m" style="margin-top:3px">beste ronde van de sessie: 4 punten in één klap</div>
+            </div>
+          </div>
+          <div class="grow"></div>
+          <div class="fadeout"></div>
+        </div>
+        <div class="cap">
+          <h4>Mid-scroll · One fun fact per player</h4>
+          <p>Every player gets exactly one line — the most remarkable stat they own, picked by a
+          priority order so no two players get the same category. Candidates: blind-%, charlatan
+          share of score, votes drawn (scapegoat), vote accuracy, blind survivals, steals, best
+          single round. The statement is the headline; the evidence sits under it in gray.</p>
+        </div>
+      </div>
+
+      <div class="mock">
+        <div class="phone">
+          <div class="eb">Sessie-overzicht · awards</div>
+          <div style="height:6px"></div>
+          <div class="list">
+            <div><span><div class="eb2">De Blindganger</div><div class="who">Jan</div></span><span class="m">83% blind</span></div>
+            <div><span><div class="eb2">De Speurneus</div><div class="who">Sanne</div></span><span class="m">5/6 stemmen raak</span></div>
+            <div><span><div class="eb2">De Zondebok</div><div class="who">Bram</div></span><span class="m">9 stemmen tegen</span></div>
+            <div><span><div class="eb2">De Meester-Charlatan</div><div class="who">Tom</div></span><span class="m">16 overleefpunten</span></div>
+            <div><span><div class="eb2">De Dief</div><div class="who">Eva</div></span><span class="m">2 geslaagde steals</span></div>
+            <div><span><div class="eb2">De Fluisteraar</div><div class="who">Eva</div></span><span class="m">3 fluisterkaarten gespeeld</span></div>
+          </div>
+          <div class="grow"></div>
+          <div class="cta">SLUIT AF</div>
+          <div style="height:8px"></div>
+          <div class="cta quiet">TERUG NAAR SCOREBORD</div>
+        </div>
+        <div class="cap">
+          <h4>Bottom of the scroll · Awards, then the exit</h4>
+          <p>Six superlatives, one winner each (ties share the line). "SLUIT AF" is the destructive
+          step that today's "EINDE SESSIE" performs — it resets to setup, keeping names and PINs as
+          prefill. The quiet escape returns to the scoreboard, so ending the session is no longer
+          a one-way door.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <footer class="foot">
     <p><strong>Type note:</strong> these frames render in the system font; the built app ships Space
     Grotesk (or Inter Tight) per §6.5 — expect the words and verdicts to gain more character at the
     same weights.</p>
-    <p><strong>Coverage:</strong> all nine screens are mocked, plus the round menu (S4b) and the
+    <p><strong>Coverage:</strong> all ten screens are mocked, plus the round menu (S4b) and the
     forgot-your-word re-check with its optional PIN (S4c). Not shown as separate frames: the
     civilian role card (identical geometry to the Charlatan's, targets close-only) and the
     vote-phase handoff (identical to the reveal-phase one).</p>
