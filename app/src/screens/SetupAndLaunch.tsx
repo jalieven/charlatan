@@ -41,6 +41,41 @@ function Stepper({
   )
 }
 
+function Toggle({
+  value,
+  onChange,
+  testId,
+}: {
+  value: boolean
+  onChange: (v: boolean) => void
+  testId: string
+}) {
+  const t = useT()
+  return (
+    <span
+      className="flex overflow-hidden rounded-lg border text-xs tracking-widest"
+      style={{ borderColor: 'var(--color-g3)' }}
+    >
+      {([false, true] as const).map((v) => (
+        <button
+          key={String(v)}
+          type="button"
+          data-testid={`${testId}.${v ? 'on' : 'off'}`}
+          className="px-4 py-2.5 font-bold uppercase"
+          style={
+            value === v
+              ? { background: 'var(--color-ink)', color: 'var(--color-paper)' }
+              : { color: 'var(--color-g4)' }
+          }
+          onClick={() => onChange(v)}
+        >
+          {t(v ? 'setup.on' : 'setup.off')}
+        </button>
+      ))}
+    </span>
+  )
+}
+
 export function SetupScreen({ state, dispatch }: { state: GameState; dispatch: Dispatch<Action> }) {
   const t = useT()
   const [draft, setDraft] = useState('')
@@ -152,6 +187,36 @@ export function SetupScreen({ state, dispatch }: { state: GameState; dispatch: D
               dispatch({ type: 'SET_WHISPER_CARDS', value: state.settings.whisperCardsPerPlayer + 1 })
             }
           />
+        </div>
+        <div className="row">
+          <span className="eb2">{t('setup.blindMode')}</span>
+          <Toggle
+            testId="setup.blind"
+            value={state.settings.blindEnabled}
+            onChange={(v) => dispatch({ type: 'SET_BLIND_ENABLED', value: v })}
+          />
+        </div>
+        <div className="row">
+          <span className="eb2">{t('setup.deafMode')}</span>
+          <Toggle
+            testId="setup.deaf"
+            value={state.settings.deafEnabled}
+            onChange={(v) => dispatch({ type: 'SET_DEAF_ENABLED', value: v })}
+          />
+        </div>
+        <div className="text-sm" style={{ color: 'var(--color-g4)' }}>
+          {t('setup.deafHint')}
+        </div>
+        <div className="row">
+          <span className="eb2">{t('setup.reshuffle')}</span>
+          <Toggle
+            testId="setup.reshuffle"
+            value={state.settings.reshuffleEnabled}
+            onChange={(v) => dispatch({ type: 'SET_RESHUFFLE_ENABLED', value: v })}
+          />
+        </div>
+        <div className="text-sm" style={{ color: 'var(--color-g4)' }}>
+          {t('setup.reshuffleHint')}
         </div>
         <div className="row">
           <span className="eb2">{t('setup.language')}</span>

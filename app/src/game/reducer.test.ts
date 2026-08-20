@@ -9,9 +9,9 @@ import {
   speakingOrder,
   votingSeat,
 } from './reducer'
-import { burnWhisperAction } from './actions'
+import { burnWhisperAction, startRoundAction } from './actions'
 import { scoreRound } from './scoring'
-import type { GameState } from './types'
+import type { GameState, Role, RoundOutcome, RoundPlayer, RoundState, Settings } from './types'
 import { charlatanCount, initialState, maxCharlatans } from './types'
 
 const run = (state: GameState, actions: Action[]) => actions.reduce(reducer, state)
@@ -27,14 +27,21 @@ function freshSession(names: string[] = NAMES6, whisperCards = 1): GameState {
 }
 
 /** Deterministic round: Tom (seat 2) is the Charlatan, seating order speaks by default. */
-function startRound(state: GameState, charlatanSeats = [2], speakerOrder?: number[]): GameState {
+function startRound(
+  state: GameState,
+  charlatanSeats = [2],
+  speakerOrder?: number[],
+  clueOrder?: number[],
+): GameState {
   const n = state.session!.players.filter((p) => !p.left).length
+  const reveal = speakerOrder ?? Array.from({ length: n }, (_, i) => i)
   return reducer(state, {
     type: 'START_ROUND',
     pairIndex: 0,
     orientation: true, // real = 'koffie', decoy = 'thee'
     charlatanSeats,
-    speakerOrder: speakerOrder ?? Array.from({ length: n }, (_, i) => i),
+    speakerOrder: reveal,
+    clueOrder: clueOrder ?? reveal,
     pair: { a: 'koffie', b: 'thee', distractors: ['espresso', 'cacao'] },
   })
 }
@@ -337,7 +344,7 @@ describe('the steal and scoring (§3.8, §3.9)', () => {
     expect(s.session!.players.find((p) => p.name === 'Jan')!.score).toBe(4)
   })
 
-  it('steal: +3 to guesser and peeked partner; a blind hidden partner keeps +8', () => {
+  it('steal: guesser and hidden partner both ride the steal ladder at their own level', () => {
     const names8 = [...NAMES6, 'Fien', 'Wout']
     let s = startRound(freshSession(names8), [2, 6]) // Tom + Fien are Charlatans
     // Tom peeks during his reveal; Fien stays blind.
@@ -357,8 +364,8 @@ describe('the steal and scoring (§3.8, §3.9)', () => {
     s = reducer(s, { type: 'SUBMIT_GUESS', text: 'koffie' })
     expect(s.round!.outcome).toEqual({ kind: 'steal', by: 'Tom' })
     const deltas = scoreRound(s.round!).deltas
-    expect(deltas['Tom']).toMatchObject({ steal: 3, survive: 0, total: 3 })
-    expect(deltas['Fien']).toMatchObject({ steal: 0, survive: 8, total: 8 }) // blind double survives the steal
+    expect(deltas['Tom']).toMatchObject({ steal: 2, survive: 0, total: 2 }) // informed guesser
+    expect(deltas['Fien']).toMatchObject({ steal: 3, survive: 0, total: 3 }) // blind hidden partner
     // The correct-vote bonus is unconditional on the outcome (§3.9): Jan did
     // catch a Charlatan on an ejecting ballot, steal or not.
     expect(deltas['Jan']).toMatchObject({ win: 0, vote: 1, total: 1 })
@@ -378,7 +385,7 @@ describe('the steal and scoring (§3.8, §3.9)', () => {
     // Tie-limit now scores survival for the hidden partner only.
   })
 
-  it('charlatans-ties outcome scores survival: +4 peeked, +8 blind', () => {
+  it('charlatans-ties outcome scores the lowered tie ladder: +2 informed, +4 blind', () => {
     let s = startRound(freshSession())
     s = reducer(s, { type: 'HANDOFF_CONTINUE' })
     s = reducer(s, { type: 'REVEAL_NEXT' })
@@ -396,8 +403,223 @@ describe('the steal and scoring (§3.8, §3.9)', () => {
     }
     expect(s.round!.outcome).toEqual({ kind: 'charlatans-ties' })
     const deltas = scoreRound(s.round!).deltas
-    expect(deltas['Tom']).toMatchObject({ survive: 4, total: 4 }) // peeked
+    expect(deltas['Tom']).toMatchObject({ survive: 2, total: 2 }) // informed, one step below parity
     expect(deltas['Jan'].total).toBe(0) // no-peek reward only on civilian WINS
+  })
+})
+
+describe('the self-handicap ladder (§2.3, §3.4, §3.9)', () => {
+  /** Session with an extra settings action applied before the names. */
+  function sessionWith(action: Action, names: string[] = NAMES6): GameState {
+    return run(initialState, [
+      action,
+      ...names.map((name) => ({ type: 'ADD_NAME', name }) as Action),
+      { type: 'START_SESSION' },
+    ])
+  }
+
+  const P = (name: string, role: Role, opts: Partial<RoundPlayer> = {}): RoundPlayer => ({
+    name,
+    role,
+    eliminated: false,
+    peeked: false,
+    viewedWord: false,
+    ...opts,
+  })
+
+  /** Minimal finished round for exercising scoreRound directly. */
+  function roundWith(players: RoundPlayer[], outcome: RoundOutcome): RoundState {
+    return {
+      number: 1,
+      pair: { real: 'koffie', decoy: 'thee', distractors: [] },
+      players,
+      speakerOrder: players.map((_, i) => i),
+      clueOrder: players.map((_, i) => i),
+      cursor: 0,
+      handoff: false,
+      cycle: 1,
+      requiredCycles: 1,
+      turn: 0,
+      awaitingVote: false,
+      ledger: [],
+      votes: {},
+      ballots: [],
+      consecutiveTies: 0,
+      verdict: null,
+      whisper: null,
+      pendingGuesser: null,
+      guess: null,
+      outcome,
+      resultAct: 1,
+      drillIn: false,
+    }
+  }
+
+  it('initializes the flags from the switches: deaf on tracks the word, blind off pre-peeks', () => {
+    expect(startRound(freshSession()).round!.players.every((p) => p.viewedWord && !p.peeked)).toBe(true)
+    const deaf = startRound(sessionWith({ type: 'SET_DEAF_ENABLED', value: true }))
+    expect(deaf.round!.players.some((p) => p.viewedWord)).toBe(false)
+    const classic = startRound(sessionWith({ type: 'SET_BLIND_ENABLED', value: false }))
+    expect(classic.round!.players.every((p) => p.peeked)).toBe(true)
+  })
+
+  it('VIEW_WORD marks only the revealing seat, respects handoff, and is idempotent', () => {
+    let s = startRound(sessionWith({ type: 'SET_DEAF_ENABLED', value: true }))
+    expect(reducer(s, { type: 'VIEW_WORD' })).toBe(s) // handoff still up
+    s = reducer(s, { type: 'HANDOFF_CONTINUE' })
+    s = reducer(s, { type: 'VIEW_WORD' })
+    expect(s.round!.players[0].viewedWord).toBe(true)
+    expect(s.round!.players[1].viewedWord).toBe(false)
+    expect(reducer(s, { type: 'VIEW_WORD' })).toBe(s) // already on record
+  })
+
+  it('classic mode satisfies the whisper peek gate without an explicit PEEK', () => {
+    let s = startRound(sessionWith({ type: 'SET_BLIND_ENABLED', value: false }))
+    for (let i = 0; i < 2; i++) {
+      s = reducer(s, { type: 'HANDOFF_CONTINUE' })
+      s = reducer(s, { type: 'REVEAL_NEXT' })
+    }
+    s = reducer(s, { type: 'HANDOFF_CONTINUE' }) // Tom (charlatan) revealing
+    expect(canWhisper(s)).toBe(true)
+  })
+
+  it('civilian win bonus ladder: 0 informed, 1 blind, 2 deaf, 4 stone', () => {
+    const round = roundWith(
+      [
+        P('Ina', 'civilian', { peeked: true, viewedWord: true }),
+        P('Bea', 'civilian', { viewedWord: true }),
+        P('Dora', 'civilian', { peeked: true }),
+        P('Stella', 'civilian', { eliminated: true }), // stone, eliminated civs included
+        P('Tom', 'charlatan', { eliminated: true }),
+      ],
+      { kind: 'civilians' },
+    )
+    const deltas = scoreRound(round).deltas
+    expect(deltas['Ina']).toMatchObject({ win: 2, blind: 0, total: 2 })
+    expect(deltas['Bea']).toMatchObject({ win: 2, blind: 1, total: 3 })
+    expect(deltas['Dora']).toMatchObject({ win: 2, blind: 2, total: 4 })
+    expect(deltas['Stella']).toMatchObject({ win: 2, blind: 4, total: 6 })
+    expect(deltas['Tom'].total).toBe(0)
+  })
+
+  it('survival ladders: parity 4/8/8/16, tie-limit one step lower 2/4/4/8', () => {
+    const chars = [
+      P('Ina', 'charlatan', { peeked: true, viewedWord: true }),
+      P('Bea', 'charlatan', { viewedWord: true }),
+      P('Dora', 'charlatan', { peeked: true }),
+      P('Stella', 'charlatan'),
+      P('Weg', 'charlatan', { eliminated: true }),
+    ]
+    const parity = scoreRound(roundWith(chars, { kind: 'charlatans-parity' })).deltas
+    expect([parity['Ina'].survive, parity['Bea'].survive, parity['Dora'].survive, parity['Stella'].survive]).toEqual([4, 8, 8, 16])
+    expect(parity['Weg'].total).toBe(0)
+    const ties = scoreRound(roundWith(chars, { kind: 'charlatans-ties' })).deltas
+    expect([ties['Ina'].survive, ties['Bea'].survive, ties['Dora'].survive, ties['Stella'].survive]).toEqual([2, 4, 4, 8])
+    expect(ties['Weg'].total).toBe(0)
+  })
+
+  it('steal ladder 2/3/3/4 pays the guesser and every hidden partner; ejected non-guessers get 0', () => {
+    const round = roundWith(
+      [
+        P('Gok', 'charlatan', { peeked: true, viewedWord: true, eliminated: true }),
+        P('Ina', 'charlatan', { peeked: true, viewedWord: true }),
+        P('Bea', 'charlatan', { viewedWord: true }),
+        P('Dora', 'charlatan', { peeked: true }),
+        P('Stella', 'charlatan'),
+        P('Weg', 'charlatan', { eliminated: true }),
+        P('Jan', 'civilian', { viewedWord: true }),
+      ],
+      { kind: 'steal', by: 'Gok' },
+    )
+    const deltas = scoreRound(round).deltas
+    expect(deltas['Gok']).toMatchObject({ steal: 2, survive: 0, total: 2 })
+    expect(deltas['Ina']).toMatchObject({ steal: 2, total: 2 })
+    expect(deltas['Bea']).toMatchObject({ steal: 3, survive: 0, total: 3 })
+    expect(deltas['Dora']).toMatchObject({ steal: 3, total: 3 })
+    expect(deltas['Stella']).toMatchObject({ steal: 4, survive: 0, total: 4 })
+    expect(deltas['Weg'].total).toBe(0)
+    expect(deltas['Jan'].total).toBe(0)
+  })
+
+  it('summarizes a level per player while keeping the peeked list', () => {
+    const summary = scoreRound(
+      roundWith(
+        [
+          P('Ina', 'civilian', { peeked: true, viewedWord: true }),
+          P('Bea', 'civilian', { viewedWord: true }),
+          P('Dora', 'civilian', { peeked: true }),
+          P('Stella', 'charlatan'),
+        ],
+        { kind: 'charlatans-parity' },
+      ),
+    )
+    expect(summary.levels).toEqual({ Ina: 'informed', Bea: 'blind', Dora: 'deaf', Stella: 'stone' })
+    expect(summary.peeked).toEqual(['Ina', 'Dora'])
+  })
+
+  it('reveal walks speakerOrder while clues and vote walk clueOrder', () => {
+    let s = startRound(freshSession(), [2], [3, 0, 5, 2, 4, 1], [1, 4, 2, 5, 0, 3])
+    const revealed: string[] = []
+    while (s.phase === 'reveal') {
+      s = reducer(s, { type: 'HANDOFF_CONTINUE' })
+      revealed.push(s.round!.players[revealSeat(s.round!)].name)
+      s = reducer(s, { type: 'REVEAL_NEXT' })
+    }
+    expect(revealed).toEqual(['Lotte', 'Jan', 'Bram', 'Tom', 'Eva', 'Sanne'])
+    expect(speakingOrder(s.round!).map((i) => s.round!.players[i].name)).toEqual(['Sanne', 'Eva', 'Tom', 'Bram', 'Jan', 'Lotte'])
+    s = clueThrough(s)
+    const voters: string[] = []
+    while (s.phase === 'vote') {
+      s = reducer(s, { type: 'HANDOFF_CONTINUE' })
+      const voter = s.round!.players[votingSeat(s.round!)].name
+      voters.push(voter)
+      s = reducer(s, { type: 'CAST_VOTE', target: voter === 'Jan' ? 'Sanne' : 'Jan' })
+    }
+    expect(voters).toEqual(['Sanne', 'Eva', 'Tom', 'Bram', 'Jan', 'Lotte'])
+  })
+
+  it('whisper targeting stays in reveal positions when the clue order diverges', () => {
+    // Jan (seat 0, charlatan) reveals first but speaks last; the second REVEALER
+    // stays off-limits even though they speak before the whisperer.
+    let s = startRound(sessionWith({ type: 'SET_RESHUFFLE_ENABLED', value: true }, ['Jan', 'Sanne', 'Tom']), [0], [0, 1, 2], [2, 1, 0])
+    s = reducer(s, { type: 'HANDOFF_CONTINUE' })
+    s = reducer(s, { type: 'PEEK' })
+    const before = s
+    s = reducer(s, { type: 'BURN_WHISPER', targetSeat: 1, fakeWord: 'espresso', swapped: false })
+    expect(s).toBe(before)
+    s = reducer(before, { type: 'BURN_WHISPER', targetSeat: 2, fakeWord: 'espresso', swapped: false })
+    expect(s.round!.whisper!.target).toBe('Tom')
+  })
+
+  it('startRoundAction copies the reveal order unless the reshuffle switch is on', () => {
+    const off = startRoundAction(freshSession())
+    if (off?.type !== 'START_ROUND') throw new Error('expected START_ROUND')
+    expect(off.clueOrder).toEqual(off.speakerOrder)
+    expect(off.clueOrder).not.toBe(off.speakerOrder) // an independent copy
+    const on = startRoundAction(sessionWith({ type: 'SET_RESHUFFLE_ENABLED', value: true }))
+    if (on?.type !== 'START_ROUND') throw new Error('expected START_ROUND')
+    expect([...on.clueOrder].sort((a, b) => a - b)).toEqual([0, 1, 2, 3, 4, 5])
+  })
+
+  it('handicap switches are setup-only: unchangeable once a session exists', () => {
+    const s = freshSession()
+    expect(reducer(s, { type: 'SET_BLIND_ENABLED', value: false })).toBe(s)
+    expect(reducer(s, { type: 'SET_DEAF_ENABLED', value: true })).toBe(s)
+    expect(reducer(s, { type: 'SET_RESHUFFLE_ENABLED', value: true })).toBe(s)
+  })
+
+  it('resume backfills pre-ladder saves: switches, viewedWord and clueOrder', () => {
+    const legacy = JSON.parse(JSON.stringify(startRound(freshSession()))) as GameState
+    delete (legacy.settings as Partial<Settings>).blindEnabled
+    delete (legacy.settings as Partial<Settings>).deafEnabled
+    delete (legacy.settings as Partial<Settings>).reshuffleEnabled
+    delete (legacy.round! as Partial<RoundState>).clueOrder
+    for (const p of legacy.round!.players) delete (p as Partial<RoundPlayer>).viewedWord
+    const resumed = reducer(initialState, { type: 'RESUME', state: legacy })
+    expect(resumed.settings).toMatchObject({ blindEnabled: true, deafEnabled: false, reshuffleEnabled: false })
+    expect(resumed.round!.players.every((p) => p.viewedWord)).toBe(true)
+    expect(resumed.round!.clueOrder).toEqual(resumed.round!.speakerOrder)
+    expect(resumed.round!.handoff).toBe(true)
   })
 })
 

@@ -4,6 +4,7 @@ import type { Action } from '../game/reducer'
 import { canWhisper, speakingOrder, tally, wordFor } from '../game/reducer'
 import { burnWhisperAction } from '../game/actions'
 import type { GameState, RoundState } from '../game/types'
+import { infoLevel } from '../game/types'
 import { useT } from '../i18n'
 import { HoldCover, RoleHold, SlideToContinue } from '../ui/gestures'
 
@@ -110,7 +111,11 @@ export function RevealScreen({ state, dispatch }: { state: GameState; dispatch: 
       <HoldCover
         testId="reveal.cover"
         coverLabel={t('reveal.holdWord')}
-        coverSub={t('reveal.holdWordSub')}
+        coverSub={t(state.settings.deafEnabled ? 'reveal.holdWordSubDeaf' : 'reveal.holdWordSub')}
+        onOpenChange={(open) => {
+          // Commits the word-view; a no-op unless the deaf switch tracks it.
+          if (open) dispatch({ type: 'VIEW_WORD' })
+        }}
       >
         {/* Thumb economics (§3.3): the word sits LOW, right above the role button. */}
         <div className="flex flex-1 flex-col items-center justify-end gap-3 pb-5 text-center">
@@ -167,9 +172,11 @@ export function RevealScreen({ state, dispatch }: { state: GameState; dispatch: 
               {player.role === 'charlatan' ? t('reveal.roleCharlatan') : t('reveal.roleCivilian')}
             </div>
             <div className="text-xs leading-relaxed" style={{ color: 'var(--color-g4)' }}>
-              {player.role === 'charlatan'
-                ? t('reveal.peekCostCharlatan')
-                : t('reveal.peekCostCivilian')}
+              {!state.settings.blindEnabled
+                ? t('reveal.peekFree')
+                : player.role === 'charlatan'
+                  ? t('reveal.peekCostCharlatan')
+                  : t('reveal.peekCostCivilian')}
               {' · '}
               {t('reveal.closeHint')}
             </div>
@@ -198,6 +205,13 @@ export function RevealScreen({ state, dispatch }: { state: GameState; dispatch: 
         )}
       />
 
+      {/* Role-neutral level readout: makes the irreversible choice legible before the pass. */}
+      {state.settings.deafEnabled && (
+        <div className="eb text-center" data-testid="reveal.level">
+          {t('reveal.levelNow', { level: t(`level.${infoLevel(player)}`) })}
+        </div>
+      )}
+
       <SlideToContinue
         label={t('reveal.slideNext')}
         testId="reveal.slide-next"
@@ -220,8 +234,11 @@ export function CluesScreen({ state, dispatch }: { state: GameState; dispatch: D
   const warnings: string[] = []
   const clean = draft.trim()
   if (clean.includes(' ')) warnings.push(t('clues.warnMultiword'))
+  // Never compare against a word the speaker chose not to see: the warning
+  // itself would let a deaf player probe out their own secret word.
   if (
     speaker &&
+    speaker.viewedWord &&
     clean &&
     clean.toLowerCase() === wordFor(round, speakerSeat!).toLowerCase()
   )
@@ -229,8 +246,8 @@ export function CluesScreen({ state, dispatch }: { state: GameState; dispatch: D
   if (clean && round.ledger.some((c) => c.word.toLowerCase() === clean.toLowerCase()))
     warnings.push(t('clues.warnDuplicate'))
 
-  // The round's full shuffled order, eliminated players struck through (§3.4).
-  const seatOrder = round.speakerOrder
+  // The round's full clue order, eliminated players struck through (§3.4).
+  const seatOrder = round.clueOrder
 
   return (
     <div className="flex h-full flex-col gap-3">
@@ -468,6 +485,7 @@ export function GuessScreen({ state, dispatch }: { state: GameState; dispatch: D
   const t = useT()
   const round = state.round!
   const [draft, setDraft] = useState('')
+  const guesser = round.players.find((p) => p.name === round.pendingGuesser)
   return (
     <div className="flex h-full flex-col gap-3">
       <div className="eb">{t('result.guessLabel')}</div>
@@ -496,7 +514,10 @@ export function GuessScreen({ state, dispatch }: { state: GameState; dispatch: D
       >
         {t('guess.submit')}
       </button>
-      <div className="eb text-center">{t('guess.note')}</div>
+      <div className="eb text-center">
+        {t('guess.note')}
+        {guesser && !guesser.viewedWord ? ` · ${t('guess.deafNote')}` : ''}
+      </div>
     </div>
   )
 }

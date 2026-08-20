@@ -30,7 +30,7 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    Assign["ASSIGN (invisible)<br/>draw unused pair from locale list · pick real/decoy ·<br/>assign Charlatans · shuffle full speaking order"]
+    Assign["ASSIGN (invisible)<br/>draw unused pair from locale list · pick real/decoy ·<br/>assign Charlatans · shuffle reveal order (+ separate clue/vote order when reshuffle is on)"]
     Assign --> H1["S2 · Handoff<br/>'Pass the phone to NAME'"]
 
     subgraph RevealLoop["REVEAL — once per player, in pass order"]
@@ -82,7 +82,7 @@ commitment a release-on-target, no simultaneous gestures anywhere.
 flowchart TD
     H["S2 · Handoff: 'Pass the phone to NAME'"] -->|slide to continue| Covered["S3 · Covered (resting state)<br/>cover panel + 'hold to check your role' button"]
 
-    Covered -->|"swipe up + hold on cover"| Word["WORD visible while held<br/>(if Whispered: two words, identical<br/>styling, random order — position<br/>never betrays which was Whispered)"]
+    Covered -->|"swipe up + hold on cover<br/>(Deaf & stone on: opening commits the<br/>word-view and spends the deaf bonus)"| Word["WORD visible while held<br/>(if Whispered: two words, identical<br/>styling, random order — position<br/>never betrays which was Whispered)"]
     Word -->|"release — cover snaps shut"| Covered
 
     Covered -->|"long-press 'check your role'<br/>(~800 ms visible fill — no accidental peeks)"| Card["ROLE CARD visible while held<br/>identical geometry for both roles"]
@@ -131,6 +131,7 @@ flowchart TD
 | Title / logo lockup | Heavy display type, monochrome |
 | Resume prompt (conditional) | "Resume or new game?" when an unfinished round exists; "new game" explicitly ends it |
 | Player name list | Add / remove / reorder; order = seating only — pass order is re-shuffled per round; min 4, max 12; unique non-empty names; no mid-session renames |
+| Handicap switches | Blind bonuses (default ON), Deaf & stone (default OFF), Reshuffle clue order (default OFF) — all setup-only (§2.2/§2.3/§3.4 of the requirements) |
 | Name input + add button | 56 px targets |
 | Charlatan count stepper | Auto default (1 for 3–7, 2 for 8+), override clamped 1…⌊players/3⌋ |
 | Clues-per-player stepper | Default 2, range 1–4 |
@@ -160,7 +161,7 @@ flowchart TD
 ### S4 · Clue entry + Ledger
 | Component | Notes |
 |---|---|
-| Turn banner | "NAME, your clue" — fully shuffled speaking order, re-shuffled each round |
+| Turn banner | "NAME, your clue" — fully shuffled clue order, re-shuffled each round (diverges from the reveal order when the reshuffle setting is on) |
 | Speaking-order strip | All players; eliminated players struck through and skipped |
 | One-word clue input | Private non-blocking warnings: multi-word, equals own secret word, duplicates an earlier clue this round |
 | Ledger | Every clue this round, in order, always visible; grouped by cycle; **must scale gracefully to 5+ cycles**; a neutral record — suspicion markers (◆) exist only in the post-round replay, never live |
@@ -202,8 +203,8 @@ accent per act. The phone-holder narrates like a game-show host, act by act.
 | Act | Content | Notes |
 |---|---|---|
 | 1 · The verdict | Winner banner + Charlatan identities; **one drill-in button: "The words & the replay"** | The **one accent-color moment** of the app; Charlatan names in the accent, huge type. The drill-in is a single screen: back-to-verdict link pinned at the very top, the word pair (real vs decoy, side by side) fixed beneath it, the replay scrolling below (clues grouped by cycle, vote outcomes, ◆ suspicion markers derived from vote tallies — replay-only, never in the live Ledger) — the shareable, screenshot-friendly moment. No progress dots on the drill-in; closing returns to the verdict |
-| 2 · The secrets | Steal guess (judge near-misses), who peeked, blind doubles, Whisper: who → whom + fake word | The "you did THAT on no information?!" beats live here |
-| 3 · The damage | Score matrix: players left, subscore columns top (win / blind / correct vote — adapting to the outcome), totals right | Tabular numerals, heaviest weight on totals, em-dash for nothing earned, one footnote line for context (eliminated, peeked, caught). Steal rounds: +3, blind hidden partner +8. Continue → scoreboard |
+| 2 · The secrets | Steal guess (judge near-misses), each player's self-handicap level (blind/deaf/stone), Whisper: who → whom + fake word (+ "never seen" when the target stayed deaf) | The "you did THAT on no information?!" beats live here |
+| 3 · The damage | Score matrix: players left, subscore columns top (win / handicap / correct vote — adapting to the outcome), totals right | Tabular numerals, heaviest weight on totals, em-dash for nothing earned, one footnote line for context (eliminated, peeked, caught). Steal rounds pay the ladder 2/3/3/4 to guesser and hidden partners alike. Continue → scoreboard |
 
 ### S9 · Scoreboard
 | Component | Notes |

@@ -25,6 +25,12 @@ export interface Settings {
   charlatanOverride: number | null
   cluesPerPlayer: number
   whisperCardsPerPlayer: number
+  /** ON: skipping the role peek pays bonuses. OFF = classic mode: everyone counts as peeked, peeking is free. */
+  blindEnabled: boolean
+  /** ON: skipping your word is a tracked, rewarded choice (deaf/stone levels). OFF: word-viewing is untracked. */
+  deafEnabled: boolean
+  /** ON: clue cycles and the vote pass walk a second permutation, drawn at round start. */
+  reshuffleEnabled: boolean
 }
 
 export interface SessionPlayer {
@@ -40,6 +46,16 @@ export interface RoundPlayer {
   role: Role
   eliminated: boolean
   peeked: boolean
+  /** Opened the word cover on their reveal turn (a whispered double view counts too). */
+  viewedWord: boolean
+}
+
+/** Self-handicap level, frozen at the player's own reveal turn (§2.3). */
+export type InfoLevel = 'informed' | 'blind' | 'deaf' | 'stone'
+
+export function infoLevel(p: { peeked: boolean; viewedWord: boolean }): InfoLevel {
+  if (p.peeked) return p.viewedWord ? 'informed' : 'deaf'
+  return p.viewedWord ? 'blind' : 'stone'
 }
 
 export interface Clue {
@@ -75,7 +91,9 @@ export interface RoundSummary {
   outcome: RoundOutcome
   pair: { real: string; decoy: string }
   charlatans: string[]
+  /** Kept for save-file compatibility; the levels map supersedes it in the UI. */
   peeked: string[]
+  levels: Record<string, InfoLevel>
   whisper: { by: string; target: string; fakeWord: string } | null
   guess: { by: string; text: string; correct: boolean } | null
   ledger: Clue[]
@@ -92,8 +110,10 @@ export interface RoundState {
   number: number
   pair: { real: string; decoy: string; distractors: string[] }
   players: RoundPlayer[]
-  /** Fresh uniform-random permutation of all seats, drawn at round start; stable within the round. */
+  /** Fresh uniform-random permutation of all seats, drawn at round start; drives the reveal pass. */
   speakerOrder: number[]
+  /** Order for clue cycles and the vote pass; equals speakerOrder unless the reshuffle setting drew a second permutation. Stable within the round. */
+  clueOrder: number[]
   /** Reveal/vote progress: position within the phase's seat order. */
   cursor: number
   /** Handoff interstitial active (privacy gate). */
@@ -152,7 +172,14 @@ export function charlatanCount(playerCount: number, override: number | null): nu
 export const initialState: GameState = {
   phase: 'setup',
   locale: 'nl',
-  settings: { charlatanOverride: null, cluesPerPlayer: 2, whisperCardsPerPlayer: 1 },
+  settings: {
+    charlatanOverride: null,
+    cluesPerPlayer: 2,
+    whisperCardsPerPlayer: 1,
+    blindEnabled: true,
+    deafEnabled: false,
+    reshuffleEnabled: false,
+  },
   setupNames: [],
   session: null,
   round: null,

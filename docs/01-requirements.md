@@ -34,7 +34,9 @@ is client-side React state, deployed as a static site, installable as an offline
 | **Civilian** | A player who received the majority (real) word. |
 | **Charlatan** | A player who received the decoy word. |
 | **Peek** | The optional, private act of viewing one's own role on one's own reveal turn. Skipping it is rewarded (§2.3). |
-| **Blind** | A player who never peeked this round. A blind surviving Charlatan earns double points ("hard mode"). |
+| **Blind** | A player who saw their word but never peeked their role this round. The lowest self-handicap rung (§2.3). |
+| **Deaf** | A player who peeked their role but never opened their word cover (Deaf & stone setting, §2.3). They clue off nothing but the table's earlier clues. |
+| **Stone** | A player who saw neither word nor role this round — the top of the self-handicap ladder (§2.3). |
 | **Word pair** | A curated pair of confusable words: the *real* word (civilians) and the *decoy* word (Charlatans). |
 | **Ledger** | The append-only, always-visible list of every clue typed this round, in order. |
 | **Whisper** | A Charlatan sabotage ability funded by each player's personal Whisper cards (§3.6). |
@@ -68,34 +70,58 @@ is client-side React state, deployed as a static site, installable as an offline
 | Charlatan count | Auto by player count | Host override allowed, clamped to 1 … ⌊players/3⌋. |
 | Clues per player before voting | **2** | Configurable at game start (range 1–4). Voting opens only after this many full clue cycles. |
 | Whisper cards **per player** | **1** | Personal, session-long allotment (§3.6). Setup-only — the allotment cannot be changed between rounds; mid-session joiners receive it on joining. |
+| Blind bonuses | **ON** | OFF = classic mode: everyone counts as peeked, peeking is free and pays nothing (§2.3). Setup-only. |
+| Deaf & stone | **OFF** | ON: opening the word cover becomes a tracked, rewarded choice — the deaf and stone rungs of the ladder open up (§2.3). Setup-only. |
+| Reshuffle clue order | **OFF** | ON: clue cycles and the vote pass walk a second independent permutation, so the reveal order does not predict clue position (§3.4). Setup-only. |
 | Language | **Dutch** | Dutch (default) or English UI (§6.4). Locale is fixed for the session. |
 
 There is deliberately **no timer of any kind, anywhere in the app**. The game gates on clue
 count and vote outcomes, never on time.
 
-### 2.3 Words, the peek, and hard mode
+### 2.3 Words, sight, and the self-handicap ladder
 
-- **Everyone always sees a word.** Civilians see the real word; Charlatans see the decoy
-  word. The reveal screen is visually identical for both — no role label, ever, by default.
+- **Everyone is offered a word.** Civilians are offered the real word; Charlatans the decoy
+  word, behind the same hold-open cover. The reveal screen is visually identical for both —
+  no role label, ever, by default.
 - **The peek.** On their own reveal turn, every player has an identical, optional control to
   privately view their role ("Civilian" or "You are the Charlatan"). Nobody is ever told
-  their role unless they ask. Peeking is only possible during the player's own reveal turn —
-  once the phone moves on, the choice is locked for the round.
-- **Peek economics** (what makes the choice interesting):
-  - A **civilian who does not peek** earns a **+1 reward point — but only on rounds the
-    civilian team wins**, stacking on top of the +2 team win (and the +1 correct-vote bonus,
-    §3.9).
-  - A **Charlatan who never peeks and survives** the round earns **double points** — this is
-    "hard mode", redefined: self-inflicted blindness rather than a blank word. Surviving a
-    round without ever knowing you were the Charlatan is the game's signature payoff
-    ("you survived and you never even checked?!").
+  their role unless they ask. Both choices — opening the word cover and peeking the role —
+  are only possible during the player's own reveal turn; once the phone moves on, they are
+  locked for the round.
+- **The ladder.** Two independent choices yield four information levels, frozen per player
+  per round:
+
+  | Level | Saw word | Peeked role |
+  |---|---|---|
+  | Informed | yes | yes |
+  | Blind | yes | no |
+  | Deaf | no | yes |
+  | Stone | no | no |
+
+  "Saw word" means the cover was opened — a whispered player who opens the cover and sees
+  the two-word psst display counts as having seen their word.
+- **Ladder economics** (what makes the choices interesting, exact values in §3.9):
+  - A **civilian** earns a rising bonus **only on rounds the civilian team wins**: +1 blind,
+    +2 deaf, +4 stone, stacking on top of the +2 team win (and the +1 correct-vote bonus).
+  - A **Charlatan who survives** earns per level 4 / 8 / 8 / 16 via parity, one step lower
+    via the tie limit (§3.9). Surviving a round without ever knowing you were the Charlatan
+    is still the game's signature payoff ("you survived and you never even checked?!") — and
+    stone raises the stakes to "you never even saw a word".
   - A **Charlatan who peeks** gains knowledge (they can hedge their clues and may use the
-    Whisper) but forfeits the blind double.
-- Whether each player peeked is **disclosed on the round result screen** — required for score
+    Whisper) but descends the ladder.
+- **The switches.** "Blind bonuses" OFF is classic mode: everyone counts as peeked, the role
+  is still rendered behind the hold gesture (a pass-around phone never shows a static role),
+  but looking is free and the blind/stone rungs do not exist — a player who still never holds
+  the role button earns nothing for it. "Deaf & stone" ON puts the word behind a tracked
+  commitment: opening the cover is the moment the choice is spent, and a role-neutral level
+  readout on the reveal screen shows the rung the player is standing on before they pass the
+  phone. With it OFF, word-viewing is untracked and the ladder collapses to today's
+  informed/blind pair.
+- Each player's level is **disclosed on the round result screen** — required for score
   transparency, and the table meta it creates ("Jan *never* peeks") is a wanted feature. Live
-  observability of the peek gesture — the room seeing *that* someone peeked, never what they
-  saw — is likewise accepted as part of the social game: no mandatory dwell is added to mask
-  it, and peek-bluffing is fair play.
+  observability of the gestures — the room seeing *that* someone peeked or kept the cover
+  shut, never what they saw — is likewise accepted as part of the social game: no mandatory
+  dwell is added to mask it, and bluffing either gesture is fair play.
 - **Charlatans are never told who their partner is** — not even after peeking. This is
   intentional: partner anonymity is what makes Whisper friendly fire (§3.6) meaningful and
   keeps multi-Charlatan rounds honest.
@@ -155,8 +181,8 @@ secret is only-visible-while-touching, and every commitment is a release-on-targ
 - **Peek (hold-state 2):** a separate **"hold to check your role"** button sits on the
   *covered* state — not behind the cover, so the two hold-states are never needed at once.
   It is a **long-press with a visible fill (~800 ms)** before the role card appears, so
-  nobody peeks by accident — important because peeking costs civilians their potential +1
-  and Charlatans their blind double. The role card is visible **only while held** and snaps
+  nobody peeks by accident — important because peeking descends the self-handicap ladder
+  (§2.3, §3.9). The role card is visible **only while held** and snaps
   away on release: the same privacy physics as the word. (The fill is an interaction
   affordance, not a timer — the no-timer rule is intact.)
 - **Whisper commit (release-on-target):** while the role card is held open, a Charlatan
@@ -183,9 +209,19 @@ optional slide-to-Whisper-target → covered → slide-to-pass.*
 **The entire player order is re-shuffled every round** — a fresh uniform-random permutation
 of all players, not a rotation of the seating order from a random starting point. Going first
 is a genuine disadvantage and must not always fall on the same person, and no player may be
-able to predict who follows whom from the seating arrangement. The same shuffled order drives
-the **reveal pass, every clue cycle, and the vote pass** of that round. Within a round the
-order is **stable**: every phase walks the same permutation, skipping eliminated players.
+able to predict who follows whom from the seating arrangement. By default the same shuffled
+order drives the **reveal pass, every clue cycle, and the vote pass** of that round.
+
+With the **Reshuffle clue order** setting ON, a **second independent permutation** is drawn
+at round start: the reveal pass walks the first, the clue cycles **and the vote pass** walk
+the second. Rationale: when reveal order equals clue order, a player deciding whether to stay
+deaf or stone (§2.3) already knows their clue position — only late seats would ever take the
+gamble. With the second permutation the clue position is unknown at decision time, so the
+ladder is the same bet for every seat. Whisper targeting stays defined in reveal-order space
+(§3.6) and is unaffected.
+
+Within a round both orders are **stable**: every phase walks its permutation, skipping
+eliminated players.
 
 ### 3.5 Clue ledger
 
@@ -217,8 +253,11 @@ joiners receive it on joining, and a same-name rejoiner gets their remaining car
 (§2.1).
 
 - **Who:** any current-round Charlatan **who has peeked** (using the Whisper requires knowing
-  your role — and peeking forfeits the blind double, which is the ability's price), while
-  they still hold an unspent personal card.
+  your role — and peeking descends the ladder, which is the ability's price), while they
+  still hold an unspent personal card. Knowing your **word** is not required: a deaf
+  Charlatan (peeked, cover never opened) may whisper — the fake word comes from the pair's
+  distractor list, not from their own word. In classic mode (§2.3) everyone counts as peeked,
+  so the gate is trivially satisfied; the gesture choreography is unchanged.
 - **When & how:** from the Charlatan's own reveal screen, via the role card's
   release-on-target gesture (§3.3). **Unusable if the Charlatan reveals last** (there is no
   later player to target).
@@ -238,6 +277,9 @@ joiners receive it on joining, and a same-name rejoiner gets their remaining car
   **not** wasted — Charlatans can sabotage each other (they don't know who their partner is).
 - **Disclosure:** who burned a Whisper, on whom, and the fake word are revealed on the round
   result screen.
+- **Deaf targets:** a whispered player who never opens their cover (§2.3) never sees the psst
+  display — the card is still spent and still disclosed. Accepted waste: at a deaf-leaning
+  table Whispers are worth less, which is on the playtest watch-list (Appendix C).
 
 ### 3.7 Voting, eliminations, and the tie limit
 
@@ -280,29 +322,39 @@ steal the win**. It keeps them engaged and adds a good beat to the ending.
   with trimming and basic singular/plural tolerance. The guess is shown on the result screen,
   so the group can house-rule an obvious near-miss.
 - A correct guess flips the round to a **Charlatan win for all Charlatans** and ends it, even
-  if other Charlatans were still hidden. The guesser and any *peeked* hidden Charlatan score
-  the steal points; a still-hidden Charlatan who **never peeked keeps their blind survival
-  double** — a teammate's steal never costs a blind partner their +8 (§3.9).
-- The result screen then reveals everything: roles, the word pair, who peeked, blind doubles
-  earned, Whisper usage, followed by the clue-by-clue replay.
+  if other Charlatans were still hidden. The guesser **and every still-hidden Charlatan**
+  score the steal ladder at their own level (§3.9); an earlier-ejected Charlatan who is not
+  the guesser scores nothing. Being rescued pays less than surviving to parity on any rung —
+  the steal is a consolation route, not an equal one.
+- The result screen then reveals everything: roles, the word pair, each player's ladder
+  level, Whisper usage, followed by the clue-by-clue replay.
 
 ### 3.9 Scoring
 
 **The score of all previous rounds is displayed between each round** on the session
 scoreboard. Scoring rules:
 
+The self-handicap ladder (§2.3) prices every payoff by information level:
+
+| Ladder row | Informed | Blind | Deaf | Stone |
+|---|---|---|---|---|
+| Civilian bonus on a civilian win (on top of the +2 team win; eliminated civilians included) | 0 | +1 | +2 | +4 |
+| Charlatan survives via **parity** (threshold) | +4 | +8 | +8 | +16 |
+| Charlatan survives via the **tie limit** (one step lower — stalling pays less than winning on the merits) | +2 | +4 | +4 | +8 |
+| Steal: the guesser **and every still-hidden Charlatan**, each at their own level | +2 | +3 | +3 | +4 |
+
+Flat rules on top:
+
 | Outcome | Points |
 |---|---|
 | Civilian team wins (all Charlatans ejected, no steal) | +2 per Civilian — **eliminated civilians score the same as survivors** (team win; being voted out is not punished twice) |
-| Civilian personally voted for a Charlatan on an ejecting vote | +1 bonus |
-| Civilian never peeked this round **and the civilian team wins** | +1 reward, on top of the team win (eliminated civilians included) — a non-peeking, sharp-voting civilian can reach +4 in one round |
-| Charlatan survives the round (threshold or tie limit), having peeked | +4 |
-| Charlatan survives the round **blind** (never peeked — "hard mode") | +8 (double) |
-| Steal (ejected Charlatan guesses the real word) | +3 to the guesser and to any **peeked** hidden Charlatan; a still-hidden Charlatan who **never peeked** scores **+8** instead — the blind double survives a teammate's steal. The guesser never gets the double (they were caught). |
+| Civilian personally voted for a Charlatan on an ejecting vote | +1 bonus, accruing regardless of the round's final outcome |
+| Ejected Charlatan who is not the steal guesser | 0 |
 
-"Survives" means the round ends by threshold or by the third consecutive tie with the
-Charlatan not ejected; steal-ended rounds are scored by the steal row instead. Point values
-are a starting balance, to be tuned in playtesting.
+Rank sanity: on every rung, parity > tie limit ≥ steal — getting caught is never preferable,
+and being rescued by a teammate's steal is the cheapest win. Ladder bonuses pay **only on
+wins**; a handicap never pays on a loss. Point values are a starting balance, to be tuned in
+playtesting.
 
 ---
 
@@ -313,11 +365,13 @@ The app is **one phase state machine**; the full phase set is:
 `setup → assign → reveal → clues → vote → verdict → guess → result → scoreboard → (next round | roster edit | end)`
 
 1. **Setup flow.** The host enters player names in seating order, adjusts Charlatan count,
-   clues-per-player, Whisper cards per player, and language, and taps **Start**. Validation:
+   clues-per-player, Whisper cards per player, the three handicap switches (Blind bonuses,
+   Deaf & stone, Reshuffle clue order — §2.2), and language, and taps **Start**. Validation:
    3–12 unique, non-empty names.
 2. **Assign flow (invisible).** The app draws an unused word pair from the locale's list,
    picks real/decoy orientation, assigns Charlatan roles uniformly at random, and shuffles
-   the full speaking order for the round.
+   the full reveal order for the round — plus an independent clue/vote order when the
+   reshuffle switch is on (§3.4).
 3. **Reveal flow.** For each player in pass order: a **handoff interstitial** ("Pass the phone
    to *name*", slide to continue) → the **reveal screen** (one-thumb grammar per §3.3: held
    word, optional long-press peek, optional Whisper release-on-target, Whisper banner if
@@ -348,11 +402,12 @@ The app is **one phase state machine**; the full phase set is:
      replay (every clue in order, grouped by cycle, annotated with vote outcomes — the
      shareable, screenshot-friendly moment) scrolling below. The drill-in shows **no progress
      dots** — it is not an act; closing returns to the verdict.
-   - **Act 2 — The secrets:** the steal guess (judge the near-miss), who peeked, blind
-     doubles earned, and the Whisper — who burned it, on whom, and the fake word. The "you
-     did THAT on no information?!" beats.
+   - **Act 2 — The secrets:** the steal guess (judge the near-miss), each player's
+     self-handicap level (blind/deaf/stone, §2.3), and the Whisper — who burned it, on whom,
+     the fake word, and whether a deaf target ever saw it. The "you did THAT on no
+     information?!" beats.
    - **Act 3 — The damage:** the round's points as a **score matrix** — players down the
-     left, the round's subscore columns across the top (e.g. win / blind / correct vote),
+     left, the round's subscore columns across the top (e.g. win / handicap / correct vote),
      totals on the right; columns adapt to the round outcome → Continue to scoreboard.
 
    Mechanics: tap anywhere (or a ≥56 px Continue) advances; a **three-dot progress strip**
@@ -567,6 +622,20 @@ Not spec gaps — behaviors to observe once the game is in hands:
   Charlatans at 12 players while the auto default never exceeds 2; a 4-Charlatan round ends
   at 4v4 parity. Legal but barely tested — consider labeling counts above the auto default
   as "experimental" in the setup UI.
-- **Blind-double asymmetry on steals:** a blind hidden partner banks +8 off a teammate's +3
-  steal — the highest payout in the game for a player who did nothing knowingly. Explicitly
-  wanted; keep an eye on it when tuning point values.
+- **Stone payouts:** parity pays a surviving stone Charlatan +16 (and a double-stone
+  two-Charlatan round +32) — the biggest number in the game, for players who knew nothing.
+  Deliberate jackpot; watch whether it warps play. (The former "blind partner keeps +8 on a
+  teammate's steal" rule was dropped by decision: all hidden partners now ride the steal
+  ladder, so a blind/stone partner is rescued *poorer* than parity would have paid them.)
+- **Deaf griefing by civilians:** a deaf/stone civilian clues noise and endangers the team
+  for a personal +2/+4; ejecting them pushes toward parity, which is the built-in brake.
+  Confirm the bonus doesn't make ladder-chasing dominate team play.
+- **Whisper devaluation at deaf-leaning tables:** a deaf target never sees the psst and the
+  card is still spent (§3.6). Watch whether Whispers stay worth burning when the Deaf & stone
+  switch is on.
+- **Deaf without the reshuffle:** with "Reshuffle clue order" off, reveal order predicts clue
+  position and only late seats will go deaf — positional, not brave. The switches are
+  independent by design; consider recommending them together in the setup copy.
+- **Getting ejected as a stone civilian** still banks the +4 on a civilian win (eliminated
+  civilians share the team bonus). The parity pressure from civilian ejections is the
+  counterweight; watch for "eject me" plays.
