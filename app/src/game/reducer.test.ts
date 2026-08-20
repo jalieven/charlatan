@@ -12,6 +12,7 @@ import {
 } from './reducer'
 import { burnWhisperAction } from './actions'
 import { scoreRound } from './scoring'
+import { sessionAwards } from './awards'
 import type { GameState } from './types'
 import { charlatanCount, initialState, maxCharlatans } from './types'
 
@@ -537,6 +538,57 @@ describe('roster and session (§2.1, §4)', () => {
   it('draw pool avoids repeats within a session', () => {
     const s = startRound(freshSession())
     expect(s.session!.usedPairIndexes).toEqual([0])
+  })
+})
+
+describe('session awards from real play (S10, §3.11)', () => {
+  it('a steal round with a whisper feeds Dief, Fluisteraar and Meester-Charlatan', () => {
+    // Round 1: Tom (Charlatan) peeks, whispers Eva, is voted out, steals the win.
+    let s = startRound(freshSession())
+    for (let i = 0; i < 2; i++) {
+      s = reducer(s, { type: 'HANDOFF_CONTINUE' })
+      s = reducer(s, { type: 'REVEAL_NEXT' })
+    }
+    s = reducer(s, { type: 'HANDOFF_CONTINUE' })
+    s = reducer(s, { type: 'PEEK' }) // Tom
+    s = reducer(s, { type: 'BURN_WHISPER', targetSeat: 4, fakeWord: 'espresso', fakeWordDef: 'klein sterk kopje', swapped: false })
+    s = revealAll(reducer(s, { type: 'REVEAL_NEXT' }))
+    s = clueThrough(s)
+    s = voteAll(s, { Jan: 'Tom', Sanne: 'Tom', Tom: 'Jan', Lotte: 'Tom', Eva: 'Tom', Bram: 'Tom' })
+    s = reducer(s, { type: 'VERDICT_CONTINUE' })
+    expect(s.phase).toBe('guess')
+    s = reducer(s, { type: 'SUBMIT_GUESS', text: 'koffie' })
+    expect(s.round!.outcome).toEqual({ kind: 'steal', by: 'Tom' })
+    for (let i = 0; i < 2; i++) s = reducer(s, { type: 'RESULT_ADVANCE' })
+    s = reducer(s, { type: 'FINISH_ROUND' })
+
+    // Round 2: Sanne (Charlatan, blind) survives to parity — civilians voted out.
+    s = startRound(s, [1])
+    s = revealAll(s)
+    s = clueThrough(s)
+    s = voteAll(s, { Jan: 'Tom', Sanne: 'Tom', Tom: 'Jan', Lotte: 'Tom', Eva: 'Tom', Bram: 'Tom' })
+    s = reducer(s, { type: 'VERDICT_CONTINUE' }) // Tom (civilian this round) ejected, no parity yet
+    expect(s.phase).toBe('clues')
+    s = clueThrough(s)
+    s = voteAll(s, { Jan: 'Eva', Sanne: 'Eva', Lotte: 'Eva', Eva: 'Jan', Bram: 'Eva' })
+    s = reducer(s, { type: 'VERDICT_CONTINUE' }) // Eva out
+    s = clueThrough(s)
+    s = voteAll(s, { Jan: 'Bram', Sanne: 'Bram', Lotte: 'Bram', Bram: 'Jan' })
+    s = reducer(s, { type: 'VERDICT_CONTINUE' }) // Bram out
+    s = clueThrough(s)
+    s = voteAll(s, { Jan: 'Lotte', Sanne: 'Lotte', Lotte: 'Jan' })
+    s = reducer(s, { type: 'VERDICT_CONTINUE' }) // Lotte out: 1 civilian vs 1 charlatan = parity
+    expect(s.round!.outcome).toEqual({ kind: 'charlatans-parity' })
+    for (let i = 0; i < 2; i++) s = reducer(s, { type: 'RESULT_ADVANCE' })
+    s = reducer(s, { type: 'FINISH_ROUND' })
+
+    // The exact call the summary screen makes.
+    const byKey = Object.fromEntries(
+      sessionAwards(s.session!.players, s.session!.history).map((a) => [a.key, a]),
+    )
+    expect(byKey.dief).toMatchObject({ winners: ['Tom'], evidence: { n: 1 } })
+    expect(byKey.fluisteraar).toMatchObject({ winners: ['Tom'], evidence: { n: 1 } })
+    expect(byKey.meesterCharlatan).toMatchObject({ winners: ['Sanne'], evidence: { n: 8 } })
   })
 })
 
