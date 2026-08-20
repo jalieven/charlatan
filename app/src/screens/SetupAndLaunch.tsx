@@ -61,7 +61,7 @@ export function SetupScreen({ state, dispatch }: { state: GameState; dispatch: D
       <div className="hairline" />
       <div className="eb">{t('setup.players', { count: n, max: MAX_PLAYERS })}</div>
       <div className="flex flex-col gap-2">
-        {state.setupNames.map((name, i) => (
+        {state.setupNames.map((name) => (
           <div className="row" key={name}>
             <span className="font-bold">{name}</span>
             <span className="flex items-center gap-1">
@@ -79,15 +79,6 @@ export function SetupScreen({ state, dispatch }: { state: GameState; dispatch: D
                 onClick={() => setPinFor(name)}
               >
                 {state.setupPins[name] ? t('setup.pinBadgeSet') : t('setup.pinBadge')}
-              </button>
-              <button
-                type="button"
-                data-testid={`setup.player.${name}.up`}
-                className="flex size-10 items-center justify-center"
-                style={{ color: 'var(--color-g4)', visibility: i === 0 ? 'hidden' : 'visible' }}
-                onClick={() => dispatch({ type: 'MOVE_NAME', name, dir: -1 })}
-              >
-                ↑
               </button>
               <button
                 type="button"

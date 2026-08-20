@@ -133,7 +133,7 @@ flowchart TD
 |---|---|
 | Title / logo lockup | Heavy display type, monochrome |
 | Resume prompt (conditional) | "Resume or new game?" when an unfinished round exists; "new game" explicitly ends it |
-| Player name list | Add / remove / reorder; order = seating only — pass order is re-shuffled per round; min 4, max 12; unique non-empty names; no mid-session renames |
+| Player name list | Add / remove; entry order carries no meaning — the pass order is re-shuffled per round; min 4, max 12; unique non-empty names; no mid-session renames |
 | Name input + add button | 56 px targets |
 | Charlatan count stepper | Auto default (1 for 3–7, 2 for 8+), override clamped 1…⌊players/3⌋ |
 | Clues-per-player stepper | Default 2, range 1–4 |

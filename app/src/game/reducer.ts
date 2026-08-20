@@ -17,7 +17,6 @@ export type Action =
   | { type: 'ADD_NAME'; name: string }
   | { type: 'SET_PIN'; name: string; pin: string }
   | { type: 'REMOVE_NAME'; name: string }
-  | { type: 'MOVE_NAME'; name: string; dir: -1 | 1 }
   | { type: 'SET_CHARLATAN_OVERRIDE'; value: number | null }
   | { type: 'SET_CLUES_PER_PLAYER'; value: number }
   | { type: 'SET_WHISPER_CARDS'; value: number }
@@ -242,15 +241,6 @@ export function reducer(state: GameState, action: Action): GameState {
       if (state.phase !== 'setup') return state
       const { [action.name]: _dropped, ...setupPins } = state.setupPins
       return { ...state, setupNames: state.setupNames.filter((n) => n !== action.name), setupPins }
-    }
-    case 'MOVE_NAME': {
-      if (state.phase !== 'setup') return state
-      const i = state.setupNames.indexOf(action.name)
-      const j = i + action.dir
-      if (i < 0 || j < 0 || j >= state.setupNames.length) return state
-      const names = [...state.setupNames]
-      ;[names[i], names[j]] = [names[j], names[i]]
-      return { ...state, setupNames: names }
     }
     case 'SET_CHARLATAN_OVERRIDE':
       return { ...state, settings: { ...state.settings, charlatanOverride: action.value } }

@@ -64,7 +64,7 @@ is client-side React state, deployed as a static site, installable as an offline
 
 | Option | Default | Notes |
 |---|---|---|
-| Player names | — | Ordered list, add/remove/reorder; order = seating only — pass order is re-shuffled per round (§3.4). Unique, non-empty names. |
+| Player names | — | Add/remove list; entry order carries no meaning — the pass order is re-shuffled per round (§3.4). Unique, non-empty names. |
 | Charlatan count | Auto by player count | Host override allowed, clamped to 1 … ⌊players/3⌋. |
 | Clues per player before voting | **2** | Configurable at game start (range 1–4). Voting opens only after this many full clue cycles. |
 | Whisper cards **per player** | **1** | Personal, session-long allotment (§3.6). Setup-only — the allotment cannot be changed between rounds; mid-session joiners receive it on joining. |
@@ -364,7 +364,8 @@ The app is **one phase state machine**; the full phase set is:
 From **clues**, the round menu (§3.10) can also exit straight to `scoreboard`, recording the
 round as skipped without scoring it.
 
-1. **Setup flow.** The host enters player names in seating order, adjusts Charlatan count,
+1. **Setup flow.** The host enters player names (in any order — every round shuffles the
+   pass order, §3.4), adjusts Charlatan count,
    clues-per-player, Whisper cards per player, and language, and taps **Start**. Validation:
    3–12 unique, non-empty names.
 2. **Assign flow (invisible).** The app draws an unused word pair from the locale's list,
