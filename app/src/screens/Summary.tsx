@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { Dispatch } from 'react'
 import type { Action } from '../game/reducer'
 import { sessionAwards, sessionCounts } from '../game/awards'
@@ -5,13 +6,14 @@ import type { GameState } from '../game/types'
 import { useT } from '../i18n'
 
 /**
- * S10 · Session summary (§3.11): the session's parting shot. "Einde sessie"
- * lands here first — final standings and the session awards, on one scrolling
- * screen. Only SLUIT AF actually resets to setup (names and PINs prefilled);
- * the quiet escape returns to the scoreboard, so ending is not a one-way door.
+ * S10 · Session summary (§3.11): the session's parting shot, in TWO screens.
+ * Screen 1 is the final standings; screen 2 holds the awards and both exits.
+ * Only SLUIT AF actually resets to setup (names and PINs prefilled); the quiet
+ * escape returns to the scoreboard, so ending is not a one-way door.
  */
 export function SummaryScreen({ state, dispatch }: { state: GameState; dispatch: Dispatch<Action> }) {
   const t = useT()
+  const [act, setAct] = useState<1 | 2>(1)
   const session = state.session!
   // Leavers sink to the bottom, grayed — same order rule as the scoreboard.
   const sorted = [...session.players].sort(
@@ -30,6 +32,62 @@ export function SummaryScreen({ state, dispatch }: { state: GameState; dispatch:
     [t('summary.pillSkipped', { n: counts.skipped }), counts.skipped],
     [t('summary.pillTies', { n: counts.ties }), counts.ties],
   ]
+
+  if (act === 2) {
+    return (
+      <div className="flex h-full flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <div className="eb">
+            {t('summary.title')} · {t('summary.awards')}
+          </div>
+          <button
+            type="button"
+            className="eb2 min-h-11 px-2"
+            data-testid="summary.back-to-standings"
+            onClick={() => setAct(1)}
+          >
+            ←
+          </button>
+        </div>
+
+        <div className="flex flex-1 flex-col overflow-y-auto" data-testid="summary.awards">
+          {awards.map((a) => (
+            <div
+              key={a.key}
+              className="flex items-center justify-between gap-2.5 border-b py-3"
+              style={{ borderColor: 'var(--color-g1)' }}
+            >
+              <span>
+                <div className="eb2">{t(`awards.${a.key}.title`)}</div>
+                <div className="text-sm font-bold">{a.winners.join(' & ')}</div>
+              </span>
+              <span className="text-right text-xs" style={{ color: 'var(--color-g4)' }}>
+                {t(`awards.${a.key}.evidence`, a.evidence)}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        {/* SLUIT AF is the destructive step: reset to setup, names and PINs prefilled. */}
+        <button
+          type="button"
+          className="cta"
+          data-testid="summary.close"
+          onClick={() => dispatch({ type: 'END_SESSION' })}
+        >
+          {t('summary.close')}
+        </button>
+        <button
+          type="button"
+          className="cta cta-quiet"
+          data-testid="summary.back"
+          onClick={() => dispatch({ type: 'BACK_TO_SCOREBOARD' })}
+        >
+          {t('summary.back')}
+        </button>
+      </div>
+    )
+  }
 
   return (
     <div className="flex h-full flex-col gap-3">
@@ -90,47 +148,15 @@ export function SummaryScreen({ state, dispatch }: { state: GameState; dispatch:
               </span>
             ))}
         </div>
-
-        {awards.length > 0 && (
-          <>
-            <div className="eb2">{t('summary.awards')}</div>
-            <div className="flex flex-col" data-testid="summary.awards">
-              {awards.map((a) => (
-                <div
-                  key={a.key}
-                  className="flex items-center justify-between gap-2.5 border-b py-2.5"
-                  style={{ borderColor: 'var(--color-g1)' }}
-                >
-                  <span>
-                    <div className="eb2">{t(`awards.${a.key}.title`)}</div>
-                    <div className="text-sm font-bold">{a.winners.join(' & ')}</div>
-                  </span>
-                  <span className="text-right text-xs" style={{ color: 'var(--color-g4)' }}>
-                    {t(`awards.${a.key}.evidence`, a.evidence)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
       </div>
 
-      {/* SLUIT AF is the destructive step: reset to setup, names and PINs prefilled. */}
       <button
         type="button"
         className="cta"
-        data-testid="summary.close"
-        onClick={() => dispatch({ type: 'END_SESSION' })}
+        data-testid="summary.to-awards"
+        onClick={() => setAct(2)}
       >
-        {t('summary.close')}
-      </button>
-      <button
-        type="button"
-        className="cta cta-quiet"
-        data-testid="summary.back"
-        onClick={() => dispatch({ type: 'BACK_TO_SCOREBOARD' })}
-      >
-        {t('summary.back')}
+        {t('summary.toAwards')}
       </button>
     </div>
   )

@@ -332,10 +332,11 @@ result screen, so nothing about the abandoned round is revealed.
 ### 3.11 The session summary and the awards
 
 **"Einde sessie" never drops straight back to setup**: it lands on the session summary
-first — final standings (winner in the inverted block, ties sharing it; leavers grayed at
-the bottom), the session's headline counts, and a set of **session awards**. Everything is
-computed from what `RoundSummary` already records (peeks, ballots, deltas, whispers,
-steals); **skipped rounds are excluded from every ratio and count**.
+first — **two screens**: the final standings (winner in the inverted block, ties sharing
+it; leavers grayed at the bottom; the session's headline counts), then the **session
+awards** with both exits. Everything is computed from what `RoundSummary` already records
+(peeks, ballots, deltas, whispers, steals); **skipped rounds are excluded from every ratio
+and count**.
 
 Six superlatives, one line each; ties share the line, and an award whose winning value
 would be zero is simply not shown:
@@ -413,12 +414,14 @@ round as skipped without scoring it.
    Charlatan scaling per §2.1; new players join the scoreboard at 0; leavers' rows gray out
    and are restored on same-name rejoin); or **End session** — which lands on the session
    summary (§3.11) first, never straight on setup.
-10. **Session summary flow (S10).** One scrolling screen: the winner in an inverted block
-    (ties share it), the full final ranking with leavers grayed at the bottom, the session's
-    headline counts as pills, and the awards. **SLUIT AF** is the destructive step that
-    resets to setup, keeping names and PINs as prefill; **TERUG NAAR SCOREBORD** returns to
-    the scoreboard, so ending the session is not a one-way door. With no rounds played there
-    is nothing to summarize: End session resets immediately.
+10. **Session summary flow (S10).** Two screens. The first is the final standings: the
+    winner in an inverted block (ties share it), the full ranking with leavers grayed at the
+    bottom, and the session's headline counts as pills — its single action continues to the
+    awards. The second screen holds the awards and both exits: **SLUIT AF** is the
+    destructive step that resets to setup, keeping names and PINs as prefill;
+    **TERUG NAAR SCOREBORD** returns to the scoreboard, so ending the session is not a
+    one-way door (a ← in the header steps back to the standings). With no rounds played
+    there is nothing to summarize: End session resets immediately.
 
 **Resume:** the complete in-progress game state (round, phase, cursor, words, votes, tie
 counter, scores, Whisper cards) is persisted locally on every transition. An unfinished round
