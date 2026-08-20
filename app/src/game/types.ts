@@ -9,6 +9,7 @@ export type Phase =
   | 'guess'
   | 'result'
   | 'scoreboard'
+  | 'summary'
 
 export type Role = 'civilian' | 'charlatan'
 

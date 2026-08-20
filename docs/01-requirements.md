@@ -329,13 +329,36 @@ honest, and it counts toward the rounds played. The word pair stays spent for th
 was already drawn), and play returns straight to the scoreboard: a skipped round shows no
 result screen, so nothing about the abandoned round is revealed.
 
+### 3.11 The session summary and the awards
+
+**"Einde sessie" never drops straight back to setup**: it lands on the session summary
+first — final standings (winner in the inverted block, ties sharing it; leavers grayed at
+the bottom), the session's headline counts, and a set of **session awards**. Everything is
+computed from what `RoundSummary` already records (peeks, ballots, deltas, whispers,
+steals); **skipped rounds are excluded from every ratio and count**.
+
+Six superlatives, one line each; ties share the line, and an award whose winning value
+would be zero is simply not shown:
+
+| Award | Metric |
+|---|---|
+| De Blindganger | highest share of played rounds without a peek |
+| De Speurneus | highest hit rate on cast votes (votes that named a real Charlatan) |
+| De Zondebok | most votes drawn against, across all ballots |
+| De Meester-Charlatan | most survival points banked |
+| De Dief | most successful steals |
+| De Fluisteraar | most Whisper cards played |
+
+Only **SLUIT AF** actually resets to setup (names and PINs carried as prefill); the quiet
+escape returns to the scoreboard.
+
 ---
 
 ## 4. Flows (lingual description)
 
 The app is **one phase state machine**; the full phase set is:
 
-`setup → assign → reveal → clues → vote → verdict → guess → result → scoreboard → (next round | roster edit | end)`
+`setup → assign → reveal → clues → vote → verdict → guess → result → scoreboard → (next round | roster edit | summary → end)`
 
 From **clues**, the round menu (§3.10) can also exit straight to `scoreboard`, recording the
 round as skipped without scoring it.
@@ -388,7 +411,14 @@ round as skipped without scoring it.
 9. **Scoreboard flow.** Cumulative session scores; **Next round** (back to Assign);
    **Edit players** — add or remove players between rounds (re-validate 3–12, re-derive
    Charlatan scaling per §2.1; new players join the scoreboard at 0; leavers' rows gray out
-   and are restored on same-name rejoin); or **End session**.
+   and are restored on same-name rejoin); or **End session** — which lands on the session
+   summary (§3.11) first, never straight on setup.
+10. **Session summary flow (S10).** One scrolling screen: the winner in an inverted block
+    (ties share it), the full final ranking with leavers grayed at the bottom, the session's
+    headline counts as pills, and the awards. **SLUIT AF** is the destructive step that
+    resets to setup, keeping names and PINs as prefill; **TERUG NAAR SCOREBORD** returns to
+    the scoreboard, so ending the session is not a one-way door. With no rounds played there
+    is nothing to summarize: End session resets immediately.
 
 **Resume:** the complete in-progress game state (round, phase, cursor, words, votes, tie
 counter, scores, Whisper cards) is persisted locally on every transition. An unfinished round
@@ -414,6 +444,7 @@ accepted, deliberate trade-off — it matches the app's trust model.
 | S7 | Charlatan's guess | guess | The steal attempt |
 | S8 | Round result | result | Three-act progressive reveal; the word pair sits on the first act |
 | S9 | Scoreboard | scoreboard | Cumulative scores between rounds; roster editing |
+| S10 | Session summary | summary | Final standings, session awards, SLUIT AF / back to scoreboard (§3.11) |
 
 Component-level detail for every screen is in [02-flows.md §5](./02-flows.md).
 

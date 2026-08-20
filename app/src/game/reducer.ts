@@ -61,6 +61,8 @@ export type Action =
   | { type: 'FINISH_ROUND' }
   | { type: 'ROSTER_ADD'; name: string }
   | { type: 'ROSTER_REMOVE'; name: string }
+  | { type: 'OPEN_SUMMARY' }
+  | { type: 'BACK_TO_SCOREBOARD' }
   | { type: 'END_SESSION' }
   | { type: 'RESUME'; state: GameState }
 
@@ -610,6 +612,19 @@ export function reducer(state: GameState, action: Action): GameState {
           players: session.players.map((p) => (p.name === action.name ? { ...p, left: true } : p)),
         },
       }
+    }
+    // ---------- session summary (S10) ----------
+    // "Einde sessie" lands on the summary first; only SLUIT AF there resets.
+    case 'OPEN_SUMMARY': {
+      const session = state.session
+      if (!session || state.phase !== 'scoreboard') return state
+      // Nothing to summarize before the first round: reset straight away.
+      if (session.history.length === 0) return reducer(state, { type: 'END_SESSION' })
+      return { ...state, phase: 'summary' }
+    }
+    case 'BACK_TO_SCOREBOARD': {
+      if (state.phase !== 'summary') return state
+      return { ...state, phase: 'scoreboard' }
     }
     case 'END_SESSION':
       return {

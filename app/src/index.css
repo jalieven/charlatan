@@ -88,8 +88,9 @@ body {
   letter-spacing: 0.1em;
 }
 
-/* Inverted block: the loudest thing monochrome can say (2nd-tie warning). */
-.invert {
+/* Inverted block: the loudest thing monochrome can say (tie warning, session winner).
+   Named .loud, not .invert: Tailwind ships an invert() filter utility under that name. */
+.loud {
   background: var(--color-ink);
   color: var(--color-paper);
   border-radius: 10px;

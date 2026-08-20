@@ -434,7 +434,7 @@ export function ScoreboardScreen({
           type="button"
           className="cta cta-quiet"
           data-testid="score.end-session"
-          onClick={() => dispatch({ type: 'END_SESSION' })}
+          onClick={() => dispatch({ type: 'OPEN_SUMMARY' })}
         >
           {t('score.endSession')}
         </button>

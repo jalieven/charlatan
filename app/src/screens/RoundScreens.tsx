@@ -27,7 +27,7 @@ const WORD_TRACKING = -0.025
 function TieStakes({ round }: { round: RoundState }) {
   const t = useT()
   if (round.consecutiveTies < 2) return null
-  return <div className="invert">{t('clues.tieStakes')}</div>
+  return <div className="loud">{t('clues.tieStakes')}</div>
 }
 
 function TallyList({ counts }: { counts: Record<string, number> }) {
@@ -584,7 +584,7 @@ export function VerdictScreen({ state, dispatch }: { state: GameState; dispatch:
     body = (
       <>
         <div className="text-3xl font-bold">{t('verdict.tie', { n: verdict.count })}</div>
-        {verdict.count >= 2 && <div className="invert">{t('clues.tieStakes')}</div>}
+        {verdict.count >= 2 && <div className="loud">{t('clues.tieStakes')}</div>}
         <div className="text-sm" style={{ color: 'var(--color-g4)' }}>
           {t('verdict.tieNote')}
         </div>

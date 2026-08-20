@@ -16,6 +16,7 @@ import {
   VerdictScreen,
 } from './screens/RoundScreens'
 import { ResultScreen, ScoreboardScreen } from './screens/ResultAndScore'
+import { SummaryScreen } from './screens/Summary'
 import { Recorder, recorderEnabled } from './recorder/Recorder'
 
 export default function App() {
@@ -92,6 +93,9 @@ export default function App() {
         break
       case 'scoreboard':
         screen = <ScoreboardScreen state={state} dispatch={dispatch} />
+        break
+      case 'summary':
+        screen = <SummaryScreen state={state} dispatch={dispatch} />
         break
     }
   }

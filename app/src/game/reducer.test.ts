@@ -622,6 +622,41 @@ describe('re-check pins (setup + roster)', () => {
     expect(jan.pin).toBe('1234')
   })
 
+  it('EINDE SESSIE lands on the summary first; SLUIT AF resets, the escape returns', () => {
+    // One finished round, so there is something to summarize.
+    let s = clueThrough(revealAll(startRound(freshSession(['Jan', 'Sanne', 'Tom']))))
+    s = voteAll(s, {})
+    s = reducer(s, { type: 'VERDICT_CONTINUE' })
+    s = reducer(s, { type: 'SUBMIT_GUESS', text: 'mis' })
+    s = reducer(s, { type: 'RESULT_ADVANCE' })
+    s = reducer(s, { type: 'RESULT_ADVANCE' })
+    s = reducer(s, { type: 'FINISH_ROUND' })
+    expect(s.phase).toBe('scoreboard')
+    s = reducer(s, { type: 'OPEN_SUMMARY' })
+    expect(s.phase).toBe('summary')
+    expect(s.session!.history).toHaveLength(1)
+    // Not a one-way door: back to the scoreboard keeps everything.
+    const back = reducer(s, { type: 'BACK_TO_SCOREBOARD' })
+    expect(back.phase).toBe('scoreboard')
+    expect(back.session).not.toBeNull()
+    // SLUIT AF is the actual reset, names carried as prefill.
+    const closed = reducer(s, { type: 'END_SESSION' })
+    expect(closed.phase).toBe('setup')
+    expect(closed.session).toBeNull()
+    expect(closed.setupNames).toEqual(['Jan', 'Sanne', 'Tom'])
+  })
+
+  it('a summary with nothing to summarize resets straight away', () => {
+    const lobby = freshSession(['Jan', 'Sanne', 'Tom'])
+    const s = reducer(lobby, { type: 'OPEN_SUMMARY' })
+    expect(s.phase).toBe('setup')
+    expect(s.session).toBeNull()
+    // And the summary is unreachable from anywhere but the scoreboard.
+    const mid = revealAll(startRound(freshSession()))
+    expect(reducer(mid, { type: 'OPEN_SUMMARY' })).toBe(mid)
+    expect(reducer(mid, { type: 'BACK_TO_SCOREBOARD' })).toBe(mid)
+  })
+
   it('END_SESSION carries pins of staying players back to setup', () => {
     const s = run(freshSession(['Jan', 'Sanne', 'Tom']), [
       { type: 'SET_PIN', name: 'Jan', pin: '1234' },
