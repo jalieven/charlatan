@@ -135,8 +135,8 @@ word.
 5. **Verdict:** ties and ejections resolve per §3.7 — eliminations shrink the circle, the tie
    counter can end the round, ejected Charlatans get their steal guess immediately (§3.8),
    and play otherwise returns to one more clue cycle followed by a revote.
-6. **Result & replay:** roles, peeks, wagers, and Whisper usage are revealed, the round is
-   replayed clue-by-clue, points are awarded (§3.8, §3.9, §5 S8).
+6. **Result:** the winner, the word pair, roles, peeks, and Whisper usage are revealed and
+   points are awarded (§3.8, §3.9, §5 S8).
 7. **Scoreboard:** cumulative session scores are shown **between every round**; the roster
    can be edited there (§5 S9).
 
@@ -195,18 +195,18 @@ order is **stable**: every phase walks the same permutation, skipping eliminated
   discussion and voting phases of the round. The live Ledger is a **neutral record**: words,
   authors, and cycle grouping only — it never carries suspicion markers, highlights, or any
   other app editorializing mid-round.
-- The app never blocks a clue, but it **warns** (non-blocking, visible only to the typer) on
-  obvious fouls: more than one word, a clue identical to the player's own secret word, or a
-  duplicate of any earlier clue this round. The group polices everything else by party
-  convention.
+- The app **warns** (non-blocking, visible only to the typer) on obvious fouls: more than
+  one word, or a clue identical to the player's own secret word. One foul is blocked
+  outright: a clue already given this round — by anyone, in any cycle — is **refused**
+  (matched trimmed, case- and diacritics-insensitively); the draft clears and a notice names
+  the refused word. The group polices everything else by party convention.
 - Ties and ejections extend rounds by one clue cycle each loop, so a round can reach five or
   more cycles: the Ledger's cycle grouping and the cycle counter must scale gracefully to
   arbitrary cycle counts.
-- At the round result, the app **replays the round**: every clue in sequence, annotated with
-  who said it and where the votes landed — "here's where the room's suspicion turned."
-  Suspicion markers (◆) flag clues whose author drew votes in the ballot that followed,
-  derived **solely from vote tallies**, and they exist **only in the post-round replay** —
-  never in the live Ledger. This post-game replay is the shareable moment of the app.
+- The live Ledger is the round's only record: there is no post-round replay, and the app
+  never editorializes over the clues — not mid-round, not afterwards. The round result
+  instead answers the table's first question directly by putting the word pair on its first
+  act (§5 S8).
 
 ### 3.6 The Whisper
 
@@ -283,8 +283,8 @@ steal the win**. It keeps them engaged and adds a good beat to the ending.
   if other Charlatans were still hidden. The guesser and any *peeked* hidden Charlatan score
   the steal points; a still-hidden Charlatan who **never peeked keeps their blind survival
   double** — a teammate's steal never costs a blind partner their +8 (§3.9).
-- The result screen then reveals everything: roles, the word pair, who peeked, blind doubles
-  earned, Whisper usage, followed by the clue-by-clue replay.
+- The result screen then reveals everything: the word pair, roles, who peeked, blind doubles
+  earned, and Whisper usage.
 
 ### 3.9 Scoring
 
@@ -406,9 +406,8 @@ round as skipped without scoring it.
 
    Mechanics: tap anywhere (or a ≥56 px Continue) advances; a **three-dot progress strip**
    shows position; back-swiping to a previous act is allowed — everything on S8 is public,
-   so no privacy machinery is needed; each act fits one screen without scrolling (the replay
-   drill-in scrolls internally); one motion accent per act, per the "let one thing move"
-   design rule.
+   so no privacy machinery is needed; each act fits one screen without scrolling; one motion
+   accent per act, per the "let one thing move" design rule.
 9. **Scoreboard flow.** Cumulative session scores; **Next round** (back to Assign);
    **Edit players** — add or remove players between rounds (re-validate 3–12, re-derive
    Charlatan scaling per §2.1; new players join the scoreboard at 0; leavers' rows gray out
@@ -479,7 +478,7 @@ Component-level detail for every screen is in [02-flows.md §5](./02-flows.md).
 ### 6.2 State machine
 
 Single reducer with phases
-`setup | assign | reveal | clues | vote | verdict | guess | result | scoreboard`.
+`setup | assign | reveal | clues | vote | verdict | guess | result | scoreboard | summary`.
 All transitions are explicit reducer actions; illegal transitions are unrepresentable. The
 reveal and vote phases carry a `cursor` (whose turn in the pass order) plus the handoff
 sub-state so a dropped phone never shows private data. Round state additionally tracks the

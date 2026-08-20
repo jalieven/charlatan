@@ -1,6 +1,6 @@
 # Charlatan — Flow Diagrams & Screen Components
 
-Diagrams are Mermaid and render directly on GitHub. Screen identifiers (S1–S9) match
+Diagrams are Mermaid and render directly on GitHub. Screen identifiers (S1–S10) match
 [01-requirements.md §5](./01-requirements.md#5-screens). All four decision passes are folded
 in — this document carries no open questions.
 
@@ -9,7 +9,8 @@ in — this document carries no open questions.
 ## 1. Session-level flow
 
 One session = repeated rounds with a cumulative scoreboard. There is no session end
-condition — the group simply stops. The roster may change between rounds.
+condition — the group simply stops, and stopping lands on the session summary (S10) before
+anything is reset. The roster may change between rounds.
 
 ```mermaid
 flowchart TD
@@ -21,7 +22,9 @@ flowchart TD
     Round --> S9["S9 · Scoreboard<br/>cumulative session scores"]
     S9 -->|"Edit players — join/leave between rounds:<br/>re-validate 3–12, re-derive scaling,<br/>leavers grayed out, same-name rejoin<br/>restores score + remaining Whisper cards"| S9
     S9 -->|Next round<br/>new word pair, new roles| Round
-    S9 -->|End session| Launch
+    S9 -->|"End session<br/>(no rounds played yet:<br/>straight reset instead)"| S10["S10 · Session summary<br/>screen 1: final standings<br/>screen 2: awards"]
+    S10 -->|Back to scoreboard| S9
+    S10 -->|"SLUIT AF — reset to setup,<br/>names + PINs prefilled"| Launch
 ```
 
 ---
@@ -64,7 +67,7 @@ flowchart TD
     Threshold -->|"yes — threshold reached"| ResultChar["S8 · Result<br/>CHARLATANS WIN"]
     Threshold -->|no| Eliminate2["Eliminated: no more clues/votes"] --> ExtraClue
 
-    ResultTies --> Acts["S8 · Three acts, advanced by tap:<br/>1 Verdict (words + replay drill-in)<br/>2 Secrets · 3 Damage"]
+    ResultTies --> Acts["S8 · Three acts, advanced by tap:<br/>1 Verdict + the word pair<br/>2 Secrets · 3 Damage"]
     ResultSteal --> Acts
     ResultCiv --> Acts
     ResultChar --> Acts
@@ -162,8 +165,8 @@ flowchart TD
 |---|---|
 | Turn banner | "NAME, your clue" — fully shuffled speaking order, re-shuffled each round |
 | Speaking-order strip | All players; eliminated players struck through and skipped |
-| One-word clue input | Private non-blocking warnings: multi-word, equals own secret word, duplicates an earlier clue this round |
-| Ledger | Every clue this round, in order, always visible; grouped by cycle; **must scale gracefully to 5+ cycles**; a neutral record — suspicion markers (◆) exist only in the post-round replay, never live |
+| One-word clue input | Non-blocking warnings for multi-word and own-secret-word; a clue already given this round is refused outright — the draft clears and a notice names the refused word |
+| Ledger | Every clue this round, in order, always visible; grouped by cycle; **must scale gracefully to 5+ cycles**; a neutral record — no suspicion markers or app editorializing, mid-round or after |
 | Cycle counter | "Clue round 1 of 2", growing with tie/ejection loops |
 | Tie-stakes banner (conditional) | Persists through the cycle after the 2nd consecutive tie: "one more tie and the Charlatans win" |
 | Go-to-vote button | Appears only when the required cycles are complete |
@@ -192,16 +195,16 @@ flowchart TD
 | Guess input | Typed; case-insensitive, trimmed, singular/plural tolerance |
 | Submit button | One attempt only |
 
-### S8 · Round result + replay — three acts of progressive disclosure
+### S8 · Round result — three acts of progressive disclosure
 
 One act on screen at a time; a tap (or ≥56 px Continue) advances; a **three-dot progress
 strip** shows position; back-swipe between acts is allowed (everything here is public). Each
-act fits one screen without scrolling — the replay drill-in scrolls internally. One motion
-accent per act. The phone-holder narrates like a game-show host, act by act.
+act fits one screen without scrolling. One motion accent per act. The phone-holder narrates
+like a game-show host, act by act.
 
 | Act | Content | Notes |
 |---|---|---|
-| 1 · The verdict | Winner banner + Charlatan identities; **one drill-in button: "The words & the replay"** | The **one accent-color moment** of the app; Charlatan names in the accent, huge type. The drill-in is a single screen: back-to-verdict link pinned at the very top, the word pair (real vs decoy, side by side) fixed beneath it, the replay scrolling below (clues grouped by cycle, vote outcomes, ◆ suspicion markers derived from vote tallies — replay-only, never in the live Ledger) — the shareable, screenshot-friendly moment. No progress dots on the drill-in; closing returns to the verdict |
+| 1 · The verdict | Winner banner + Charlatan identities, with the **word pair (real vs decoy, side by side)** right on the act | The accent-color act of the app: Charlatan names in the accent, huge type — and the word **STEAL** above the headline, larger and in the accent, when a caught Charlatan stole the round. "Wait, what was it?" is the question every table asks next, so the pair sits on the page instead of behind a button. Both words share one size; a long pair stacks instead of shrinking |
 | 2 · The secrets | Steal guess (judge near-misses), who peeked, blind doubles, Whisper: who → whom + fake word | The "you did THAT on no information?!" beats live here |
 | 3 · The damage | Score matrix: players left, subscore columns top (win / blind / correct vote — adapting to the outcome), totals right | Tabular numerals, heaviest weight on totals, em-dash for nothing earned, one footnote line for context (eliminated, peeked, caught). Steal rounds: +2, blind hidden partner +8. Continue → scoreboard |
 
@@ -212,4 +215,24 @@ accent per act. The phone-holder narrates like a game-show host, act by act.
 | Round history strip | Compact per-round outcomes |
 | Edit-players control | Join/leave between rounds; re-validates 3–12, re-derives Charlatan scaling; joiners start at 0 with the configured Whisper allotment; same-name rejoin restores score + remaining cards |
 | Next-round button | New assignment with current roster |
-| End-session button | Back to launch/setup |
+| End-session button | Opens the session summary (S10); with no rounds played there is nothing to summarize and it resets straight to setup |
+
+### S10 · Session summary — two screens
+
+Screen 1 · Final standings:
+
+| Component | Notes |
+|---|---|
+| Winner block | Inverted (white-on-black flipped) — the loudest monochrome statement; ties share it ("JAN & TOM"); shows the winning score |
+| Final ranking | Ranked rows below the winner(s); leavers grayed at the bottom, same order rule as the scoreboard |
+| Session pills | Headline counts as pills: n× civilians / charlatans / steal / skipped / ties; zero counts are hidden |
+| To-the-awards button | The screen's single action — continues to screen 2 |
+
+Screen 2 · Awards:
+
+| Component | Notes |
+|---|---|
+| Back arrow (header) | ← steps back to the standings |
+| Awards list | Six superlatives mined from the round history (blind-%, vote accuracy, votes drawn, survival points, steals, Whisper cards); skipped rounds excluded from every ratio; ties share the line; an award whose winning value would be zero is not shown |
+| SLUIT AF button | The destructive step: resets to setup, keeping names and PINs as prefill |
+| Back-to-scoreboard button | Quiet escape — ending the session is not a one-way door |
