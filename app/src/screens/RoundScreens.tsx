@@ -11,6 +11,7 @@ import {
 } from '../game/reducer'
 import { burnWhisperAction } from '../game/actions'
 import type { GameState, RoundState } from '../game/types'
+import { infoLevel } from '../game/types'
 import { useT } from '../i18n'
 import { FitWord } from '../ui/FitWord'
 import { groupWidthEm } from '../ui/fitText'
@@ -190,7 +191,11 @@ export function RevealScreen({ state, dispatch }: { state: GameState; dispatch: 
       <HoldCover
         testId="reveal.cover"
         coverLabel={t('reveal.holdWord')}
-        coverSub={t('reveal.holdWordSub')}
+        coverSub={t(state.settings.deafEnabled ? 'reveal.holdWordSubDeaf' : 'reveal.holdWordSub')}
+        onOpenChange={(open) => {
+          // Commits the word-view; a no-op unless the deaf switch tracks it.
+          if (open) dispatch({ type: 'VIEW_WORD' })
+        }}
       >
         <SecretWordPanel round={round} seat={seat} />
       </HoldCover>
@@ -215,9 +220,11 @@ export function RevealScreen({ state, dispatch }: { state: GameState; dispatch: 
               {player.role === 'charlatan' ? t('reveal.roleCharlatan') : t('reveal.roleCivilian')}
             </div>
             <div className="text-xs leading-relaxed" style={{ color: 'var(--color-g4)' }}>
-              {player.role === 'charlatan'
-                ? t('reveal.peekCostCharlatan')
-                : t('reveal.peekCostCivilian')}
+              {!state.settings.blindEnabled
+                ? t('reveal.peekFree')
+                : player.role === 'charlatan'
+                  ? t('reveal.peekCostCharlatan')
+                  : t('reveal.peekCostCivilian')}
               {' · '}
               {t('reveal.closeHint')}
             </div>
@@ -246,6 +253,13 @@ export function RevealScreen({ state, dispatch }: { state: GameState; dispatch: 
         )}
       />
 
+      {/* Role-neutral level readout: makes the irreversible choice legible before the pass. */}
+      {state.settings.deafEnabled && (
+        <div className="eb text-center" data-testid="reveal.level">
+          {t('reveal.levelNow', { level: t(`level.${infoLevel(player)}`) })}
+        </div>
+      )}
+
       <SlideToContinue
         label={t('reveal.slideNext')}
         testId="reveal.slide-next"
@@ -271,8 +285,11 @@ export function CluesScreen({ state, dispatch }: { state: GameState; dispatch: D
   const warnings: string[] = []
   const clean = draft.trim()
   if (clean.includes(' ')) warnings.push(t('clues.warnMultiword'))
+  // Never compare against a word the speaker chose not to see: the warning
+  // itself would let a deaf player probe out their own secret word.
   if (
     speaker &&
+    speaker.viewedWord &&
     clean &&
     clean.toLowerCase() === wordFor(round, speakerSeat!).toLowerCase()
   )
@@ -297,8 +314,8 @@ export function CluesScreen({ state, dispatch }: { state: GameState; dispatch: D
     inputRef.current?.focus()
   }
 
-  // The round's full shuffled order, eliminated players struck through (§3.4).
-  const seatOrder = round.speakerOrder
+  // The round's full clue order, eliminated players struck through (§3.4).
+  const seatOrder = round.clueOrder
 
   return (
     <div className="relative flex h-full flex-col gap-3">
@@ -342,8 +359,10 @@ export function CluesScreen({ state, dispatch }: { state: GameState; dispatch: D
             fontWeight: status === 'now' ? 700 : 400,
           } as const
           const label = `${p.name}${status === 'done' ? ' ✓' : ''}`
-          // Active players' pills open their word re-check; eliminated ones stay inert.
-          return status === 'out' ? (
+          // Active players' pills open their word re-check; eliminated ones stay
+          // inert, and so do deaf/stone players — they never saw a word to
+          // re-check, and the reducer refuses the bypass anyway (§2.3).
+          return status === 'out' || !p.viewedWord ? (
             <span key={p.name} className="rounded-full border px-3 py-1.5 text-xs" style={pillStyle}>
               {label}
             </span>
@@ -641,6 +660,7 @@ export function GuessScreen({ state, dispatch }: { state: GameState; dispatch: D
   const round = state.round!
   const [draft, setDraft] = useState('')
   const clean = draft.trim()
+  const guesser = round.players.find((p) => p.name === round.pendingGuesser)
   return (
     <form
       className="flex h-full flex-col gap-3"
@@ -675,7 +695,10 @@ export function GuessScreen({ state, dispatch }: { state: GameState; dispatch: D
       <button type="submit" className="cta" data-testid="guess.submit" disabled={!clean}>
         {t('guess.submit')}
       </button>
-      <div className="eb text-center">{t('guess.note')}</div>
+      <div className="eb text-center">
+        {t('guess.note')}
+        {guesser && !guesser.viewedWord ? ` · ${t('guess.deafNote')}` : ''}
+      </div>
     </form>
   )
 }

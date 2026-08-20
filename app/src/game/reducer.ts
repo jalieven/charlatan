@@ -20,6 +20,9 @@ export type Action =
   | { type: 'SET_CHARLATAN_OVERRIDE'; value: number | null }
   | { type: 'SET_CLUES_PER_PLAYER'; value: number }
   | { type: 'SET_WHISPER_CARDS'; value: number }
+  | { type: 'SET_BLIND_ENABLED'; value: boolean }
+  | { type: 'SET_DEAF_ENABLED'; value: boolean }
+  | { type: 'SET_RESHUFFLE_ENABLED'; value: boolean }
   | { type: 'START_SESSION' }
   | {
       type: 'START_ROUND'
@@ -28,6 +31,7 @@ export type Action =
       orientation: boolean
       charlatanSeats: number[]
       speakerOrder: number[]
+      clueOrder: number[]
       pair: {
         a: string
         b: string
@@ -39,6 +43,7 @@ export type Action =
     }
   | { type: 'HANDOFF_CONTINUE' }
   | { type: 'PEEK' }
+  | { type: 'VIEW_WORD' }
   | {
       type: 'BURN_WHISPER'
       targetSeat: number
@@ -70,9 +75,9 @@ export function activeSeats(round: RoundState): number[] {
   return round.players.map((_, i) => i).filter((i) => !round.players[i].eliminated)
 }
 
-/** Speaking order for the current cycle: the round's shuffled seats, minus eliminated. */
+/** Clue/vote order for the current cycle: the round's clue permutation, minus eliminated. Equals the reveal order unless the reshuffle setting drew a second permutation. */
 export function speakingOrder(round: RoundState): number[] {
-  return round.speakerOrder.filter((seat) => !round.players[seat].eliminated)
+  return round.clueOrder.filter((seat) => !round.players[seat].eliminated)
 }
 
 export function currentSpeaker(round: RoundState): RoundPlayer | null {
@@ -255,6 +260,17 @@ export function reducer(state: GameState, action: Action): GameState {
         ...state,
         settings: { ...state.settings, whisperCardsPerPlayer: Math.min(5, Math.max(0, action.value)) },
       }
+    // The three handicap switches shape round-start flags and scoring semantics,
+    // so like the whisper allotment they are frozen once a session exists.
+    case 'SET_BLIND_ENABLED':
+      if (state.session) return state
+      return { ...state, settings: { ...state.settings, blindEnabled: action.value } }
+    case 'SET_DEAF_ENABLED':
+      if (state.session) return state
+      return { ...state, settings: { ...state.settings, deafEnabled: action.value } }
+    case 'SET_RESHUFFLE_ENABLED':
+      if (state.session) return state
+      return { ...state, settings: { ...state.settings, reshuffleEnabled: action.value } }
     case 'START_SESSION': {
       if (state.phase !== 'setup') return state
       const n = state.setupNames.length
@@ -286,11 +302,14 @@ export function reducer(state: GameState, action: Action): GameState {
       const realDef = action.orientation ? action.pair.defA : action.pair.defB
       const decoy = action.orientation ? action.pair.b : action.pair.a
       const decoyDef = action.orientation ? action.pair.defB : action.pair.defA
+      // Disabled switches are baked into the flags here (classic mode = everyone
+      // counts as peeked; deaf off = word-viewing untracked), keeping scoring settings-free.
       const players: RoundPlayer[] = names.map((name, seat) => ({
         name,
         role: action.charlatanSeats.includes(seat) ? 'charlatan' : 'civilian',
         eliminated: false,
-        peeked: false,
+        peeked: !state.settings.blindEnabled,
+        viewedWord: !state.settings.deafEnabled,
       }))
       const round: RoundState = {
         number: session.roundsPlayed + 1,
@@ -304,6 +323,7 @@ export function reducer(state: GameState, action: Action): GameState {
         },
         players,
         speakerOrder: action.speakerOrder,
+        clueOrder: action.clueOrder,
         cursor: 0,
         handoff: true,
         cycle: 1,
@@ -340,7 +360,18 @@ export function reducer(state: GameState, action: Action): GameState {
       const round = state.round
       if (!round || state.phase !== 'reveal' || round.handoff) return state
       const seat = revealSeat(round)
+      if (round.players[seat].peeked) return state
       const players = round.players.map((p, i) => (i === seat ? { ...p, peeked: true } : p))
+      return withRound(state, { players })
+    }
+    case 'VIEW_WORD': {
+      // Fired on every cover open; a no-op once the seat's word is on record
+      // (and always a no-op when the deaf switch left viewedWord pre-set).
+      const round = state.round
+      if (!round || state.phase !== 'reveal' || round.handoff) return state
+      const seat = revealSeat(round)
+      if (round.players[seat].viewedWord) return state
+      const players = round.players.map((p, i) => (i === seat ? { ...p, viewedWord: true } : p))
       return withRound(state, { players })
     }
     case 'BURN_WHISPER': {
@@ -430,6 +461,9 @@ export function reducer(state: GameState, action: Action): GameState {
       if (!round || state.phase !== 'clues') return state
       const p = round.players[action.seat]
       if (!p || p.eliminated) return state
+      // A deaf/stone player never saw their word: "forgot your word" does not
+      // apply, and a re-check would bypass the reveal-locked choice (§2.3).
+      if (!p.viewedWord) return state
       return withRound(state, { recheck: action.seat })
     }
     case 'CLOSE_RECHECK': {
@@ -648,12 +682,27 @@ export function reducer(state: GameState, action: Action): GameState {
         // the handoff gate (and the default for pre-recheck saves).
         s = { ...s, round: { ...s.round, recheck: null } }
       }
+      // Saves from before the handicap switches rehydrate the new fields as undefined.
+      s = {
+        ...s,
+        settings: {
+          ...s.settings,
+          blindEnabled: s.settings.blindEnabled ?? true,
+          deafEnabled: s.settings.deafEnabled ?? false,
+          reshuffleEnabled: s.settings.reshuffleEnabled ?? false,
+        },
+      }
       if (s.round && !s.round.speakerOrder) {
         // Pre-shuffle saves carried a firstSpeaker rotation instead of a permutation.
         const first = (s.round as RoundState & { firstSpeaker?: number }).firstSpeaker ?? 0
         const n = s.round.players.length
         const speakerOrder = Array.from({ length: n }, (_, k) => (first + k) % n)
         s = { ...s, round: { ...s.round, speakerOrder } }
+      }
+      if (s.round) {
+        // Pre-ladder saves: word-viewing was untracked, and clues walked the reveal order.
+        const players = s.round.players.map((p) => ({ ...p, viewedWord: p.viewedWord ?? true }))
+        s = { ...s, round: { ...s.round, players, clueOrder: s.round.clueOrder ?? s.round.speakerOrder } }
       }
       if (s.round && (s.phase === 'reveal' || s.phase === 'vote')) {
         return { ...s, round: { ...s.round, handoff: true } }

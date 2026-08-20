@@ -40,12 +40,14 @@ export function startRoundAction(state: GameState): Action | null {
   const pool = unused.length > 0 ? unused : list.map((_, i) => i)
   const pairIndex = pool[randInt(pool.length)]
   const pair = list[pairIndex]
+  const speakerOrder = shuffledSeats(n)
   return {
     type: 'START_ROUND',
     pairIndex,
     orientation: Math.random() < 0.5,
     charlatanSeats: sampleSeats(charlatanCount(n, state.settings.charlatanOverride), n),
-    speakerOrder: shuffledSeats(n),
+    speakerOrder,
+    clueOrder: state.settings.reshuffleEnabled ? shuffledSeats(n) : [...speakerOrder],
     pair: {
       a: pair.a,
       b: pair.b,

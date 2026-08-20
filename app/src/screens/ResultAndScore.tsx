@@ -166,13 +166,24 @@ export function ResultScreen({ state, dispatch }: { state: GameState; dispatch: 
           </div>
           <div className="hairline" />
           <div>
-            <div className="eb2">{t('result.peekedLabel')}</div>
-            <div className="mt-1 text-sm" style={{ color: 'var(--color-g5)' }}>
-              {summary.peeked.length === 0
-                ? t('result.nobodyPeeked')
-                : summary.peeked.length === 1
-                  ? t('result.peekedOne', { name: summary.peeked[0] })
-                  : t('result.peekedList', { names: summary.peeked.join(', ') })}
+            <div className="eb2">{t('result.levelsLabel')}</div>
+            <div className="mt-1 flex flex-col gap-1 text-sm" style={{ color: 'var(--color-g5)' }}>
+              {(['blind', 'deaf', 'stone'] as const)
+                .map((lvl) => ({
+                  lvl,
+                  names: Object.entries(summary.levels)
+                    .filter(([, l]) => l === lvl)
+                    .map(([name]) => name),
+                }))
+                .filter(({ names }) => names.length > 0)
+                .map(({ lvl, names }) => (
+                  <div key={lvl}>
+                    {t('result.levelLine', { level: t(`level.${lvl}`), names: names.join(', ') })}
+                  </div>
+                ))}
+              {Object.values(summary.levels).every((l) => l === 'informed') && (
+                <div>{t('result.noHandicaps')}</div>
+              )}
             </div>
           </div>
           <div className="hairline" />
@@ -184,7 +195,11 @@ export function ResultScreen({ state, dispatch }: { state: GameState; dispatch: 
                     by: summary.whisper.by,
                     target: summary.whisper.target,
                     word: summary.whisper.fakeWord,
-                  })
+                  }) +
+                  (summary.levels[summary.whisper.target] === 'deaf' ||
+                  summary.levels[summary.whisper.target] === 'stone'
+                    ? ` ${t('result.whisperUnseen')}`
+                    : '')
                 : t('result.noWhisper')}
             </div>
           </div>

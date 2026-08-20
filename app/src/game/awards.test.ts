@@ -32,6 +32,9 @@ function round(over: {
     pair: { real: 'koffie', decoy: 'thee' },
     charlatans: over.charlatans ?? [],
     peeked: over.peeked ?? [],
+    levels: Object.fromEntries(
+      over.participants.map((n) => [n, (over.peeked ?? []).includes(n) ? 'informed' : 'blind']),
+    ),
     whisper: over.whisperBy
       ? { by: over.whisperBy, target: 'x', fakeWord: 'espresso' }
       : null,
