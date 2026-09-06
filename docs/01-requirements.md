@@ -100,6 +100,11 @@ count and vote outcomes, never on time.
 
   "Saw word" means the cover was opened — a whispered player who opens the cover and sees
   the two-word psst display counts as having seen their word.
+- **The word re-check follows the ladder.** The "forgot your word" re-check on the clue screen
+  (S4c) is refused for deaf and stone players: they never saw a word, and handing it over
+  mid-round would undo the reveal-locked choice. With "Deaf & stone" OFF every player counts
+  as having seen their word, so every active name stays re-checkable — the clue screen's hint
+  says which of the two it is.
 - **Ladder economics** (what makes the choices interesting, exact values in §3.9):
   - A **civilian** earns a rising bonus **only on rounds the civilian team wins**: +1 blind,
     +2 deaf, +4 stone, stacking on top of the +2 team win (and the +1 correct-vote bonus).

@@ -101,3 +101,47 @@ test('forgot-your-word re-check: PIN gate and slider gate from the clue screen',
   // The clue turn underneath is untouched by both visits.
   await expect(page.getByTestId('clues.input')).toBeVisible()
 })
+
+test('deaf & stone: only players who opened their word can re-check it', async ({ page }) => {
+  await page.goto('/')
+
+  for (const name of ['Anna', 'Bea', 'Carl']) {
+    await page.getByTestId('setup.name-input').fill(name)
+    await page.getByTestId('setup.name-add').click()
+  }
+  // The switch that makes word-viewing a tracked choice (§2.3).
+  await page.getByTestId('setup.deaf.on').click()
+  await page.getByTestId('setup.start').click()
+  await page.getByTestId('score.next-round').click()
+
+  // Only the first reveal opens its cover; the other two pass the phone blind.
+  let looker = ''
+  for (let i = 0; i < 3; i++) {
+    await slide(page, 'handoff.slide')
+    if (i === 0) {
+      looker = (await page.getByTestId('reveal.name').textContent())!.trim()
+      const release = await holdCoverOpen(page, 'reveal.cover')
+      await expect(page.getByTestId('reveal.word').first()).toBeVisible()
+      await release()
+    }
+    await slide(page, 'reveal.slide-next')
+  }
+  await expect(page.getByTestId('clues.input')).toBeVisible()
+
+  // The hint no longer promises a tap the deaf players do not have.
+  await expect(page.getByTestId('clues.pill-hint')).toHaveText(
+    'Woord vergeten? Tik op je naam — enkel als je het deze ronde bekeek.',
+  )
+
+  // Whoever opened their cover is the only re-checkable name; the other two are
+  // deaf or stone this round, so their names render as inert text.
+  const openable: string[] = []
+  for (const name of ['Anna', 'Bea', 'Carl']) {
+    if ((await page.getByTestId(`clues.pill.${name}`).count()) > 0) openable.push(name)
+  }
+  expect(openable.map((n) => n.toUpperCase())).toEqual([looker])
+  await page.getByTestId(`clues.pill.${openable[0]}`).click()
+  await expect(page.getByTestId('recheck.slide')).toBeVisible()
+  await page.getByTestId('recheck.back').click()
+  await expect(page.getByTestId('clues.input')).toBeVisible()
+})

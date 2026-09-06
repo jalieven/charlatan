@@ -185,7 +185,9 @@ export function RevealScreen({ state, dispatch }: { state: GameState; dispatch: 
     <div className="flex h-full flex-col gap-3">
       <div>
         <div className="eb">{t('handoff.progress', { i: round.cursor + 1, n: round.players.length })}</div>
-        <div className="text-xl font-bold">{player.name.toUpperCase()}</div>
+        <div className="text-xl font-bold" data-testid="reveal.name">
+          {player.name.toUpperCase()}
+        </div>
       </div>
 
       <HoldCover
@@ -380,8 +382,11 @@ export function CluesScreen({ state, dispatch }: { state: GameState; dispatch: D
           )
         })}
       </div>
-      <div className="text-[10px]" style={{ color: 'var(--color-g4)' }}>
-        {t('clues.pillHint')}
+      {/* The re-check is only offered to players who actually saw a word: with the
+          Deaf & stone switch on, a deaf/stone player's name stays inert (§2.3), so the
+          hint says so instead of promising a tap that does nothing. */}
+      <div className="text-[10px]" data-testid="clues.pill-hint" style={{ color: 'var(--color-g4)' }}>
+        {t(state.settings.deafEnabled ? 'clues.pillHintDeaf' : 'clues.pillHint')}
       </div>
 
       {round.awaitingVote ? (

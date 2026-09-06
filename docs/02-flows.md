@@ -166,6 +166,7 @@ flowchart TD
 |---|---|
 | Turn banner | "NAME, your clue" — fully shuffled clue order, re-shuffled each round (diverges from the reveal order when the reshuffle setting is on) |
 | Speaking-order strip | All players; eliminated players struck through and skipped |
+| Name-strip re-check (S4c) | Tapping a name re-opens that player's word behind their PIN — a slide gate when they set none — under the same hold-to-see cover as the reveal; eliminated names are inert, and so are deaf/stone names when "Deaf & stone" is on (§2.3). The hint under the strip states the condition |
 | One-word clue input | Non-blocking warnings for multi-word and own-secret-word; a clue already given this round is refused outright — the draft clears and a notice names the refused word |
 | Ledger | Every clue this round, in order, always visible; grouped by cycle; **must scale gracefully to 5+ cycles**; a neutral record — no suspicion markers or app editorializing, mid-round or after |
 | Cycle counter | "Clue round 1 of 2", growing with tie/ejection loops |
